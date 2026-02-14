@@ -206,6 +206,48 @@
 - 测试需要 schema.sql 文件初始化 H2 数据库表结构
 提交: [待提交]
 
+---
+
+## 会话 7 - FEAT-007 完成
+日期: 2026-02-15 06:17
+处理的 Feature: FEAT-007 - ServiceItem 实体与仓库
+完成内容:
+- 创建 ServiceCategory 枚举 (GENERAL, MEDICAL, BEAUTY, CONSULTATION, EDUCATION, FITNESS, OTHER)
+  - 包含 code 和 displayName 属性
+  - 位于 org.example.appointment_system.enums 包
+- 创建 ServiceItem 实体类
+  - JPA 注解配置 (@Entity, @Table, @Column, @Enumerated)
+  - @ManyToOne 关联到 MerchantProfile
+  - 字段: id, merchant, name, description, category, duration, price, active, createdAt, updatedAt
+  - @PrePersist/@PreUpdate 生命周期回调处理时间戳
+  - 便利构造函数用于快速创建服务项
+  - 位于 org.example.appointment_system.entity 包
+- 创建 ServiceItemRepository 接口
+  - 继承 JpaRepository<ServiceItem, Long>
+  - 自定义查询方法:
+    - findByMerchant, findByMerchantId
+    - findByMerchantAndActiveTrue, findByMerchantIdAndActiveTrue
+    - findByIdAndMerchant, findByIdAndMerchantId
+    - findByCategory, findByCategoryAndActiveTrue
+    - findByMerchantAndCategoryAndActiveTrue
+    - existsByMerchantAndName, existsByMerchantIdAndName
+    - countByMerchant, countByMerchantAndActiveTrue
+    - findByMerchantAndActiveFalse
+  - 位于 org.example.appointment_system.repository 包
+- 创建 ServiceItemTest 单元测试
+  - 14 个测试用例覆盖实体行为
+  - 测试构造函数、生命周期回调、getter/setter、默认值
+- 创建 ServiceItemRepositoryTest 集成测试
+  - 28 个测试用例覆盖仓库方法
+  - 使用 @DataJpaTest 和 H2 内存数据库
+  - 测试 CRUD、按商户查询、按类别查询、存在性检查等
+- 项目编译成功，所有测试通过 (89 tests)
+- 更新 feature_list.json 标记 FEAT-007 passes=true
+问题/备注:
+- 移除 findByNameContainingIgnoreCase 方法 (H2 与 MySQL ESCAPE 字符不兼容)
+- 此功能可在后续使用自定义 @Query 实现
+提交: [待提交]
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

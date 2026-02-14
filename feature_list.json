@@ -223,7 +223,7 @@
         "src/main/java/org/example/appointment_system/enums/ServiceCategory.java",
         "src/main/java/org/example/appointment_system/repository/ServiceItemRepository.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-008",
