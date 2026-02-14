@@ -274,7 +274,7 @@
         "src/main/java/org/example/appointment_system/repository/AppointmentTaskRepository.java",
         "src/main/java/org/example/appointment_system/repository/AppointmentSlotRepository.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-010",
