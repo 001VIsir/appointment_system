@@ -1,0 +1,919 @@
+{
+  "project": "appointment_system",
+  "description": "ToC appointment platform - merchants create appointment tasks, users book via signed links",
+  "version": "2.0.0",
+  "techStack": {
+    "backend": "Spring Boot 4.0.2 + Java 21",
+    "frontend": "Vue 3 + TypeScript + Element Plus",
+    "database": "MySQL 8.0 + Flyway",
+    "cache": "Redis 7.x",
+    "messageQueue": "RabbitMQ 3.12",
+    "gateway": "Spring Cloud Gateway 4.x"
+  },
+  "phases": [
+    {
+      "id": "P0",
+      "name": "基础设施",
+      "priority": 0,
+      "description": "项目基础设施配置，包括依赖管理、数据库、缓存、安全基础配置"
+    },
+    {
+      "id": "P1",
+      "name": "核心实体与仓库",
+      "priority": 1,
+      "description": "核心实体类和数据访问层"
+    },
+    {
+      "id": "P2",
+      "name": "认证授权",
+      "priority": 2,
+      "description": "用户认证、授权、签名链接"
+    },
+    {
+      "id": "P3",
+      "name": "业务服务",
+      "priority": 3,
+      "description": "核心业务逻辑实现"
+    },
+    {
+      "id": "P4",
+      "name": "API 层",
+      "priority": 4,
+      "description": "REST API 控制器"
+    },
+    {
+      "id": "P5",
+      "name": "企业级特性",
+      "priority": 5,
+      "description": "限流、异常处理、文档、监控等企业级功能"
+    },
+    {
+      "id": "P6",
+      "name": "前端开发",
+      "priority": 6,
+      "description": "Vue 3 前端应用开发"
+    },
+    {
+      "id": "P7",
+      "name": "测试与部署",
+      "priority": 7,
+      "description": "测试和部署相关"
+    }
+  ],
+  "features": [
+    {
+      "id": "FEAT-001",
+      "phase": "P0",
+      "category": "infrastructure",
+      "priority": 1,
+      "title": "项目依赖配置与 Maven 设置",
+      "description": "配置完整的 Maven 依赖，包括 Spring Boot、JPA、Security、Redis、RabbitMQ、Flyway、OpenAPI 等",
+      "steps": [
+        "更新 pom.xml 添加所有必需依赖",
+        "配置 spring-boot-starter-data-jpa",
+        "配置 spring-boot-starter-security",
+        "配置 spring-boot-starter-data-redis",
+        "配置 spring-boot-starter-amqp",
+        "配置 spring-boot-starter-validation",
+        "配置 flyway-core 和 flyway-mysql",
+        "配置 springdoc-openapi-starter-webmvc-ui",
+        "配置 micrometer-registry-prometheus",
+        "配置 lombok",
+        "验证依赖版本兼容性"
+      ],
+      "dependencies": [],
+      "files": ["pom.xml"],
+      "passes": false
+    },
+    {
+      "id": "FEAT-002",
+      "phase": "P0",
+      "category": "infrastructure",
+      "priority": 2,
+      "title": "数据库连接与 Flyway 迁移",
+      "description": "配置 MySQL 数据库连接，创建 Flyway 迁移脚本初始化数据库表结构",
+      "steps": [
+        "配置 application.properties 数据库连接",
+        "创建 V1__Init_schema.sql 迁移脚本",
+        "定义 users 表结构",
+        "定义 merchant_profiles 表结构",
+        "定义 service_items 表结构",
+        "定义 appointment_tasks 表结构",
+        "定义 appointment_slots 表结构",
+        "定义 bookings 表结构",
+        "添加外键约束和索引",
+        "验证 Flyway 迁移执行"
+      ],
+      "dependencies": ["FEAT-001"],
+      "files": [
+        "src/main/resources/application.properties",
+        "src/main/resources/db/migration/V1__Init_schema.sql"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-003",
+      "phase": "P0",
+      "category": "infrastructure",
+      "priority": 3,
+      "title": "Redis 配置与 Session 管理",
+      "description": "配置 Redis 连接和 Spring Session，支持分布式 Session 存储",
+      "steps": [
+        "配置 Redis 连接参数",
+        "配置 spring-session-data-redis",
+        "设置 Session 序列化方式",
+        "配置 Session 超时时间",
+        "测试 Redis 连接",
+        "验证 Session 存储到 Redis"
+      ],
+      "dependencies": ["FEAT-001"],
+      "files": [
+        "src/main/resources/application.properties",
+        "src/main/java/org/example/appointment_system/config/RedisConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-004",
+      "phase": "P0",
+      "category": "security",
+      "priority": 4,
+      "title": "Spring Security 基础配置",
+      "description": "配置 Spring Security 基础设置，包括认证规则、Session 管理、CORS 配置",
+      "steps": [
+        "创建 SecurityConfig 配置类",
+        "配置 Session 认证方式",
+        "配置 CORS 策略",
+        "配置 CSRF 保护（可禁用用于 API）",
+        "配置路径权限规则",
+        "配置密码编码器 BCrypt",
+        "测试基础安全配置"
+      ],
+      "dependencies": ["FEAT-001", "FEAT-003"],
+      "files": [
+        "src/main/java/org/example/appointment_system/config/SecurityConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-005",
+      "phase": "P1",
+      "category": "entity",
+      "priority": 5,
+      "title": "User 实体与 UserRepository",
+      "description": "创建用户实体和数据访问层",
+      "steps": [
+        "创建 UserRole 枚举（ADMIN, MERCHANT, USER）",
+        "创建 User 实体类",
+        "配置 JPA 注解（@Entity, @Table, @Column）",
+        "添加 id, username, password, email, role, createdAt, updatedAt 字段",
+        "创建 UserRepository 接口",
+        "添加自定义查询方法（findByUsername, findByEmail）",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-002"],
+      "files": [
+        "src/main/java/org/example/appointment_system/entity/User.java",
+        "src/main/java/org/example/appointment_system/enums/UserRole.java",
+        "src/main/java/org/example/appointment_system/repository/UserRepository.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-006",
+      "phase": "P1",
+      "category": "entity",
+      "priority": 6,
+      "title": "MerchantProfile 实体与仓库",
+      "description": "创建商户档案实体和数据访问层",
+      "steps": [
+        "创建 MerchantProfile 实体类",
+        "关联 User 实体（@ManyToOne）",
+        "添加 businessName, description, phone, address, settings 字段",
+        "创建 MerchantProfileRepository 接口",
+        "添加按 userId 查询方法",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-005"],
+      "files": [
+        "src/main/java/org/example/appointment_system/entity/MerchantProfile.java",
+        "src/main/java/org/example/appointment_system/repository/MerchantProfileRepository.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-007",
+      "phase": "P1",
+      "category": "entity",
+      "priority": 7,
+      "title": "ServiceItem 实体与仓库",
+      "description": "创建服务项目实体和数据访问层",
+      "steps": [
+        "创建 ServiceCategory 枚举",
+        "创建 ServiceItem 实体类",
+        "关联 MerchantProfile",
+        "添加 name, description, category, duration, price, active 字段",
+        "创建 ServiceItemRepository 接口",
+        "添加按 merchantId 查询方法",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-006"],
+      "files": [
+        "src/main/java/org/example/appointment_system/entity/ServiceItem.java",
+        "src/main/java/org/example/appointment_system/enums/ServiceCategory.java",
+        "src/main/java/org/example/appointment_system/repository/ServiceItemRepository.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-008",
+      "phase": "P1",
+      "category": "entity",
+      "priority": 8,
+      "title": "Booking 实体与仓库",
+      "description": "创建预约实体和数据访问层",
+      "steps": [
+        "创建 BookingStatus 枚举（PENDING, CONFIRMED, CANCELLED, COMPLETED）",
+        "创建 Booking 实体类",
+        "关联 User 和 AppointmentSlot",
+        "添加 status, remark, createdAt, updatedAt 字段",
+        "添加 @Version 实现乐观锁",
+        "创建 BookingRepository 接口",
+        "添加按 userId 和 status 查询方法",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-005", "FEAT-009"],
+      "files": [
+        "src/main/java/org/example/appointment_system/entity/Booking.java",
+        "src/main/java/org/example/appointment_system/enums/BookingStatus.java",
+        "src/main/java/org/example/appointment_system/repository/BookingRepository.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-009",
+      "phase": "P1",
+      "category": "entity",
+      "priority": 9,
+      "title": "AppointmentTask/Slot 实体",
+      "description": "创建预约任务和时段实体",
+      "steps": [
+        "创建 AppointmentTask 实体类",
+        "关联 ServiceItem",
+        "添加 title, description, date, totalCapacity, active 字段",
+        "创建 AppointmentSlot 实体类",
+        "关联 AppointmentTask",
+        "添加 startTime, endTime, capacity, bookedCount 字段",
+        "创建对应的 Repository 接口",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-007"],
+      "files": [
+        "src/main/java/org/example/appointment_system/entity/AppointmentTask.java",
+        "src/main/java/org/example/appointment_system/entity/AppointmentSlot.java",
+        "src/main/java/org/example/appointment_system/repository/AppointmentTaskRepository.java",
+        "src/main/java/org/example/appointment_system/repository/AppointmentSlotRepository.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-010",
+      "phase": "P2",
+      "category": "auth",
+      "priority": 10,
+      "title": "用户注册服务",
+      "description": "实现用户注册功能",
+      "steps": [
+        "创建 RegisterRequest DTO",
+        "创建 AuthService.register 方法",
+        "验证用户名和邮箱唯一性",
+        "使用 BCrypt 加密密码",
+        "保存用户到数据库",
+        "创建对应 Controller 端点",
+        "编写单元测试和集成测试"
+      ],
+      "dependencies": ["FEAT-005"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/AuthService.java",
+        "src/main/java/org/example/appointment_system/dto/request/RegisterRequest.java",
+        "src/main/java/org/example/appointment_system/controller/AuthController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-011",
+      "phase": "P2",
+      "category": "auth",
+      "priority": 11,
+      "title": "用户登录与 Session 管理",
+      "description": "实现用户登录和 Session 管理",
+      "steps": [
+        "创建 LoginRequest DTO",
+        "实现 AuthService.login 方法",
+        "验证用户名密码",
+        "创建 Session 并存储到 Redis",
+        "支持商户自定义 Session 超时",
+        "实现 logout 功能",
+        "实现获取当前用户信息",
+        "编写测试"
+      ],
+      "dependencies": ["FEAT-003", "FEAT-004", "FEAT-010"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/AuthService.java",
+        "src/main/java/org/example/appointment_system/dto/request/LoginRequest.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-012",
+      "phase": "P2",
+      "category": "auth",
+      "priority": 12,
+      "title": "角色权限控制 (RBAC)",
+      "description": "实现基于角色的访问控制",
+      "steps": [
+        "创建自定义 UserDetailsService 实现",
+        "创建自定义 UserDetails 实现",
+        "配置 SecurityFilterChain 角色规则",
+        "实现 @PreAuthorize 注解支持",
+        "创建角色检查工具类",
+        "编写安全测试"
+      ],
+      "dependencies": ["FEAT-004", "FEAT-005"],
+      "files": [
+        "src/main/java/org/example/appointment_system/security/CustomUserDetailsService.java",
+        "src/main/java/org/example/appointment_system/security/CustomUserDetails.java",
+        "src/main/java/org/example/appointment_system/config/SecurityConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-013",
+      "phase": "P2",
+      "category": "auth",
+      "priority": 13,
+      "title": "签名链接生成与验证",
+      "description": "实现 HMAC 签名链接用于外部访问",
+      "steps": [
+        "创建 SignedLinkService",
+        "实现 HMAC-SHA256 签名生成",
+        "生成格式: /book/{taskId}?token={signature}&exp={expiry}",
+        "实现签名验证逻辑",
+        "实现链接过期检查",
+        "创建签名链接生成 API",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-004"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/SignedLinkService.java",
+        "src/main/java/org/example/appointment_system/util/SignedLinkUtils.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-014",
+      "phase": "P3",
+      "category": "service",
+      "priority": 14,
+      "title": "商户服务 CRUD",
+      "description": "实现商户档案管理服务",
+      "steps": [
+        "创建 MerchantService",
+        "实现创建商户档案",
+        "实现更新商户档案",
+        "实现查询商户档案",
+        "实现商户设置管理",
+        "添加权限校验（仅 MERCHANT 角色）",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-006", "FEAT-012"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/MerchantService.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-015",
+      "phase": "P3",
+      "category": "service",
+      "priority": 15,
+      "title": "服务项 CRUD",
+      "description": "实现服务项目管理服务",
+      "steps": [
+        "创建 ServiceItemService",
+        "实现创建服务项",
+        "实现更新服务项",
+        "实现删除服务项（软删除）",
+        "实现查询商户的服务项列表",
+        "添加参数校验",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-007", "FEAT-014"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/ServiceItemService.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-016",
+      "phase": "P3",
+      "category": "service",
+      "priority": 16,
+      "title": "预约服务（乐观锁）",
+      "description": "实现预约服务，使用乐观锁控制并发",
+      "steps": [
+        "创建 BookingService",
+        "实现查询可用时段",
+        "实现创建预约（乐观锁）",
+        "实现取消预约",
+        "实现查询用户预约列表",
+        "实现查询商户预约列表",
+        "添加容量检查",
+        "防止重复预约",
+        "编写并发测试"
+      ],
+      "dependencies": ["FEAT-008", "FEAT-009"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/BookingService.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-017",
+      "phase": "P3",
+      "category": "service",
+      "priority": 17,
+      "title": "统计服务",
+      "description": "实现统计和指标服务",
+      "steps": [
+        "创建 StatisticsService",
+        "实现预约统计（按日期、商户）",
+        "实现用户统计",
+        "实现调用量统计",
+        "实现错误率统计",
+        "实现响应时间统计",
+        "编写单元测试"
+      ],
+      "dependencies": ["FEAT-008", "FEAT-016"],
+      "files": [
+        "src/main/java/org/example/appointment_system/service/StatisticsService.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-018",
+      "phase": "P4",
+      "category": "api",
+      "priority": 18,
+      "title": "Auth Controller",
+      "description": "实现认证相关 REST API",
+      "steps": [
+        "创建 AuthController",
+        "POST /api/auth/register - 用户注册",
+        "POST /api/auth/login - 用户登录",
+        "POST /api/auth/logout - 用户登出",
+        "GET /api/auth/me - 获取当前用户",
+        "添加 @Operation OpenAPI 注解",
+        "添加参数校验",
+        "编写 API 集成测试"
+      ],
+      "dependencies": ["FEAT-010", "FEAT-011"],
+      "files": [
+        "src/main/java/org/example/appointment_system/controller/AuthController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-019",
+      "phase": "P4",
+      "category": "api",
+      "priority": 19,
+      "title": "Merchant Controller",
+      "description": "实现商户管理 REST API",
+      "steps": [
+        "创建 MerchantController",
+        "GET /api/merchants/profile - 获取商户档案",
+        "PUT /api/merchants/profile - 更新商户档案",
+        "GET /api/merchants/settings - 获取商户设置",
+        "PUT /api/merchants/settings - 更新商户设置",
+        "添加角色权限控制",
+        "添加 OpenAPI 注解",
+        "编写集成测试"
+      ],
+      "dependencies": ["FEAT-014"],
+      "files": [
+        "src/main/java/org/example/appointment_system/controller/MerchantController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-020",
+      "phase": "P4",
+      "category": "api",
+      "priority": 20,
+      "title": "Service Controller",
+      "description": "实现服务项管理 REST API",
+      "steps": [
+        "创建 ServiceItemController",
+        "POST /api/merchants/services - 创建服务项",
+        "GET /api/merchants/services - 获取服务项列表",
+        "GET /api/merchants/services/{id} - 获取服务项详情",
+        "PUT /api/merchants/services/{id} - 更新服务项",
+        "DELETE /api/merchants/services/{id} - 删除服务项",
+        "添加权限和校验",
+        "编写集成测试"
+      ],
+      "dependencies": ["FEAT-015"],
+      "files": [
+        "src/main/java/org/example/appointment_system/controller/ServiceItemController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-021",
+      "phase": "P4",
+      "category": "api",
+      "priority": 21,
+      "title": "Booking Controller",
+      "description": "实现预约 REST API",
+      "steps": [
+        "创建 BookingController",
+        "POST /api/bookings - 创建预约",
+        "GET /api/bookings/my - 获取我的预约",
+        "GET /api/bookings/{id} - 获取预约详情",
+        "DELETE /api/bookings/{id} - 取消预约",
+        "GET /api/merchants/bookings - 商户查看预约",
+        "PUT /api/merchants/bookings/{id}/status - 更新预约状态",
+        "添加权限控制",
+        "编写集成测试"
+      ],
+      "dependencies": ["FEAT-016"],
+      "files": [
+        "src/main/java/org/example/appointment_system/controller/BookingController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-022",
+      "phase": "P4",
+      "category": "api",
+      "priority": 22,
+      "title": "Task Controller",
+      "description": "实现预约任务 REST API",
+      "steps": [
+        "创建 AppointmentTaskController",
+        "POST /api/merchants/tasks - 创建预约任务",
+        "GET /api/merchants/tasks - 获取任务列表",
+        "GET /api/tasks/{id} - 获取任务详情（公开）",
+        "GET /api/tasks/{id}/slots - 获取可用时段（公开）",
+        "PUT /api/merchants/tasks/{id} - 更新任务",
+        "DELETE /api/merchants/tasks/{id} - 删除任务",
+        "POST /api/merchants/tasks/{id}/slots - 创建时段",
+        "编写集成测试"
+      ],
+      "dependencies": ["FEAT-009"],
+      "files": [
+        "src/main/java/org/example/appointment_system/controller/AppointmentTaskController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-023",
+      "phase": "P4",
+      "category": "api",
+      "priority": 23,
+      "title": "Stats Controller",
+      "description": "实现统计 REST API",
+      "steps": [
+        "创建 AdminController（或 StatsController）",
+        "GET /api/admin/metrics - 获取系统指标",
+        "GET /api/admin/stats - 获取统计数据",
+        "GET /api/merchants/stats - 商户统计数据",
+        "添加 ADMIN 角色权限",
+        "添加 OpenAPI 注解",
+        "编写集成测试"
+      ],
+      "dependencies": ["FEAT-017"],
+      "files": [
+        "src/main/java/org/example/appointment_system/controller/AdminController.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-024",
+      "phase": "P5",
+      "category": "enterprise",
+      "priority": 24,
+      "title": "限流过滤器",
+      "description": "实现基于 Redis 的滑动时间窗限流",
+      "steps": [
+        "创建 RateLimitFilter",
+        "实现滑动时间窗算法",
+        "使用 Redis 计数器",
+        "返回 429 状态码",
+        "添加 X-RateLimit-* 响应头",
+        "配置不同端点的限流规则",
+        "编写限流测试"
+      ],
+      "dependencies": ["FEAT-003"],
+      "files": [
+        "src/main/java/org/example/appointment_system/filter/RateLimitFilter.java",
+        "src/main/java/org/example/appointment_system/service/RateLimitService.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-025",
+      "phase": "P5",
+      "category": "enterprise",
+      "priority": 25,
+      "title": "全局异常处理",
+      "description": "实现统一的异常处理机制",
+      "steps": [
+        "创建 BusinessException 自定义异常",
+        "创建 ErrorCode 枚举",
+        "创建 GlobalExceptionHandler",
+        "处理业务异常",
+        "处理验证异常",
+        "处理安全异常",
+        "统一错误响应格式",
+        "添加错误日志"
+      ],
+      "dependencies": [],
+      "files": [
+        "src/main/java/org/example/appointment_system/exception/BusinessException.java",
+        "src/main/java/org/example/appointment_system/exception/ErrorCode.java",
+        "src/main/java/org/example/appointment_system/exception/GlobalExceptionHandler.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-026",
+      "phase": "P5",
+      "category": "enterprise",
+      "priority": 26,
+      "title": "OpenAPI 文档",
+      "description": "配置 Swagger/OpenAPI 文档",
+      "steps": [
+        "创建 OpenApiConfig 配置类",
+        "配置 API 标题和描述",
+        "配置认证方式（Session）",
+        "为所有 Controller 添加 @Tag 注解",
+        "为所有端点添加 @Operation 注解",
+        "配置分组（公开 API、商户 API、管理 API）",
+        "验证 Swagger UI 访问"
+      ],
+      "dependencies": ["FEAT-001"],
+      "files": [
+        "src/main/java/org/example/appointment_system/config/OpenApiConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-027",
+      "phase": "P5",
+      "category": "enterprise",
+      "priority": 27,
+      "title": "Prometheus 指标",
+      "description": "配置 Micrometer 和 Prometheus 指标采集",
+      "steps": [
+        "配置 management.endpoints.web.exposure.include",
+        "启用 prometheus 端点",
+        "添加自定义指标（预约量、成功率）",
+        "配置指标标签",
+        "测试 /actuator/prometheus 端点",
+        "创建 Grafana 仪表板配置（可选）"
+      ],
+      "dependencies": ["FEAT-001"],
+      "files": [
+        "src/main/resources/application.properties",
+        "src/main/java/org/example/appointment_system/config/MetricsConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-028",
+      "phase": "P5",
+      "category": "enterprise",
+      "priority": 28,
+      "title": "日志配置",
+      "description": "配置结构化日志和链路追踪",
+      "steps": [
+        "创建 logback-spring.xml 配置",
+        "配置 JSON 格式日志",
+        "添加 TraceId 和 SpanId",
+        "配置日志级别",
+        "配置日志文件滚动",
+        "添加请求日志过滤器",
+        "添加业务日志"
+      ],
+      "dependencies": [],
+      "files": [
+        "src/main/resources/logback-spring.xml",
+        "src/main/java/org/example/appointment_system/filter/RequestLoggingFilter.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-029",
+      "phase": "P6",
+      "category": "frontend",
+      "priority": 29,
+      "title": "Vue 项目初始化",
+      "description": "初始化 Vue 3 + TypeScript + Vite 前端项目",
+      "steps": [
+        "使用 Vite 创建 Vue 3 项目",
+        "安装 TypeScript",
+        "安装 Element Plus",
+        "安装 Vue Router",
+        "安装 Pinia",
+        "安装 Axios",
+        "配置 vite.config.ts",
+        "配置 tsconfig.json",
+        "配置 ESLint 和 Prettier",
+        "创建项目目录结构"
+      ],
+      "dependencies": [],
+      "files": [
+        "frontend/package.json",
+        "frontend/vite.config.ts",
+        "frontend/tsconfig.json"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-030",
+      "phase": "P6",
+      "category": "frontend",
+      "priority": 30,
+      "title": "登录/注册页面",
+      "description": "实现用户登录和注册页面",
+      "steps": [
+        "创建 Auth Store (Pinia)",
+        "创建登录页面 LoginView.vue",
+        "创建注册页面 RegisterView.vue",
+        "创建表单验证",
+        "集成登录/注册 API",
+        "处理登录状态",
+        "实现路由守卫",
+        "添加错误提示"
+      ],
+      "dependencies": ["FEAT-029", "FEAT-018"],
+      "files": [
+        "frontend/src/views/auth/LoginView.vue",
+        "frontend/src/views/auth/RegisterView.vue",
+        "frontend/src/stores/auth.ts",
+        "frontend/src/api/auth.ts"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-031",
+      "phase": "P6",
+      "category": "frontend",
+      "priority": 31,
+      "title": "商户管理页面",
+      "description": "实现商户管理相关页面",
+      "steps": [
+        "创建商户布局组件",
+        "创建商户仪表板页面",
+        "创建服务项管理页面",
+        "创建预约任务管理页面",
+        "创建预约列表页面",
+        "实现 CRUD 操作",
+        "添加表单验证",
+        "添加权限控制"
+      ],
+      "dependencies": ["FEAT-030", "FEAT-019", "FEAT-020", "FEAT-022"],
+      "files": [
+        "frontend/src/layouts/MerchantLayout.vue",
+        "frontend/src/views/merchant/DashboardView.vue",
+        "frontend/src/views/merchant/ServicesView.vue",
+        "frontend/src/views/merchant/TasksView.vue",
+        "frontend/src/views/merchant/BookingsView.vue"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-032",
+      "phase": "P6",
+      "category": "frontend",
+      "priority": 32,
+      "title": "用户预约页面",
+      "description": "实现用户端预约页面",
+      "steps": [
+        "创建预约页面 BookingView.vue",
+        "实现日期选择器",
+        "实现时段选择器",
+        "实现预约表单",
+        "创建我的预约页面",
+        "实现取消预约功能",
+        "支持签名链接访问",
+        "添加预约成功/失败提示"
+      ],
+      "dependencies": ["FEAT-030", "FEAT-021", "FEAT-022"],
+      "files": [
+        "frontend/src/views/user/BookingView.vue",
+        "frontend/src/views/user/MyBookingsView.vue",
+        "frontend/src/components/business/TimeSlotPicker.vue"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-033",
+      "phase": "P7",
+      "category": "testing",
+      "priority": 33,
+      "title": "单元测试",
+      "description": "编写完整的单元测试",
+      "steps": [
+        "配置 JUnit 5",
+        "配置 Mockito",
+        "编写 Service 层单元测试",
+        "编写 Repository 层单元测试",
+        "编写工具类单元测试",
+        "覆盖核心业务逻辑",
+        "目标覆盖率 > 80%"
+      ],
+      "dependencies": ["FEAT-017"],
+      "files": [
+        "src/test/java/org/example/appointment_system/service/**",
+        "src/test/java/org/example/appointment_system/repository/**"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-034",
+      "phase": "P7",
+      "category": "testing",
+      "priority": 34,
+      "title": "集成测试",
+      "description": "编写 API 集成测试",
+      "steps": [
+        "配置 Testcontainers (MySQL, Redis)",
+        "使用 @SpringBootTest",
+        "使用 MockMvc 测试 API",
+        "测试认证流程",
+        "测试权限控制",
+        "测试业务流程（注册→登录→预约→取消）",
+        "测试并发预约场景"
+      ],
+      "dependencies": ["FEAT-023", "FEAT-033"],
+      "files": [
+        "src/test/java/org/example/appointment_system/controller/**",
+        "src/test/java/org/example/appointment_system/integration/**"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-035",
+      "phase": "P7",
+      "category": "deployment",
+      "priority": 35,
+      "title": "Docker 部署",
+      "description": "配置 Docker 部署",
+      "steps": [
+        "创建后端 Dockerfile",
+        "创建前端 Dockerfile",
+        "创建 docker-compose.yml",
+        "创建 .env.example",
+        "配置健康检查",
+        "配置网络",
+        "配置数据卷",
+        "编写部署文档"
+      ],
+      "dependencies": [],
+      "files": [
+        "Dockerfile",
+        "docker-compose.yml",
+        ".env.example",
+        "frontend/Dockerfile"
+      ],
+      "passes": false
+    },
+    {
+      "id": "FEAT-036",
+      "phase": "P7",
+      "category": "testing",
+      "priority": 36,
+      "title": "压力测试",
+      "description": "进行系统压力测试和性能优化",
+      "steps": [
+        "创建 JMeter 测试计划",
+        "测试用户注册场景",
+        "测试用户登录场景",
+        "测试查询任务场景",
+        "测试创建预约场景",
+        "测试并发预约场景",
+        "分析性能瓶颈",
+        "生成压测报告"
+      ],
+      "dependencies": ["FEAT-034", "FEAT-035"],
+      "files": [
+        "load-test/*.jmx",
+        "load-test/README.md"
+      ],
+      "passes": false
+    }
+  ]
+}
