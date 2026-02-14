@@ -171,6 +171,41 @@
 - Repository 集成测试需要进一步配置，暂时使用单元测试验证实体
 提交: [待提交]
 
+---
+
+## 会话 6 - FEAT-006 完成
+日期: 2026-02-15 05:21
+处理的 Feature: FEAT-006 - MerchantProfile 实体与仓库
+完成内容:
+- 创建 MerchantProfile 实体类
+  - JPA 注解配置 (@Entity, @Table, @Column)
+  - @ManyToOne 关联到 User 实体
+  - 字段: id, user, businessName, description, phone, address, settings (JSON)
+  - @PrePersist/@PreUpdate 生命周期回调处理时间戳
+  - 便利构造函数用于快速创建档案
+  - 位于 org.example.appointment_system.entity 包
+- 创建 MerchantProfileRepository 接口
+  - 继承 JpaRepository<MerchantProfile, Long>
+  - 自定义查询方法:
+    - findByUserId, findByUser
+    - existsByUserId, existsByUser
+    - findByBusinessName, existsByBusinessName
+  - 位于 org.example.appointment_system.repository 包
+- 创建 MerchantProfileTest 单元测试
+  - 12 个测试用例覆盖实体行为
+  - 测试构造函数、生命周期回调、getter/setter
+- 修复 UserRepositoryTest 的 Spring Boot 4 导入问题
+  - @DataJpaTest: org.springframework.boot.data.jpa.test.autoconfigure
+  - TestEntityManager: org.springframework.boot.jpa.test.autoconfigure
+- 创建 schema.sql 用于测试数据库初始化
+- 更新 application-test.properties 配置
+- 项目编译成功，所有测试通过 (47 tests)
+- 更新 feature_list.json 标记 FEAT-006 passes=true
+问题/备注:
+- Spring Boot 4 中 @DataJpaTest 和 TestEntityManager 移至新包
+- 测试需要 schema.sql 文件初始化 H2 数据库表结构
+提交: [待提交]
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

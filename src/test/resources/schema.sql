@@ -1,0 +1,78 @@
+-- Test schema for H2 in-memory database
+-- This file is automatically picked up by Spring Boot for schema initialization
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS merchant_profiles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE,
+    business_name VARCHAR(100) NOT NULL,
+    description CLOB,
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    settings CLOB,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_merchant_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS service_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    merchant_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description CLOB,
+    category VARCHAR(50) NOT NULL DEFAULT 'GENERAL',
+    duration INT NOT NULL DEFAULT 30,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_service_merchant FOREIGN KEY (merchant_id) REFERENCES merchant_profiles(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS appointment_tasks (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    service_id BIGINT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    description CLOB,
+    task_date DATE NOT NULL,
+    total_capacity INT NOT NULL DEFAULT 1,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_task_service FOREIGN KEY (service_id) REFERENCES service_items(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS appointment_slots (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task_id BIGINT NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    capacity INT NOT NULL DEFAULT 1,
+    booked_count INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_slot_task FOREIGN KEY (task_id) REFERENCES appointment_tasks(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS bookings (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    slot_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    remark CLOB,
+    version INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_booking_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_booking_slot FOREIGN KEY (slot_id) REFERENCES appointment_slots(id) ON DELETE CASCADE
+);

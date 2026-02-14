@@ -199,7 +199,7 @@
         "src/main/java/org/example/appointment_system/entity/MerchantProfile.java",
         "src/main/java/org/example/appointment_system/repository/MerchantProfileRepository.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-007",
