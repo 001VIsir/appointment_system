@@ -359,6 +359,44 @@
 - H2数据库不支持JPQL生成的别名删除语法
 提交: [待提交]
 
+---
+
+## 会话 10 - FEAT-010 完成
+日期: 2026-02-15 06:52
+处理的 Feature: FEAT-010 - 用户注册服务
+完成内容:
+- 创建 RegisterRequest DTO
+  - 包含验证规则: @NotBlank, @Size, @Pattern, @Email
+  - 用户名: 3-50字符，仅支持字母、数字、下划线
+  - 密码: 6-100字符
+  - 邮箱: 有效邮箱格式
+  - 角色: 可选，默认 USER
+- 创建 UserResponse DTO
+  - 安全返回用户信息（不包含密码）
+  - 使用 @Builder 模式
+- 创建 AuthService 服务类
+  - register() 方法实现注册逻辑
+  - 用户名唯一性验证
+  - 邮箱唯一性验证
+  - BCrypt 密码加密
+  - 角色分配（默认 USER）
+  - isUsernameAvailable() / isEmailAvailable() 辅助方法
+- 创建 AuthController REST API
+  - POST /api/auth/register - 用户注册（公开端点）
+  - GET /api/auth/check-username - 检查用户名可用性
+  - GET /api/auth/check-email - 检查邮箱可用性
+  - 添加 OpenAPI @Operation 注解文档
+- 编写单元测试
+  - AuthServiceTest: 9 个测试用例
+  - AuthControllerTest: 5 个测试用例（使用 MockMvc）
+- 项目编译成功，所有测试通过 (282 tests)
+- 更新 feature_list.json 标记 FEAT-010 passes=true
+问题/备注:
+- Spring Boot 4 中 @WebMvcTest 包路径已变更
+- 使用 MockMvcBuilders.standaloneSetup() 替代 @WebMvcTest
+- 异常处理测试将在 FEAT-025 (全局异常处理) 完成后补充
+提交: fb80fae
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

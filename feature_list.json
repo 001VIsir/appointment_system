@@ -298,7 +298,7 @@
         "src/main/java/org/example/appointment_system/dto/request/RegisterRequest.java",
         "src/main/java/org/example/appointment_system/controller/AuthController.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-011",
