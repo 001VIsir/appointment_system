@@ -248,7 +248,7 @@
         "src/main/java/org/example/appointment_system/enums/BookingStatus.java",
         "src/main/java/org/example/appointment_system/repository/BookingRepository.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-009",

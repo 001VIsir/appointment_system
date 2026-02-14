@@ -305,6 +305,60 @@
 - 无问题，编译和测试全部通过
 提交: [待提交]
 
+---
+
+## 会话 9 - FEAT-008 完成
+日期: 2026-02-15 06:45
+处理的 Feature: FEAT-008 - Booking 实体与仓库
+完成内容:
+- 创建 BookingStatus 枚举 (PENDING, CONFIRMED, CANCELLED, COMPLETED)
+  - 包含 code 和 displayName 属性
+  - 包含状态转换验证方法: canCancel(), canConfirm(), canComplete()
+  - 包含状态检查方法: isActive(), isFinal()
+  - 位于 org.example.appointment_system.enums 包
+- 创建 Booking 实体类
+  - JPA 注解配置 (@Entity, @Table, @Column, @Index)
+  - @ManyToOne 关联到 User 和 AppointmentSlot
+  - 字段: id, user, slot, status, remark, version, createdAt, updatedAt
+  - @Version 实现乐观锁用于并发控制
+  - 唯一约束: uk_user_slot (user_id, slot_id) 防止重复预约
+  - @PrePersist/@PreUpdate 生命周期回调处理时间戳
+  - 便利方法: confirm(), cancel(), complete(), isActive(), canCancel()
+  - 位于 org.example.appointment_system.entity 包
+- 创建 BookingRepository 接口
+  - 继承 JpaRepository<Booking, Long>
+  - 自定义查询方法:
+    - findByUser, findByUserId (支持分页)
+    - findByUserAndStatus, findByUserIdAndStatus
+    - findBySlot, findBySlotId
+    - findByUserAndSlot, findByUserIdAndSlotId
+    - existsByUserIdAndSlotId, existsActiveBookingByUserIdAndSlotId
+    - findByStatus, findByStatusIn
+    - findByTaskId, findByMerchantId
+    - countByUserId, countBySlotId, countByTaskId, countByMerchantId
+    - countActiveBySlotId, countActiveByTaskId
+    - findByCreatedAtBetween, findByUserIdAndCreatedAtBetween
+    - deleteByUserId, deleteBySlotId (使用原生SQL)
+  - 位于 org.example.appointment_system.repository 包
+- 创建 BookingTest 单元测试
+  - 30 个测试用例覆盖实体行为
+  - 测试构造函数、生命周期回调、getter/setter
+  - 测试状态转换: PENDING -> CONFIRMED -> COMPLETED
+  - 测试状态转换失败场景
+- 创建 BookingRepositoryTest 集成测试
+  - 64 个测试用例覆盖仓库方法
+  - 使用 @DataJpaTest 和 H2 内存数据库
+  - 测试 CRUD、按用户查询、按时段查询、按状态查询
+  - 测试唯一约束、乐观锁版本递增
+  - 测试按商户查询（通过关联链）
+- 更新 schema.sql 添加唯一约束
+- 项目编译成功，所有测试通过 (268 tests)
+- 更新 feature_list.json 标记 FEAT-008 passes=true
+问题/备注:
+- 删除方法使用原生SQL以兼容H2数据库
+- H2数据库不支持JPQL生成的别名删除语法
+提交: [待提交]
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
