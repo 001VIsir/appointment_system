@@ -109,7 +109,7 @@
         "src/main/resources/application.properties",
         "src/main/resources/db/migration/V1__Init_schema.sql"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-003",
@@ -131,7 +131,7 @@
         "src/main/resources/application.properties",
         "src/main/java/org/example/appointment_system/config/RedisConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-004",

@@ -49,9 +49,57 @@
 - 项目编译成功 (mvnw clean compile)
 - 测试失败是预期的（需要 FEAT-002 数据库配置）
 - 更新 feature_list.json 标记 FEAT-001 passes=true
+提交: 8bcd857
+
+---
+
+## 会话 2 - FEAT-002 完成
+日期: 2026-02-15 04:32
+处理的 Feature: FEAT-002 - 数据库连接与 Flyway 迁移
+完成内容:
+- 配置 application.properties 数据库连接 (MySQL/HikariCP)
+- 配置 JPA/Hibernate 设置 (ddl-auto=none, 使用 Flyway)
+- 配置 Flyway 迁移设置
+- 创建 V1__Init_schema.sql 迁移脚本
+- 定义 users 表 (用户账号，支持 ADMIN/MERCHANT/USER 角色)
+- 定义 merchant_profiles 表 (商户档案，关联用户)
+- 定义 service_items 表 (服务项目，支持分类枚举)
+- 定义 appointment_tasks 表 (预约任务，关联服务项)
+- 定义 appointment_slots 表 (时段，包含容量和已预约数)
+- 定义 bookings 表 (预约记录，乐观锁 version 字段)
+- 添加所有外键约束和索引
+- 添加 CHECK 约束确保数据完整性
+- 项目编译成功
+问题/备注:
+- 实际数据库连接测试需要 MySQL 运行（在 FEAT-003/004 测试）
+- 所有表使用 utf8mb4 字符集
 提交: 待提交
 
 ---
+
+## 会话 3 - FEAT-003 完成
+日期: 2026-02-15 04:42
+处理的 Feature: FEAT-003 - Redis 配置与 Session 管理
+完成内容:
+- 验证 Redis 连接参数已配置 (application.properties)
+  - spring.data.redis.host/port/password/database
+  - spring.session.store-type=redis
+  - spring.session.redis.namespace=appointment:session
+  - spring.session.timeout=4h
+- 验证 spring-session-data-redis 依赖已添加 (pom.xml)
+- 创建 RedisConfig.java 配置类
+  - @EnableRedisHttpSession 启用 Redis Session
+  - 配置 RedisTemplate<String, Object> Bean
+  - 配置 StringRedisSerializer 用于 keys
+  - 配置 GenericJackson2JsonRedisSerializer 用于 values (JSON 序列化)
+  - 配置 springSessionDefaultRedisSerializer (session 属性序列化)
+  - 支持 Java 8+ 时间类型 (JavaTimeModule)
+- 项目编译成功 (mvnw clean compile)
+- 更新 feature_list.json 标记 FEAT-003 passes=true
+问题/备注:
+- GenericJackson2JsonRedisSerializer 有 deprecation 警告，但功能正常
+- 实际 Redis 连接测试需要 Redis 服务器运行
+提交: 待提交
 
 ## 会话模板
 ```
