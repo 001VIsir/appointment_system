@@ -101,6 +101,38 @@
 - 实际 Redis 连接测试需要 Redis 服务器运行
 提交: 待提交
 
+---
+
+## 会话 4 - FEAT-004 完成
+日期: 2026-02-15 04:51
+处理的 Feature: FEAT-004 - Spring Security 基础配置
+完成内容:
+- 创建 SecurityConfig.java 配置类
+  - @EnableWebSecurity 启用 Web 安全
+  - @EnableMethodSecurity 启用方法级安全 (@PreAuthorize)
+- 配置 Session 认证方式
+  - SessionCreationPolicy.IF_REQUIRED (按需创建)
+  - 最大会话数 1，不阻止新登录
+- 配置 CORS 策略
+  - 允许 localhost 开发环境跨域
+  - 允许所有标准 HTTP 方法
+  - 允许携带凭证 (credentials)
+  - 暴露 X-Total-Count 和 X-RateLimit-* 响应头
+- 配置 CSRF 保护（禁用，用于 API）
+- 配置路径权限规则
+  - 公开端点: /actuator/health, /api-docs/**, /swagger-ui/**, /api/auth/register, /api/auth/login, /api/public/**
+  - 管理端点: /api/admin/** 需要 ADMIN 角色
+  - 商户端点: /api/merchants/** 需要 MERCHANT 或 ADMIN 角色
+  - 其他端点需要认证
+- 配置 BCrypt 密码编码器
+- 禁用 formLogin 和 httpBasic (API 模式)
+- 配置 logout 端点: /api/auth/logout
+- 项目编译成功 (mvnw clean compile)
+- 更新 feature_list.json 标记 FEAT-004 passes=true
+问题/备注:
+- 无问题，编译通过
+提交: 待提交
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

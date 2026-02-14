@@ -153,7 +153,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/config/SecurityConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-005",
