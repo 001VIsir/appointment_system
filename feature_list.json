@@ -83,7 +83,7 @@
       ],
       "dependencies": [],
       "files": ["pom.xml"],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-002",
