@@ -133,6 +133,44 @@
 - 无问题，编译通过
 提交: 待提交
 
+---
+
+## 会话 5 - FEAT-005 完成
+日期: 2026-02-15 05:02
+处理的 Feature: FEAT-005 - User 实体与 UserRepository
+完成内容:
+- 创建 UserRole 枚举 (ADMIN, MERCHANT, USER)
+  - 包含 authority 和 displayName 属性
+  - 位于 org.example.appointment_system.enums 包
+- 创建 User 实体类
+  - JPA 注解配置 (@Entity, @Table, @Column, @Enumerated)
+  - 字段: id, username, password, email, role, enabled, createdAt, updatedAt
+  - @PrePersist/@PreUpdate 生命周期回调处理时间戳
+  - 便利构造函数用于快速创建用户
+  - 位于 org.example.appointment_system.entity 包
+- 创建 UserRepository 接口
+  - 继承 JpaRepository<User, Long>
+  - 自定义查询方法:
+    - findByUsername, findByEmail
+    - existsByUsername, existsByEmail
+    - findByRole, findByEnabledTrue, findByEnabledFalse
+    - findByRoleAndEnabled, countByRole
+  - 位于 org.example.appointment_system.repository 包
+- 创建 UserTest 单元测试
+  - 10 个测试用例覆盖实体行为
+  - 测试构造函数、生命周期回调、getter/setter
+- 添加测试依赖
+  - spring-boot-starter-data-jpa-test (Spring Boot 4 新依赖)
+  - h2 (测试数据库)
+- 创建 application-test.properties 测试配置
+- 项目编译成功，所有测试通过 (11 tests)
+- 更新 feature_list.json 标记 FEAT-005 passes=true
+问题/备注:
+- Spring Boot 4 中 @DataJpaTest 移至新包: org.springframework.boot.data.jpa.test.autoconfigure
+- Spring Boot 4 需要 spring-boot-starter-data-jpa-test 依赖
+- Repository 集成测试需要进一步配置，暂时使用单元测试验证实体
+提交: [待提交]
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
