@@ -2,6 +2,8 @@ package org.example.appointment_system.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,6 +32,7 @@ import java.util.List;
  *   <li>CSRF protection disabled for stateless API access</li>
  *   <li>Path-based authorization rules</li>
  *   <li>BCrypt password encoding</li>
+ *   <li>Authentication manager for programmatic login</li>
  * </ul>
  */
 @Configuration
@@ -166,5 +169,20 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Expose the AuthenticationManager as a bean.
+     *
+     * <p>Required for programmatic authentication in AuthService.</p>
+     *
+     * @param authenticationConfiguration the authentication configuration
+     * @return the AuthenticationManager
+     * @throws Exception if configuration fails
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

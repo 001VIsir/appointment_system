@@ -453,6 +453,46 @@ FEAT-012 - 角色权限控制 (RBAC):
 - 无问题，编译和测试全部通过
 提交: 17ef7ec
 
+---
+
+## 会话 12 - FEAT-013 完成
+日期: 2026-02-15 10:38
+处理的 Feature: FEAT-013 - 签名链接生成与验证
+完成内容:
+- 创建 SignedLinkService 服务类
+  - HMAC-SHA256 签名生成算法
+  - 链接格式: /book/{taskId}?token={signature}&exp={expiry}
+  - 签名验证逻辑
+  - 链接过期检查
+  - 常量时间比较防止时序攻击
+- 创建 SignedLinkResponse DTO
+  - link: 签名链接路径
+  - fullUrl: 完整 API URL
+  - taskId: 任务 ID
+  - expiresAt/expiresAtIso: 过期时间
+  - valid: 是否有效
+- 创建 SignedLinkController REST API
+  - POST /api/merchants/links - 生成签名链接 (需要 MERCHANT/ADMIN 角色)
+  - GET /api/public/links/verify - 验证签名链接 (公开)
+- 配置 application.properties
+  - app.signed-link.secret: 签名密钥
+  - app.signed-link.expiration-hours: 链接有效期 (默认72小时)
+- 编写单元测试
+  - SignedLinkServiceTest: 20 个测试用例
+    - 链接生成测试
+    - 签名验证测试
+    - 过期检查测试
+    - 安全测试 (时序攻击防护)
+  - SignedLinkControllerTest: 6 个测试用例
+    - API 响应测试
+- 项目编译成功，所有测试通过 (346 tests)
+- 更新 feature_list.json 标记 FEAT-013 passes=true
+问题/备注:
+- HMAC-SHA256 签名确保链接不可伪造
+- 常量时间比较防止时序攻击
+- 默认链接有效期 72 小时，可配置
+提交: [待提交]
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

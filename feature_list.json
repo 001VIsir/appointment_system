@@ -368,7 +368,7 @@
         "src/main/java/org/example/appointment_system/service/SignedLinkService.java",
         "src/main/java/org/example/appointment_system/util/SignedLinkUtils.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-014",
