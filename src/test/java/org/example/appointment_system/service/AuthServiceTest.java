@@ -1,10 +1,14 @@
 package org.example.appointment_system.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.example.appointment_system.dto.request.LoginRequest;
 import org.example.appointment_system.dto.request.RegisterRequest;
 import org.example.appointment_system.dto.response.UserResponse;
 import org.example.appointment_system.entity.User;
 import org.example.appointment_system.enums.UserRole;
 import org.example.appointment_system.repository.UserRepository;
+import org.example.appointment_system.security.CustomUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +18,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,10 +45,15 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private AuthenticationManager authenticationManager;
+
     @InjectMocks
     private AuthService authService;
 
     private RegisterRequest validRequest;
+    private LoginRequest validLoginRequest;
+    private User testUser;
 
     @BeforeEach
     void setUp() {
@@ -44,6 +62,17 @@ class AuthServiceTest {
         validRequest.setPassword("password123");
         validRequest.setEmail("test@example.com");
         validRequest.setRole(null);
+
+        validLoginRequest = new LoginRequest();
+        validLoginRequest.setUsername("testuser");
+        validLoginRequest.setPassword("password123");
+
+        testUser = new User("testuser", "hashedPassword", "test@example.com", UserRole.USER);
+        testUser.setId(1L);
+        testUser.setEnabled(true);
+
+        // Clear security context before each test
+        SecurityContextHolder.clearContext();
     }
 
     @Nested
@@ -207,6 +236,187 @@ class AuthServiceTest {
 
             // Then
             assertThat(available).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("login() method")
+    class LoginTests {
+
+        @Test
+        @DisplayName("should login user successfully with valid credentials")
+        void login_withValidCredentials_shouldSucceed() {
+            // Given
+            Authentication authentication = mock(Authentication.class);
+            when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+            HttpSession session = mock(HttpSession.class);
+            when(httpRequest.getSession(true)).thenReturn(session);
+
+            // When
+            UserResponse response = authService.login(validLoginRequest, httpRequest);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getUsername()).isEqualTo("testuser");
+            assertThat(response.getEmail()).isEqualTo("test@example.com");
+            assertThat(response.getRole()).isEqualTo(UserRole.USER);
+            assertThat(response.isEnabled()).isTrue();
+
+            verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+            verify(session).setAttribute(anyString(), any(SecurityContext.class));
+        }
+
+        @Test
+        @DisplayName("should throw BadCredentialsException for invalid credentials")
+        void login_withInvalidCredentials_shouldThrowException() {
+            // Given
+            when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Invalid credentials"));
+
+            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+
+            // When/Then
+            assertThatThrownBy(() -> authService.login(validLoginRequest, httpRequest))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessageContaining("Invalid credentials");
+
+            verify(userRepository, never()).findByUsername(anyString());
+        }
+
+        @Test
+        @DisplayName("should throw DisabledException for disabled account")
+        void login_withDisabledAccount_shouldThrowException() {
+            // Given
+            when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new DisabledException("Account is disabled"));
+
+            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+
+            // When/Then
+            assertThatThrownBy(() -> authService.login(validLoginRequest, httpRequest))
+                .isInstanceOf(DisabledException.class)
+                .hasMessageContaining("Account is disabled");
+        }
+    }
+
+    @Nested
+    @DisplayName("logout() method")
+    class LogoutTests {
+
+        @Test
+        @DisplayName("should invalidate session when session exists")
+        void logout_withExistingSession_shouldInvalidate() {
+            // Given
+            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+            HttpSession session = mock(HttpSession.class);
+            SecurityContext securityContext = mock(SecurityContext.class);
+            Authentication authentication = mock(Authentication.class);
+
+            when(httpRequest.getSession(false)).thenReturn(session);
+            when(session.getAttribute(anyString())).thenReturn(securityContext);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.getName()).thenReturn("testuser");
+
+            // When
+            authService.logout(httpRequest);
+
+            // Then
+            verify(session).invalidate();
+        }
+
+        @Test
+        @DisplayName("should handle logout when no session exists")
+        void logout_withoutSession_shouldNotThrow() {
+            // Given
+            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+            when(httpRequest.getSession(false)).thenReturn(null);
+
+            // When/Then - should not throw
+            assertThatCode(() -> authService.logout(httpRequest))
+                .doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
+    @DisplayName("getCurrentUser() method")
+    class GetCurrentUserTests {
+
+        @Test
+        @DisplayName("should return current user when authenticated")
+        void getCurrentUser_whenAuthenticated_shouldReturnUser() {
+            // Given
+            SecurityContext securityContext = mock(SecurityContext.class);
+            Authentication authentication = mock(Authentication.class);
+            CustomUserDetails userDetails = new CustomUserDetails(testUser);
+
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.isAuthenticated()).thenReturn(true);
+            when(authentication.getPrincipal()).thenReturn(userDetails);
+            SecurityContextHolder.setContext(securityContext);
+
+            when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+            // When
+            Optional<UserResponse> result = authService.getCurrentUser();
+
+            // Then
+            assertThat(result).isPresent();
+            assertThat(result.get().getUsername()).isEqualTo("testuser");
+            assertThat(result.get().getEmail()).isEqualTo("test@example.com");
+        }
+
+        @Test
+        @DisplayName("should return empty when not authenticated")
+        void getCurrentUser_whenNotAuthenticated_shouldReturnEmpty() {
+            // Given
+            SecurityContext securityContext = mock(SecurityContext.class);
+            when(securityContext.getAuthentication()).thenReturn(null);
+            SecurityContextHolder.setContext(securityContext);
+
+            // When
+            Optional<UserResponse> result = authService.getCurrentUser();
+
+            // Then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("should return empty when authentication is not authenticated")
+        void getCurrentUser_whenAuthenticationNotAuthenticated_shouldReturnEmpty() {
+            // Given
+            SecurityContext securityContext = mock(SecurityContext.class);
+            Authentication authentication = mock(Authentication.class);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.isAuthenticated()).thenReturn(false);
+            SecurityContextHolder.setContext(securityContext);
+
+            // When
+            Optional<UserResponse> result = authService.getCurrentUser();
+
+            // Then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("should return empty for anonymous user")
+        void getCurrentUser_whenAnonymousUser_shouldReturnEmpty() {
+            // Given
+            SecurityContext securityContext = mock(SecurityContext.class);
+            Authentication authentication = mock(Authentication.class);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.isAuthenticated()).thenReturn(true);
+            when(authentication.getPrincipal()).thenReturn("anonymousUser");
+            SecurityContextHolder.setContext(securityContext);
+
+            // When
+            Optional<UserResponse> result = authService.getCurrentUser();
+
+            // Then
+            assertThat(result).isEmpty();
         }
     }
 }

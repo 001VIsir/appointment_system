@@ -1,15 +1,30 @@
 package org.example.appointment_system.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.appointment_system.dto.request.LoginRequest;
 import org.example.appointment_system.dto.request.RegisterRequest;
 import org.example.appointment_system.dto.response.UserResponse;
 import org.example.appointment_system.entity.User;
 import org.example.appointment_system.enums.UserRole;
 import org.example.appointment_system.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 /**
  * Service for authentication operations.
@@ -22,6 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
  *   <li>Username and email uniqueness checks</li>
  *   <li>BCrypt password hashing</li>
  *   <li>Role assignment with security checks</li>
+ *   <li>Session-based authentication</li>
+ *   <li>Login and logout management</li>
  * </ul>
  */
 @Service
@@ -31,6 +48,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     /**
      * Register a new user.
@@ -104,6 +122,114 @@ public class AuthService {
      */
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);
+    }
+
+    /**
+     * Authenticate a user and create a session.
+     *
+     * <p>Validates credentials and creates a Spring Security session.</p>
+     *
+     * @param request the login request containing credentials
+     * @param httpRequest the HTTP request for session creation
+     * @return UserResponse containing the authenticated user's information
+     * @throws BadCredentialsException if username or password is invalid
+     * @throws DisabledException if the user account is disabled
+     */
+    @Transactional(readOnly = true)
+    public UserResponse login(LoginRequest request, HttpServletRequest httpRequest) {
+        log.info("Attempting to login user: {}", request.getUsername());
+
+        try {
+            // Authenticate using Spring Security
+            UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+
+            Authentication authentication = authenticationManager.authenticate(authToken);
+
+            // Get the authenticated user
+            User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+            // Create session and set security context
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
+
+            HttpSession session = httpRequest.getSession(true);
+            session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, securityContext);
+
+            log.info("User logged in successfully: id={}, username={}, role={}",
+                user.getId(), user.getUsername(), user.getRole());
+
+            return mapToResponse(user);
+
+        } catch (BadCredentialsException e) {
+            log.warn("Login failed for user '{}': invalid credentials", request.getUsername());
+            throw e;
+        } catch (DisabledException e) {
+            log.warn("Login failed for user '{}': account disabled", request.getUsername());
+            throw e;
+        }
+    }
+
+    /**
+     * Logout the current user by invalidating the session.
+     *
+     * @param httpRequest the HTTP request containing the session
+     */
+    public void logout(HttpServletRequest httpRequest) {
+        SecurityContextHolder.clearContext();
+
+        HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            String username = getUsernameFromSession(session);
+            log.info("Logging out user: {}", username);
+            session.invalidate();
+        }
+    }
+
+    /**
+     * Get the currently authenticated user.
+     *
+     * @return Optional containing UserResponse if authenticated, empty otherwise
+     */
+    @Transactional(readOnly = true)
+    public Optional<UserResponse> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Optional.empty();
+        }
+
+        String username;
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        } else if (authentication.getPrincipal() instanceof String) {
+            username = (String) authentication.getPrincipal();
+        } else {
+            return Optional.empty();
+        }
+
+        // Handle anonymous user
+        if ("anonymousUser".equals(username)) {
+            return Optional.empty();
+        }
+
+        return userRepository.findByUsername(username)
+            .map(this::mapToResponse);
+    }
+
+    /**
+     * Get username from session for logging purposes.
+     *
+     * @param session the HTTP session
+     * @return the username or "unknown"
+     */
+    private String getUsernameFromSession(HttpSession session) {
+        SecurityContext context = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
+        if (context != null && context.getAuthentication() != null) {
+            return context.getAuthentication().getName();
+        }
+        return "unknown";
     }
 
     /**

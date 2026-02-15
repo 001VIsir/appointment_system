@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.appointment_system.dto.request.LoginRequest;
 import org.example.appointment_system.dto.request.RegisterRequest;
 import org.example.appointment_system.dto.response.UserResponse;
 import org.example.appointment_system.service.AuthService;
@@ -102,5 +104,85 @@ public class AuthController {
     public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
         boolean available = authService.isEmailAvailable(email);
         return ResponseEntity.ok(available);
+    }
+
+    /**
+     * Login a user.
+     *
+     * <p>Authenticates the user and creates a session. This endpoint is publicly accessible.</p>
+     *
+     * @param request the login request containing credentials
+     * @param httpRequest the HTTP request for session creation
+     * @return the authenticated user information
+     */
+    @PostMapping("/login")
+    @Operation(
+        summary = "Login user",
+        description = "Authenticates user credentials and creates a session. Session is stored in Redis.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Login successful",
+                content = @Content(schema = @Schema(implementation = UserResponse.class))
+            ),
+            @ApiResponse(
+                responseCode = "401",
+                description = "Invalid credentials or account disabled"
+            )
+        }
+    )
+    public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request,
+                                               HttpServletRequest httpRequest) {
+        log.info("Login request received for username: {}", request.getUsername());
+        UserResponse response = authService.login(request, httpRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Logout the current user.
+     *
+     * <p>Invalidates the current session. Requires authentication.</p>
+     *
+     * @param httpRequest the HTTP request containing the session
+     * @return empty response with 204 status
+     */
+    @PostMapping("/logout")
+    @Operation(
+        summary = "Logout user",
+        description = "Invalidates the current session and logs out the user"
+    )
+    public ResponseEntity<Void> logout(HttpServletRequest httpRequest) {
+        log.info("Logout request received");
+        authService.logout(httpRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get the current authenticated user.
+     *
+     * <p>Requires authentication. Returns the currently logged-in user's information.</p>
+     *
+     * @return the current user information or 401 if not authenticated
+     */
+    @GetMapping("/me")
+    @Operation(
+        summary = "Get current user",
+        description = "Returns the currently authenticated user's information",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Current user information",
+                content = @Content(schema = @Schema(implementation = UserResponse.class))
+            ),
+            @ApiResponse(
+                responseCode = "401",
+                description = "Not authenticated"
+            )
+        }
+    )
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        return authService.getCurrentUser()
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }

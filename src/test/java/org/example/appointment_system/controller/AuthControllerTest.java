@@ -1,6 +1,8 @@
 package org.example.appointment_system.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import org.example.appointment_system.dto.request.LoginRequest;
 import org.example.appointment_system.dto.request.RegisterRequest;
 import org.example.appointment_system.dto.response.UserResponse;
 import org.example.appointment_system.enums.UserRole;
@@ -18,8 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +46,7 @@ class AuthControllerTest {
     private AuthController authController;
 
     private RegisterRequest validRequest;
+    private LoginRequest validLoginRequest;
     private UserResponse validResponse;
 
     @BeforeEach
@@ -55,6 +60,10 @@ class AuthControllerTest {
         validRequest.setPassword("password123");
         validRequest.setEmail("test@example.com");
         validRequest.setRole(null);
+
+        validLoginRequest = new LoginRequest();
+        validLoginRequest.setUsername("testuser");
+        validLoginRequest.setPassword("password123");
 
         validResponse = UserResponse.builder()
             .id(1L)
@@ -152,6 +161,78 @@ class AuthControllerTest {
                     .param("email", "existing@example.com"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/auth/login")
+    class LoginEndpointTests {
+
+        @Test
+        @DisplayName("should login user successfully and return 200")
+        void login_withValidCredentials_shouldReturn200() throws Exception {
+            // Given
+            when(authService.login(any(LoginRequest.class), any(HttpServletRequest.class)))
+                .thenReturn(validResponse);
+
+            // When/Then
+            mockMvc.perform(post("/api/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(validLoginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("testuser"))
+                .andExpect(jsonPath("$.email").value("test@example.com"))
+                .andExpect(jsonPath("$.role").value("USER"))
+                .andExpect(jsonPath("$.enabled").value(true));
+
+            verify(authService).login(any(LoginRequest.class), any(HttpServletRequest.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/auth/logout")
+    class LogoutEndpointTests {
+
+        @Test
+        @DisplayName("should logout user successfully and return 204")
+        void logout_shouldReturn204() throws Exception {
+            // When/Then
+            mockMvc.perform(post("/api/auth/logout"))
+                .andExpect(status().isNoContent());
+
+            verify(authService).logout(any(HttpServletRequest.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/auth/me")
+    class GetCurrentUserEndpointTests {
+
+        @Test
+        @DisplayName("should return current user when authenticated")
+        void getCurrentUser_whenAuthenticated_shouldReturn200() throws Exception {
+            // Given
+            when(authService.getCurrentUser()).thenReturn(Optional.of(validResponse));
+
+            // When/Then
+            mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("testuser"))
+                .andExpect(jsonPath("$.email").value("test@example.com"))
+                .andExpect(jsonPath("$.role").value("USER"));
+        }
+
+        @Test
+        @DisplayName("should return 401 when not authenticated")
+        void getCurrentUser_whenNotAuthenticated_shouldReturn401() throws Exception {
+            // Given
+            when(authService.getCurrentUser()).thenReturn(Optional.empty());
+
+            // When/Then
+            mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized());
         }
     }
 }
