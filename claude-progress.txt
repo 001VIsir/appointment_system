@@ -547,6 +547,67 @@ FEAT-012 - 角色权限控制 (RBAC):
 - 使用 ObjectMapper 处理 JSON 序列化/反序列化
 提交: cfe1154
 
+---
+
+## 会话 14 - FEAT-015 完成
+日期: 2026-02-15 12:40
+处理的 Feature: FEAT-015 - 服务项 CRUD
+完成内容:
+- 创建 ServiceItemRequest DTO
+  - 包含验证规则: @NotBlank, @Size, @NotNull, @Min, @DecimalMin
+  - name: 必填, 2-100 字符
+  - description: 可选, 最大 1000 字符
+  - category: 必填, ServiceCategory 枚举
+  - duration: 必填, 最小 5 分钟
+  - price: 必填, 最小 0
+  - active: 可选, 默认 true
+- 创建 ServiceItemResponse DTO
+  - 包含完整的服务项信息
+  - 包含关联的商户 ID 和商户名称
+  - 包含类别显示名称
+- 创建 ServiceItemService 服务类
+  - createServiceItem(): 创建服务项
+    - 验证商户档案存在
+    - 验证服务名称唯一性
+    - 支持设置 active 状态
+  - updateServiceItem(): 更新服务项
+    - 验证服务项所有权
+    - 支持部分字段更新
+    - 检查新名称唯一性
+  - deleteServiceItem(): 软删除服务项
+    - 设置 active=false
+  - reactivateServiceItem(): 重新激活服务项
+    - 设置 active=true
+  - getServiceItemById(): 按 ID 获取服务项
+  - getAllServiceItems(): 获取所有服务项
+  - getActiveServiceItems(): 获取活跃服务项
+  - getInactiveServiceItems(): 获取已删除服务项
+  - countAllServiceItems(): 统计所有服务项数量
+  - countActiveServiceItems(): 统计活跃服务项数量
+  - existsByName(): 检查服务名称是否存在
+- 权限控制
+  - 只有拥有商户档案的用户可以操作服务项
+  - 用户只能访问和修改自己商户的服务项
+- ServiceItemServiceTest 单元测试
+  - 22 个测试用例
+  - createServiceItem: 5 个测试 (成功、默认inactive、重名、无档案、无认证)
+  - updateServiceItem: 4 个测试 (成功、重名、同名更新、不存在)
+  - deleteServiceItem: 2 个测试 (成功、不存在)
+  - reactivateServiceItem: 1 个测试
+  - getServiceItemById: 2 个测试 (成功、不存在)
+  - getAllServiceItems: 2 个测试 (成功、空列表)
+  - getActiveServiceItems: 1 个测试
+  - getInactiveServiceItems: 1 个测试
+  - countAllServiceItems: 1 个测试
+  - countActiveServiceItems: 1 个测试
+  - existsByName: 2 个测试
+- 项目编译成功，所有测试通过 (390 tests)
+- 更新 feature_list.json 标记 FEAT-015 passes=true
+问题/备注:
+- 软删除通过设置 active=false 实现
+- 服务名称在商户范围内必须唯一
+提交: [待提交]
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
