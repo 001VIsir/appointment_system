@@ -689,6 +689,26 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 16 - 功能计划重构
+日期: 2026-02-15
+处理内容: 功能列表重构，技术增强点融合
+完成内容:
+- 删除未提交的 FEAT-017~020 代码（WebSocket、Spring Task、AOP、Spring Cache）
+- 更新 feature_list.md，与 feature_list.json 保持一致
+- 更新 feature_list.json，将技术增强点融合到后续任务：
+  - WebSocket 实时通知 → FEAT-021 (Booking Controller)
+  - Spring Task 定时任务 → FEAT-017 (统计服务)
+  - AOP 公共字段填充 → FEAT-025 (全局异常处理)
+  - Spring Cache 缓存 → FEAT-024 (限流过滤器)
+- 创建 docs/progress.json 进度追踪文件
+问题/备注:
+- 代码未提交到 git，直接删除未跟踪文件
+- 功能编号与 feature_list.json 保持一致
+- 当前进度：FEAT-016 已完成，准备开始 FEAT-017（统计服务）
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

@@ -1,0 +1,72 @@
+{
+  "project": "appointment_system",
+  "lastUpdated": "2026-02-15",
+  "currentPhase": "P3",
+  "currentFeature": "FEAT-017",
+  "statistics": {
+    "totalFeatures": 36,
+    "completedFeatures": 16,
+    "inProgressFeatures": 0,
+    "pendingFeatures": 20,
+    "completionPercentage": 44.4
+  },
+  "phases": [
+    { "id": "P0", "name": "基础设施", "status": "completed", "features": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"] },
+    { "id": "P1", "name": "核心实体与仓库", "status": "completed", "features": ["FEAT-005", "FEAT-006", "FEAT-007", "FEAT-008", "FEAT-009"] },
+    { "id": "P2", "name": "认证授权", "status": "completed", "features": ["FEAT-010", "FEAT-011", "FEAT-012", "FEAT-013"] },
+    { "id": "P3", "name": "业务服务", "status": "in_progress", "features": ["FEAT-014", "FEAT-015", "FEAT-016", "FEAT-017"] },
+    { "id": "P4", "name": "API 层", "status": "pending", "features": ["FEAT-018", "FEAT-019", "FEAT-020", "FEAT-021", "FEAT-022", "FEAT-023"] },
+    { "id": "P5", "name": "企业级特性", "status": "pending", "features": ["FEAT-024", "FEAT-025", "FEAT-026", "FEAT-027", "FEAT-028"] },
+    { "id": "P6", "name": "前端开发", "status": "pending", "features": ["FEAT-029", "FEAT-030", "FEAT-031", "FEAT-032"] },
+    { "id": "P7", "name": "测试与部署", "status": "pending", "features": ["FEAT-033", "FEAT-034", "FEAT-035", "FEAT-036"] }
+  ],
+  "completedFeaturesDetail": [
+    { "id": "FEAT-001", "title": "项目依赖配置与 Maven 设置", "completedAt": "2026-02-15", "commit": "8bcd857" },
+    { "id": "FEAT-002", "title": "数据库连接与 Flyway 迁移", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-003", "title": "Redis 配置与 Session 管理", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-004", "title": "Spring Security 基础配置", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-005", "title": "User 实体与 UserRepository", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-006", "title": "MerchantProfile 实体与仓库", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-007", "title": "ServiceItem 实体与仓库", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-008", "title": "Booking 实体与仓库", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-009", "title": "AppointmentTask/Slot 实体", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-010", "title": "用户注册服务", "completedAt": "2026-02-15", "commit": "fb80fae" },
+    { "id": "FEAT-011", "title": "用户登录与 Session 管理", "completedAt": "2026-02-15", "commit": "17ef7ec" },
+    { "id": "FEAT-012", "title": "角色权限控制 (RBAC)", "completedAt": "2026-02-15", "commit": "17ef7ec" },
+    { "id": "FEAT-013", "title": "签名链接生成与验证", "completedAt": "2026-02-15", "commit": "8c068ea" },
+    { "id": "FEAT-014", "title": "商户服务 CRUD", "completedAt": "2026-02-15", "commit": "cfe1154" },
+    { "id": "FEAT-015", "title": "服务项 CRUD", "completedAt": "2026-02-15", "commit": "14df6d9" },
+    { "id": "FEAT-016", "title": "预约服务（乐观锁）", "completedAt": "2026-02-15", "commit": "631fe5f" }
+  ],
+  "techEnhancementsIntegrated": {
+    "description": "以下技术增强点已融合到对应的开发任务中",
+    "items": [
+      {
+        "name": "WebSocket 实时通知",
+        "targetFeature": "FEAT-021 (Booking Controller)",
+        "description": "商户端新预约通知、用户端预约提醒"
+      },
+      {
+        "name": "Spring Task 定时任务",
+        "targetFeature": "FEAT-017 (统计服务)",
+        "description": "预约超时取消、提醒、自动完成、每日汇总"
+      },
+      {
+        "name": "AOP 公共字段填充",
+        "targetFeature": "FEAT-025 (全局异常处理)",
+        "description": "自动填充 createdAt/updatedAt 等字段"
+      },
+      {
+        "name": "Spring Cache 缓存",
+        "targetFeature": "FEAT-024 (限流过滤器)",
+        "description": "商户信息、服务项列表、热门任务缓存"
+      }
+    ]
+  },
+  "nextSteps": [
+    "FEAT-017: 统计服务（含 Spring Task 定时任务）",
+    "FEAT-018: Auth Controller",
+    "FEAT-019: Merchant Controller",
+    "FEAT-020: Service Controller"
+  ]
+}

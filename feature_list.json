@@ -443,8 +443,8 @@
       "phase": "P3",
       "category": "service",
       "priority": 17,
-      "title": "统计服务",
-      "description": "实现统计和指标服务",
+      "title": "统计服务（含 Spring Task 定时任务）",
+      "description": "实现统计和指标服务，集成 Spring Task 定时任务（预约超时取消、提醒、自动完成、每日汇总）",
       "steps": [
         "创建 StatisticsService",
         "实现预约统计（按日期、商户）",
@@ -452,11 +452,17 @@
         "实现调用量统计",
         "实现错误率统计",
         "实现响应时间统计",
+        "[Spring Task] 启用 @EnableScheduling",
+        "[Spring Task] 创建预约超时处理任务（每分钟）",
+        "[Spring Task] 创建预约提醒任务（每5分钟）",
+        "[Spring Task] 创建自动完成任务（每小时）",
+        "[Spring Task] 创建每日统计任务（凌晨1点）",
         "编写单元测试"
       ],
       "dependencies": ["FEAT-008", "FEAT-016"],
       "files": [
-        "src/main/java/org/example/appointment_system/service/StatisticsService.java"
+        "src/main/java/org/example/appointment_system/service/StatisticsService.java",
+        "src/main/java/org/example/appointment_system/task/AppointmentScheduledTask.java"
       ],
       "passes": false
     },
@@ -534,8 +540,8 @@
       "phase": "P4",
       "category": "api",
       "priority": 21,
-      "title": "Booking Controller",
-      "description": "实现预约 REST API",
+      "title": "Booking Controller（含 WebSocket 实时通知）",
+      "description": "实现预约 REST API，集成 WebSocket 实时通知（商户端新预约通知、用户端预约提醒）",
       "steps": [
         "创建 BookingController",
         "POST /api/bookings - 创建预约",
@@ -544,12 +550,19 @@
         "DELETE /api/bookings/{id} - 取消预约",
         "GET /api/merchants/bookings - 商户查看预约",
         "PUT /api/merchants/bookings/{id}/status - 更新预约状态",
+        "[WebSocket] 创建 WebSocketConfig 配置类",
+        "[WebSocket] 创建 AppointmentWebSocketServer 服务端点",
+        "[WebSocket] 创建 NotificationService 通知服务",
+        "[WebSocket] 集成到预约服务（新预约通知商户）",
         "添加权限控制",
         "编写集成测试"
       ],
       "dependencies": ["FEAT-016"],
       "files": [
-        "src/main/java/org/example/appointment_system/controller/BookingController.java"
+        "src/main/java/org/example/appointment_system/controller/BookingController.java",
+        "src/main/java/org/example/appointment_system/websocket/WebSocketConfig.java",
+        "src/main/java/org/example/appointment_system/websocket/AppointmentWebSocketServer.java",
+        "src/main/java/org/example/appointment_system/websocket/NotificationService.java"
       ],
       "passes": false
     },
@@ -604,8 +617,8 @@
       "phase": "P5",
       "category": "enterprise",
       "priority": 24,
-      "title": "限流过滤器",
-      "description": "实现基于 Redis 的滑动时间窗限流",
+      "title": "限流过滤器（含 Spring Cache 缓存）",
+      "description": "实现基于 Redis 的滑动时间窗限流，集成 Spring Cache 声明式缓存",
       "steps": [
         "创建 RateLimitFilter",
         "实现滑动时间窗算法",
@@ -613,12 +626,18 @@
         "返回 429 状态码",
         "添加 X-RateLimit-* 响应头",
         "配置不同端点的限流规则",
+        "[Spring Cache] 启用 @EnableCaching",
+        "[Spring Cache] 创建 CacheConfig 配置（Redis 缓存管理器）",
+        "[Spring Cache] 在 MerchantService 应用缓存注解",
+        "[Spring Cache] 在 ServiceItemService 应用缓存注解",
+        "[Spring Cache] 实现缓存失效策略",
         "编写限流测试"
       ],
       "dependencies": ["FEAT-003"],
       "files": [
         "src/main/java/org/example/appointment_system/filter/RateLimitFilter.java",
-        "src/main/java/org/example/appointment_system/service/RateLimitService.java"
+        "src/main/java/org/example/appointment_system/service/RateLimitService.java",
+        "src/main/java/org/example/appointment_system/config/CacheConfig.java"
       ],
       "passes": false
     },
@@ -627,8 +646,8 @@
       "phase": "P5",
       "category": "enterprise",
       "priority": 25,
-      "title": "全局异常处理",
-      "description": "实现统一的异常处理机制",
+      "title": "全局异常处理（含 AOP 公共字段填充）",
+      "description": "实现统一的异常处理机制，集成 AOP 公共字段自动填充",
       "steps": [
         "创建 BusinessException 自定义异常",
         "创建 ErrorCode 枚举",
@@ -637,13 +656,20 @@
         "处理验证异常",
         "处理安全异常",
         "统一错误响应格式",
+        "[AOP] 创建 OperationType 枚举（INSERT/UPDATE）",
+        "[AOP] 创建 @AutoFill 自定义注解",
+        "[AOP] 创建 AutoFillAspect 切面（自动填充 createdAt/updatedAt 等）",
+        "[AOP] 在 Repository 的 save 方法上应用 @AutoFill",
         "添加错误日志"
       ],
       "dependencies": [],
       "files": [
         "src/main/java/org/example/appointment_system/exception/BusinessException.java",
         "src/main/java/org/example/appointment_system/exception/ErrorCode.java",
-        "src/main/java/org/example/appointment_system/exception/GlobalExceptionHandler.java"
+        "src/main/java/org/example/appointment_system/exception/GlobalExceptionHandler.java",
+        "src/main/java/org/example/appointment_system/annotation/OperationType.java",
+        "src/main/java/org/example/appointment_system/annotation/AutoFill.java",
+        "src/main/java/org/example/appointment_system/aop/AutoFillAspect.java"
       ],
       "passes": false
     },
