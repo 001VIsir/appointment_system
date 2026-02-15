@@ -397,6 +397,62 @@
 - 异常处理测试将在 FEAT-025 (全局异常处理) 完成后补充
 提交: fb80fae
 
+---
+
+## 会话 11 - FEAT-011/FEAT-012 完成
+日期: 2026-02-15 10:27
+处理的 Feature: FEAT-011 用户登录与 Session 管理, FEAT-012 角色权限控制
+完成内容:
+FEAT-011 - 用户登录与 Session 管理:
+- 创建 LoginRequest DTO 用于登录请求
+  - 包含验证规则: @NotBlank, @Size
+  - 用户名: 3-50字符
+  - 密码: 6-100字符
+- 实现 AuthService.login() 方法
+  - 使用 AuthenticationManager 验证凭证
+  - 创建 Session 并存储到 Redis
+  - 返回 UserResponse
+- 实现 AuthService.logout() 方法
+  - 清除 SecurityContext
+  - 使 Session 失效
+- 实现 AuthService.getCurrentUser() 方法
+  - 从 SecurityContext 获取当前用户
+  - 处理匿名用户和未认证情况
+- AuthController 添加端点
+  - POST /api/auth/login - 用户登录
+  - POST /api/auth/logout - 用户登出
+  - GET /api/auth/me - 获取当前用户
+FEAT-012 - 角色权限控制 (RBAC):
+- 创建 CustomUserDetails 类
+  - 实现 Spring Security UserDetails 接口
+  - 包装 User 实体
+  - 映射 UserRole 到 GrantedAuthority
+  - 支持 ROLE_USER, ROLE_MERCHANT, ROLE_ADMIN
+- 创建 CustomUserDetailsService 类
+  - 实现 Spring Security UserDetailsService 接口
+  - 从数据库加载用户进行认证
+  - 事务性只读访问
+测试覆盖:
+- AuthServiceTest: 新增 9 个测试用例
+  - login: 3 个测试（成功、无效凭证、禁用账户）
+  - logout: 2 个测试（有Session、无Session）
+  - getCurrentUser: 4 个测试（已认证、未认证、匿名）
+- AuthControllerTest: 新增 5 个测试用例
+  - login: 1 个测试
+  - logout: 1 个测试
+  - getCurrentUser: 2 个测试（已认证、未认证）
+- CustomUserDetailsTest: 15 个测试用例
+  - 构造函数和属性测试
+  - 权限映射测试
+  - 账户状态方法测试
+- CustomUserDetailsServiceTest: 10 个测试用例
+  - loadUserByUsername: 各种场景测试
+- 项目编译成功，所有测试通过 (320 tests)
+- 更新 feature_list.json 标记 FEAT-011 passes=true, FEAT-012 passes=true
+问题/备注:
+- 无问题，编译和测试全部通过
+提交: 17ef7ec
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

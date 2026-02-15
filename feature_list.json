@@ -322,7 +322,7 @@
         "src/main/java/org/example/appointment_system/service/AuthService.java",
         "src/main/java/org/example/appointment_system/dto/request/LoginRequest.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-012",
@@ -345,7 +345,7 @@
         "src/main/java/org/example/appointment_system/security/CustomUserDetails.java",
         "src/main/java/org/example/appointment_system/config/SecurityConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-013",
