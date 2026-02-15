@@ -390,7 +390,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/service/MerchantService.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-015",
