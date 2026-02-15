@@ -493,6 +493,60 @@ FEAT-012 - 角色权限控制 (RBAC):
 - 默认链接有效期 72 小时，可配置
 提交: 8c068ea
 
+---
+
+## 会话 13 - FEAT-014 完成
+日期: 2026-02-15 10:57
+处理的 Feature: FEAT-014 - 商户服务 CRUD
+完成内容:
+- 创建 MerchantProfileRequest DTO
+  - 包含验证规则: @NotBlank, @Size, @Pattern
+  - businessName: 必填, 2-100 字符
+  - description: 可选, 最大 1000 字符
+  - phone: 可选, 电话格式验证
+  - address: 可选, 最大 255 字符
+- 创建 MerchantProfileResponse DTO
+  - 包含完整的商户档案信息
+  - 包含关联的用户 ID 和用户名
+- 创建 MerchantSettingsRequest DTO
+  - sessionTimeout: 会话超时时间 (秒)
+  - notificationsEnabled: 邮件通知开关
+  - timezone: 商户时区
+  - bookingAdvanceDays: 提前预约天数
+  - cancelDeadlineHours: 取消截止时间 (小时)
+  - autoConfirmBookings: 自动确认预约
+  - maxBookingsPerUserPerDay: 每用户每日最大预约数
+- 创建 MerchantSettingsResponse DTO
+- 创建 MerchantService 服务类
+  - createProfile(): 创建商户档案 (仅 MERCHANT 角色)
+  - updateProfile(): 更新商户档案
+  - getCurrentMerchantProfile(): 获取当前用户档案
+  - getProfileById(): 按 ID 获取档案 (仅限本人)
+  - getSettings(): 获取商户设置
+  - updateSettings(): 更新商户设置 (JSON 合并)
+  - deleteProfile(): 删除商户档案
+  - hasMerchantProfile(): 检查档案是否存在
+- 权限控制
+  - 只有 MERCHANT 角色可以创建档案
+  - ADMIN 和 USER 角色无法创建档案
+  - 用户只能访问和修改自己的档案
+- MerchantServiceTest 单元测试
+  - 22 个测试用例
+  - createProfile: 5 个测试 (成功、角色限制、已存在、无认证)
+  - getCurrentMerchantProfile: 2 个测试
+  - getProfileById: 3 个测试 (成功、非本人、不存在)
+  - updateProfile: 2 个测试
+  - getSettings: 3 个测试 (成功、null、无效JSON)
+  - updateSettings: 3 个测试 (成功、合并、档案不存在)
+  - deleteProfile: 2 个测试
+  - hasMerchantProfile: 2 个测试
+- 项目编译成功，所有测试通过 (368 tests)
+- 更新 feature_list.json 标记 FEAT-014 passes=true
+问题/备注:
+- 设置使用 JSON 格式存储，支持灵活扩展
+- 使用 ObjectMapper 处理 JSON 序列化/反序列化
+提交: cfe1154
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
