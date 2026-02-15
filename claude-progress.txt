@@ -610,6 +610,85 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 15 - FEAT-016 完成
+日期: 2026-02-15 13:05
+处理的 Feature: FEAT-016 - 预约服务（乐观锁）
+完成内容:
+- 创建 BookingRequest DTO
+  - slotId: 必填，预约时段 ID
+  - remark: 可选，备注信息，最大 500 字符
+- 创建 BookingResponse DTO
+  - 包含完整预约信息
+  - 包含关联的任务、服务、商户信息
+  - 包含时段时间信息
+  - 包含乐观锁版本号
+- 创建 SlotResponse DTO
+  - 时段 ID、开始/结束时间
+  - 容量信息：总容量、已预约数、可用数
+  - hasCapacity 标志
+- 创建 BookingService 服务类
+  - createBooking(): 创建预约（乐观锁）
+    - 验证时段存在
+    - 检查时段容量
+    - 防止重复预约
+    - 原子增加 bookedCount
+  - createBookingForUser(): 为指定用户创建预约（商户/签名链接场景）
+  - cancelBooking(): 用户取消预约
+    - 减少时段 bookedCount
+    - 状态验证
+  - cancelBookingByMerchant(): 商户取消预约
+  - confirmBooking(): 商户确认预约
+  - completeBooking(): 商户完成预约
+  - getBookingById(): 获取预约详情
+  - getMyBookings(): 获取用户预约列表
+  - getMyBookings(Pageable): 分页获取
+  - getMyBookingsByStatus(): 按状态筛选
+  - getMyActiveBookings(): 获取活跃预约
+  - getBookingsByMerchant(): 获取商户预约列表
+  - getBookingsByMerchantAndStatus(): 商户按状态筛选
+  - getBookingsByTask(): 获取任务预约列表
+  - getAvailableSlots(): 获取任务时段列表
+  - getSlotsWithCapacity(): 获取有容量的时段
+  - getSlotById(): 获取时段详情
+  - countMyBookings/countMyActiveBookings(): 统计用户预约
+  - countBookingsByMerchant/countActiveBookingsByTask(): 统计
+  - hasActiveBookingForSlot(): 检查是否已预约
+- 乐观锁实现
+  - Booking 实体使用 @Version 字段
+  - 并发更新时自动检测冲突
+  - ObjectOptimisticLockingFailureException 处理
+- BookingServiceTest 单元测试
+  - 42 个测试用例
+  - createBooking: 5 个测试 (成功、时段不存在、已满、重复预约、无认证)
+  - createBookingForUser: 2 个测试
+  - cancelBooking: 3 个测试
+  - cancelBookingByMerchant: 3 个测试
+  - confirmBooking: 2 个测试
+  - completeBooking: 2 个测试
+  - getBookingById: 2 个测试
+  - getMyBookings: 2 个测试
+  - getMyBookings paged: 1 个测试
+  - getMyBookingsByStatus: 1 个测试
+  - getMyActiveBookings: 1 个测试
+  - getBookingsByMerchant: 3 个测试
+  - getBookingsByTask: 2 个测试
+  - getAvailableSlots: 2 个测试
+  - getSlotsWithCapacity: 1 个测试
+  - getSlotById: 2 个测试
+  - countOperations: 4 个测试
+  - hasActiveBookingForSlot: 2 个测试
+  - SlotResponse mapping: 2 个测试
+- 项目编译成功，所有测试通过 (432 tests)
+- 更新 feature_list.json 标记 FEAT-016 passes=true
+问题/备注:
+- Booking 实体已有 @Version 字段支持乐观锁
+- 时段容量通过 incrementBookedCount/decrementBookedCount 原子操作
+- 防止重复预约检查 existsActiveBookingByUserIdAndSlotId
+- 商户操作需验证预约归属（通过 slot -> task -> service -> merchant 链）
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

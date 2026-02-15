@@ -436,7 +436,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/service/BookingService.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-017",
