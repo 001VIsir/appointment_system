@@ -154,4 +154,15 @@ public class AppointmentTask {
         this.totalCapacity = totalCapacity;
         this.active = active;
     }
+
+    /**
+     * Check if this task is active.
+     * Convenience method for better readability.
+     *
+     * @return true if the task is active
+     */
+    @Transient
+    public boolean isActive() {
+        return Boolean.TRUE.equals(this.active);
+    }
 }

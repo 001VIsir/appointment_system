@@ -709,6 +709,57 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 17 - FEAT-017 完成
+日期: 2026-02-15 13:55
+处理的 Feature: FEAT-017 - 统计服务（含 Spring Task 定时任务）
+完成内容:
+- 创建 BookingStatsResponse DTO
+  - 包含预约统计（总数、活跃、按状态分类）
+  - 包含今日统计
+  - 包含日期范围统计
+  - 包含成功率计算（完成率、取消率、确认率）
+- 创建 UserStatsResponse DTO
+  - 包含用户统计（总数、启用/禁用、按角色分类）
+  - 包含注册统计（今日、本周、本月）
+  - 包含活动统计（有预约用户、有服务商户）
+- 创建 SystemStatsResponse DTO
+  - 包含 API 调用统计（今日、最近一小时、每分钟平均）
+  - 包含错误率统计（总数、客户端错误、服务端错误）
+  - 包含响应时间统计（平均、最大、最小、P95）
+  - 包含资源统计（活跃会话、堆内存、运行时间）
+- 创建 StatisticsService 服务类
+  - getBookingStats(): 获取预约统计（支持日期范围）
+  - getMerchantBookingStats(): 获取商户预约统计
+  - getUserStats(): 获取用户统计
+  - getSystemStats(): 获取系统统计
+  - recordApiCall(): 记录 API 调用（Redis 计数器）
+  - recordError(): 记录错误（支持 4xx/5xx 分类）
+  - recordResponseTime(): 记录响应时间
+  - generateDailySummary(): 生成每日汇总
+- 创建 AppointmentScheduledTask 定时任务类
+  - handleBookingTimeouts(): 预约超时处理（每分钟）
+  - sendAppointmentReminders(): 预约提醒（每5分钟）
+  - autoCompleteAppointments(): 自动完成（每小时）
+  - generateDailyStatistics(): 每日统计（凌晨1点）
+  - cleanupOldData(): 数据清理（凌晨2点）
+- 启用 @EnableScheduling
+  - 在 AppointmentSystemApplication 添加注解
+- 添加 isActive() 方法到 AppointmentTask 实体
+- 编写单元测试
+  - StatisticsServiceTest: 13 个测试用例
+  - AppointmentScheduledTaskTest: 12 个测试用例
+- 项目编译成功，所有测试通过 (457 tests)
+- 更新 feature_list.json 标记 FEAT-017 passes=true
+问题/备注:
+- Redis 用于存储实时指标（API 调用、错误、响应时间）
+- 定时任务使用 @Scheduled 注解配置
+- 预设提醒时间：24小时前发送提醒
+- 预设自动完成时间：时段结束后2小时
+- 数据保留期：90天
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

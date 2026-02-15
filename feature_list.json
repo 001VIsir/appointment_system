@@ -464,7 +464,7 @@
         "src/main/java/org/example/appointment_system/service/StatisticsService.java",
         "src/main/java/org/example/appointment_system/task/AppointmentScheduledTask.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-018",
