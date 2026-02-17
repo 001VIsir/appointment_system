@@ -715,7 +715,7 @@
         "src/main/resources/application.properties",
         "src/main/java/org/example/appointment_system/config/MetricsConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-028",

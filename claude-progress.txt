@@ -1139,6 +1139,46 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 27 - FEAT-027 完成
+日期: 2026-02-18 01:34
+处理的 Feature: FEAT-027 - Prometheus 指标
+完成内容:
+- 创建 MetricsConfig 配置类
+  - @PostConstruct 配置 MeterRegistry (common tags, meter filters)
+  - Gauge 指标: 预约总数、按状态分类、活跃预约
+  - Gauge 指标: 用户总数、启用/禁用、商户总数、服务项统计
+  - Counter 指标: 预约创建、取消、完成、确认计数器
+  - 分布统计配置: HTTP 请求百分位 (0.5, 0.9, 0.95, 0.99)
+- 创建 BookingMetricsService 服务类
+  - recordBookingCreated(): 记录预约创建事件
+  - recordBookingCancelled(): 记录预约取消事件
+  - recordBookingCompleted(): 记录预约完成事件
+  - recordBookingConfirmed(): 记录预约确认事件
+  - recordBookingDuration(): 记录操作耗时
+  - recordError(): 记录错误事件
+  - recordSignedLinkAccess(): 记录签名链接访问
+  - recordWebSocketNotification(): 记录 WebSocket 通知
+- 更新 application.properties 添加 Prometheus 配置
+  - management.endpoints.web.exposure.include: health,info,prometheus,metrics,loggers,env,beans,mappings
+  - management.prometheus.metrics.export.enabled=true
+  - management.metrics.distribution.percentiles-histogram.http.server.requests=true
+  - management.metrics.distribution.percentiles.http.server.requests=0.5,0.9,0.95,0.99
+  - management.metrics.tags.application=appointment_system
+- 创建 JacksonConfig 提供 ObjectMapper bean (修复 RateLimitFilter 依赖)
+- 编写单元测试
+  - MetricsConfigTest: 20 个测试用例
+  - BookingMetricsServiceTest: 21 个测试用例
+- 项目编译成功，所有测试通过 (685 tests)
+- 更新 feature_list.json 标记 FEAT-027 passes=true
+问题/备注:
+- 使用 Micrometer + Prometheus 进行指标采集
+- 可用指标前缀: appointment.bookings.*, appointment.users.*, appointment.merchants.*, appointment.services.*
+- /actuator/prometheus 端点可被 Prometheus 抓取
+- 集成 BookingMetricsService 到业务服务以记录事件
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
