@@ -2,6 +2,7 @@ package org.example.appointment_system.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.appointment_system.config.CacheConfig;
 import org.example.appointment_system.dto.request.ServiceItemRequest;
 import org.example.appointment_system.dto.response.ServiceItemResponse;
 import org.example.appointment_system.entity.MerchantProfile;
@@ -12,6 +13,9 @@ import org.example.appointment_system.repository.MerchantProfileRepository;
 import org.example.appointment_system.repository.ServiceItemRepository;
 import org.example.appointment_system.repository.UserRepository;
 import org.example.appointment_system.security.CustomUserDetails;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -48,7 +52,8 @@ public class ServiceItemService {
      * Create a new service item for the current merchant.
      *
      * <p>The current user must have a merchant profile. Service names must be
-     * unique within a merchant's catalog.</p>
+     * unique within a merchant's catalog.
+     * Cache is evicted after creation to ensure consistency.</p>
      *
      * @param request the service item creation request
      * @return ServiceItemResponse containing the created service item
@@ -56,6 +61,7 @@ public class ServiceItemService {
      * @throws IllegalArgumentException if a service with the same name already exists
      */
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_SERVICE_ITEM_LISTS, allEntries = true)
     public ServiceItemResponse createServiceItem(ServiceItemRequest request) {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
@@ -88,7 +94,8 @@ public class ServiceItemService {
      *
      * <p>Only the merchant who owns the service item can update it.
      * If the name is being changed, the new name must not conflict with
-     * existing service names.</p>
+     * existing service names.
+     * Cache is evicted after update to ensure consistency.</p>
      *
      * @param serviceId the ID of the service item to update
      * @param request the update request
@@ -96,6 +103,7 @@ public class ServiceItemService {
      * @throws IllegalArgumentException if service not found or not owned by current merchant
      */
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_SERVICE_ITEM_LISTS, allEntries = true)
     public ServiceItemResponse updateServiceItem(Long serviceId, ServiceItemRequest request) {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
@@ -132,12 +140,17 @@ public class ServiceItemService {
      *
      * <p>Only the merchant who owns the service item can delete it.
      * This performs a soft delete - the record remains in the database
-     * but is hidden from active listings.</p>
+     * but is hidden from active listings.
+     * Cache is evicted after deletion to ensure consistency.</p>
      *
      * @param serviceId the ID of the service item to delete
      * @throws IllegalArgumentException if service not found or not owned by current merchant
      */
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.CACHE_SERVICE_ITEMS, key = "#serviceId"),
+        @CacheEvict(value = CacheConfig.CACHE_SERVICE_ITEM_LISTS, allEntries = true)
+    })
     public void deleteServiceItem(Long serviceId) {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
@@ -154,11 +167,17 @@ public class ServiceItemService {
     /**
      * Reactivate a previously soft-deleted service item.
      *
+     * <p>Cache is evicted after reactivation to ensure consistency.</p>
+     *
      * @param serviceId the ID of the service item to reactivate
      * @return ServiceItemResponse containing the reactivated service item
      * @throws IllegalArgumentException if service not found or not owned by current merchant
      */
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.CACHE_SERVICE_ITEMS, key = "#serviceId"),
+        @CacheEvict(value = CacheConfig.CACHE_SERVICE_ITEM_LISTS, allEntries = true)
+    })
     public ServiceItemResponse reactivateServiceItem(Long serviceId) {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
@@ -176,12 +195,14 @@ public class ServiceItemService {
     /**
      * Get a service item by ID.
      *
-     * <p>Only returns service items owned by the current merchant.</p>
+     * <p>Only returns service items owned by the current merchant.
+     * Results are cached to improve performance.</p>
      *
      * @param serviceId the ID of the service item
      * @return Optional containing ServiceItemResponse if found and owned by current merchant
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_SERVICE_ITEMS, key = "#serviceId", unless = "#result == null || !#result.isPresent()")
     public Optional<ServiceItemResponse> getServiceItemById(Long serviceId) {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
@@ -192,11 +213,13 @@ public class ServiceItemService {
     /**
      * Get all service items for the current merchant.
      *
-     * <p>Returns both active and inactive service items.</p>
+     * <p>Returns both active and inactive service items.
+     * Results are cached to improve performance.</p>
      *
      * @return list of ServiceItemResponse for all merchant's services
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_SERVICE_ITEM_LISTS, key = "'all:' + T(org.example.appointment_system.service.ServiceItemService).getCurrentMerchantId()")
     public List<ServiceItemResponse> getAllServiceItems() {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
@@ -206,13 +229,31 @@ public class ServiceItemService {
     }
 
     /**
+     * Helper method to get current merchant ID for cache key.
+     * This is used internally for cache key generation.
+     *
+     * @return the current merchant profile ID or null
+     */
+    public static Long getCurrentMerchantId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+            authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            // This requires a repository lookup, but for cache key we can use user ID
+            return userDetails.getId();
+        }
+        return null;
+    }
+
+    /**
      * Get all active service items for the current merchant.
      *
-     * <p>Only returns service items that are available for booking.</p>
+     * <p>Only returns service items that are available for booking.
+     * Results are cached to improve performance.</p>
      *
      * @return list of ServiceItemResponse for active services
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_SERVICE_ITEM_LISTS, key = "'active:' + T(org.example.appointment_system.service.ServiceItemService).getCurrentMerchantId()")
     public List<ServiceItemResponse> getActiveServiceItems() {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 

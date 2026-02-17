@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.appointment_system.config.CacheConfig;
 import org.example.appointment_system.dto.request.MerchantProfileRequest;
 import org.example.appointment_system.dto.request.MerchantSettingsRequest;
 import org.example.appointment_system.dto.response.MerchantProfileResponse;
@@ -16,6 +17,9 @@ import org.example.appointment_system.enums.UserRole;
 import org.example.appointment_system.repository.MerchantProfileRepository;
 import org.example.appointment_system.repository.UserRepository;
 import org.example.appointment_system.security.CustomUserDetails;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -99,14 +103,32 @@ public class MerchantService {
     /**
      * Get the merchant profile for the current user.
      *
+     * <p>Results are cached to improve performance.</p>
+     *
      * @return Optional containing MerchantProfileResponse if found
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_MERCHANT_PROFILES, key = "#root.methodName + ':' + T(org.example.appointment_system.service.MerchantService).getCurrentUserId()")
     public Optional<MerchantProfileResponse> getCurrentMerchantProfile() {
         User currentUser = getCurrentUserOrThrow();
 
         return merchantProfileRepository.findByUserId(currentUser.getId())
             .map(this::mapToResponse);
+    }
+
+    /**
+     * Helper method to get current user ID for cache key.
+     * This is used internally for cache key generation.
+     *
+     * @return the current user ID or null
+     */
+    public static Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+            authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            return userDetails.getId();
+        }
+        return null;
     }
 
     /**
@@ -129,11 +151,14 @@ public class MerchantService {
     /**
      * Update the merchant profile for the current user.
      *
+     * <p>Cache is evicted after update to ensure consistency.</p>
+     *
      * @param request the profile update request
      * @return MerchantProfileResponse containing the updated profile
      * @throws IllegalArgumentException if user doesn't have a merchant profile
      */
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_MERCHANT_PROFILES, allEntries = true)
     public MerchantProfileResponse updateProfile(MerchantProfileRequest request) {
         User currentUser = getCurrentUserOrThrow();
 
@@ -156,10 +181,13 @@ public class MerchantService {
     /**
      * Get the current merchant's settings.
      *
+     * <p>Results are cached to improve performance.</p>
+     *
      * @return MerchantSettingsResponse containing the settings
      * @throws IllegalArgumentException if user doesn't have a merchant profile
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.CACHE_MERCHANT_SETTINGS, key = "'settings:' + T(org.example.appointment_system.service.MerchantService).getCurrentUserId()")
     public MerchantSettingsResponse getSettings() {
         User currentUser = getCurrentUserOrThrow();
 
@@ -172,13 +200,15 @@ public class MerchantService {
     /**
      * Update the merchant's settings.
      *
-     * <p>Merges the provided settings with existing settings.</p>
+     * <p>Merges the provided settings with existing settings.
+     * Cache is evicted after update to ensure consistency.</p>
      *
      * @param request the settings update request
      * @return MerchantSettingsResponse containing the updated settings
      * @throws IllegalArgumentException if user doesn't have a merchant profile
      */
     @Transactional
+    @CacheEvict(value = CacheConfig.CACHE_MERCHANT_SETTINGS, allEntries = true)
     public MerchantSettingsResponse updateSettings(MerchantSettingsRequest request) {
         User currentUser = getCurrentUserOrThrow();
 
@@ -232,11 +262,16 @@ public class MerchantService {
      * Delete the merchant profile for the current user.
      *
      * <p>Note: This is a hard delete. Consider implementing soft delete
-     * if business requirements need to retain historical data.</p>
+     * if business requirements need to retain historical data.
+     * Cache is evicted after deletion.</p>
      *
      * @throws IllegalArgumentException if user doesn't have a merchant profile
      */
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.CACHE_MERCHANT_PROFILES, allEntries = true),
+        @CacheEvict(value = CacheConfig.CACHE_MERCHANT_SETTINGS, allEntries = true)
+    })
     public void deleteProfile() {
         User currentUser = getCurrentUserOrThrow();
 
