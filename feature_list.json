@@ -510,7 +510,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/controller/MerchantController.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-020",

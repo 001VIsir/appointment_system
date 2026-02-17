@@ -782,6 +782,39 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 19 - FEAT-019 完成
+日期: 2026-02-17 22:45
+处理的 Feature: FEAT-019 - Merchant Controller
+完成内容:
+- 创建 MerchantController REST API
+  - POST /api/merchants/profile - 创建商户档案 (201 Created)
+  - GET /api/merchants/profile - 获取商户档案 (200/404)
+  - PUT /api/merchants/profile - 更新商户档案 (200)
+  - DELETE /api/merchants/profile - 删除商户档案 (204)
+  - GET /api/merchants/settings - 获取商户设置 (200)
+  - PUT /api/merchants/settings - 更新商户设置 (200)
+  - GET /api/merchants/profile/exists - 检查档案是否存在 (200)
+- 添加 OpenAPI 注解 (@Tag, @Operation, @ApiResponse)
+- 添加参数校验 (@Valid)
+- 权限控制: /api/merchants/** 需要 MERCHANT 或 ADMIN 角色
+- 编写单元测试 (MerchantControllerTest)
+  - 11 个测试用例
+  - createProfile: 1 个测试
+  - getProfile: 2 个测试 (成功、不存在)
+  - updateProfile: 1 个测试
+  - deleteProfile: 1 个测试
+  - getSettings: 2 个测试 (有设置、无设置)
+  - updateSettings: 2 个测试 (完整更新、部分更新)
+  - hasProfile: 2 个测试 (存在、不存在)
+- 项目编译成功，所有测试通过 (468 tests)
+- 更新 feature_list.json 标记 FEAT-019 passes=true
+问题/备注:
+- 使用 MockMvc.standaloneSetup 进行单元测试
+- 集成测试将在 FEAT-034 完成
+提交: e5d9a09
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
