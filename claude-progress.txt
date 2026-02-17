@@ -1179,6 +1179,51 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 28 - FEAT-028 完成
+日期: 2026-02-18 01:55
+处理的 Feature: FEAT-028 - 日志配置
+完成内容:
+- 创建 logback-spring.xml 配置文件
+  - Console appender (开发环境，彩色输出)
+  - JSON Console appender (生产环境)
+  - JSON File appender (滚动日志，100MB/文件，30天保留)
+  - Plain Text File appender (本地调试)
+  - Error File appender (仅错误日志，90天保留)
+  - 异步 appender 提升性能
+  - 支持 Spring Profile (dev/prod/test)
+- 添加 logstash-logback-encoder 依赖 (JSON 格式日志)
+- 添加 spring-aop 和 aspectjweaver 依赖 (AOP 支持)
+- 创建 RequestLoggingFilter 请求日志过滤器
+  - TraceId/SpanId 生成与传播
+  - X-Trace-Id 头支持 (分布式追踪)
+  - Client IP 获取 (支持代理头 X-Forwarded-For, X-Real-IP)
+  - 请求/响应日志 (方法、URI、状态码、耗时)
+  - MDC 上下文填充 (userId, merchantId, clientIp 等)
+  - 跳过静态路径 (/actuator/health, /swagger-ui, /api-docs 等)
+- 创建 TraceContext 工具类
+  - 获取/设置 MDC 上下文
+  - Runnable/Callable 包装 (上下文传播)
+  - 上下文验证方法
+- 创建 BusinessLogger 业务日志工具类
+  - 20+ 预定义业务事件类型
+  - 结构化事件日志格式
+  - 邮箱脱敏处理
+- 更新 application.properties 添加日志配置
+- 编写单元测试
+  - RequestLoggingFilterTest: 15 个测试用例
+  - TraceContextTest: 31 个测试用例
+  - BusinessLoggerTest: 31 个测试用例
+- 项目编译成功，所有测试通过 (762 tests)
+- 更新 feature_list.json 标记 FEAT-028 passes=true
+问题/备注:
+- Spring Boot 4 中 spring-boot-starter-aop 不存在，改用 spring-aop + aspectjweaver
+- JSON 日志使用 logstash-logback-encoder 实现
+- TraceId 支持从请求头传入，便于分布式追踪
+- MDC 上下文在异步线程中需要手动传播
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

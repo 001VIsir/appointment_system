@@ -738,7 +738,7 @@
         "src/main/resources/logback-spring.xml",
         "src/main/java/org/example/appointment_system/filter/RequestLoggingFilter.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-029",
