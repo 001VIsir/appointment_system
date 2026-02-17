@@ -1048,6 +1048,66 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 25 - FEAT-025 完成
+日期: 2026-02-18 01:10
+处理的 Feature: FEAT-025 - 全局异常处理（含 AOP 公共字段填充）
+完成内容:
+- 创建 ErrorCode 枚举
+  - 40+ 错误码，分 9 类
+  - 通用错误 (1xxx): INVALID_PARAMETER, RESOURCE_NOT_FOUND, OPERATION_NOT_ALLOWED 等
+  - 认证错误 (2xxx): UNAUTHORIZED, INVALID_CREDENTIALS, SESSION_EXPIRED 等
+  - 用户错误 (3xxx): USER_NOT_FOUND, USERNAME_ALREADY_EXISTS 等
+  - 商户错误 (4xxx): MERCHANT_PROFILE_NOT_FOUND, MERCHANT_PROFILE_ALREADY_EXISTS 等
+  - 服务项错误 (5xxx): SERVICE_ITEM_NOT_FOUND, SERVICE_ITEM_NAME_EXISTS 等
+  - 任务错误 (6xxx): APPOINTMENT_TASK_NOT_FOUND, APPOINTMENT_TASK_INACTIVE 等
+  - 时段错误 (7xxx): APPOINTMENT_SLOT_NOT_FOUND, APPOINTMENT_SLOT_FULL 等
+  - 预约错误 (8xxx): BOOKING_NOT_FOUND, BOOKING_CANNOT_CANCEL, BOOKING_CONCURRENT_MODIFICATION 等
+  - 签名链接错误 (9xxx): SIGNED_LINK_INVALID, SIGNED_LINK_EXPIRED 等
+- 创建 BusinessException 自定义异常
+  - 支持仅 ErrorCode、ErrorCode+消息、ErrorCode+cause、全参数构造
+  - 静态工厂方法: notFound(), invalidParameter(), unauthorized(), accessDenied()
+- 创建 ErrorResponse DTO 统一错误响应格式
+  - 包含: timestamp, status, code, error, message, path, traceId, fieldErrors
+  - 支持验证错误详情 (FieldError 列表)
+- 创建 GlobalExceptionHandler 处理各类异常
+  - BusinessException → 业务错误响应
+  - MethodArgumentNotValidException → 验证错误详情
+  - ConstraintViolationException → 约束违反错误
+  - MissingServletRequestParameterException → 缺少参数
+  - MethodArgumentTypeMismatchException → 类型不匹配
+  - HttpMessageNotReadableException → JSON 解析错误
+  - HttpRequestMethodNotSupportedException → 方法不支持
+  - NoHandlerFoundException → 404 错误
+  - BadCredentialsException → 凭证错误
+  - DisabledException → 账户禁用
+  - AuthenticationException → 认证失败
+  - AccessDeniedException → 权限不足
+  - OptimisticLockingFailureException → 并发冲突
+  - DataIntegrityViolationException → 数据完整性违反
+  - Exception → 未知错误 (500)
+- 创建 OperationType 枚举 (INSERT/UPDATE)
+- 创建 @AutoFill 自定义注解
+- 创建 AutoFillAspect 切面
+  - 自动填充 createdAt (仅 INSERT)
+  - 自动填充 updatedAt (INSERT 和 UPDATE)
+  - 支持类层级查找字段
+  - 不覆盖已有值
+- 编写单元测试
+  - BusinessExceptionTest: 11 个测试
+  - GlobalExceptionHandlerTest: 15 个测试
+  - AutoFillAspectTest: 9 个测试
+  - AutoFillAnnotationTest: 4 个测试
+  - OperationTypeTest: 4 个测试
+- 项目编译成功，所有相关测试通过 (41 tests, 635 total)
+- 更新 feature_list.json 标记 FEAT-025 passes=true
+问题/备注:
+- GlobalExceptionHandler 使用 @RestControllerAdvice 统一处理
+- AutoFillAspect 使用 @Aspect + @Around 实现字段填充
+- 所有异常处理方法添加了日志记录
+提交: 742d889
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

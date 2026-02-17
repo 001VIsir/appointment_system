@@ -671,7 +671,7 @@
         "src/main/java/org/example/appointment_system/annotation/AutoFill.java",
         "src/main/java/org/example/appointment_system/aop/AutoFillAspect.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-026",
