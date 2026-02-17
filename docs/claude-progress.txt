@@ -1355,6 +1355,40 @@ FEAT-031 - 商户管理页面:
 
 ---
 
+## 会话 32 - FEAT-033 完成
+日期: 2026-02-18 05:29
+处理的 Feature: FEAT-033 - 单元测试
+完成内容:
+- 验证现有测试状态
+  - 762 个测试全部通过
+  - Service 层测试覆盖率 100% (10/10)
+  - Controller 层测试覆盖率 100% (7/7)
+  - Repository 层测试覆盖率 83% (5/6)，缺少 MerchantProfileRepositoryTest
+- 创建 MerchantProfileRepositoryTest 单元测试
+  - 34 个测试用例
+  - 覆盖基本 CRUD 操作
+  - 覆盖 findByUserId/findByUser 方法
+  - 覆盖 existsByUserId/existsByUser 方法
+  - 覆盖 findByBusinessName/existsByBusinessName 方法
+  - 覆盖时间戳自动生成
+  - 覆盖用户-档案关系
+  - 覆盖 settings JSON 字段
+  - 覆盖可选字段验证
+  - 覆盖必填字段验证
+- 测试结果
+  - 新增 34 个测试
+  - 总测试数从 762 增加到 796
+  - 所有测试通过
+  - Repository 层测试覆盖率达到 100%
+- 更新 feature_list.json 标记 FEAT-033 passes=true
+- 更新 progress.json 统计数据 (91.7% 完成)
+问题/备注:
+- 单元测试已全面覆盖核心业务逻辑
+- 目标覆盖率 > 80% 已达成
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

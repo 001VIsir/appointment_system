@@ -866,7 +866,7 @@
         "src/test/java/org/example/appointment_system/service/**",
         "src/test/java/org/example/appointment_system/repository/**"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-034",

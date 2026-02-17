@@ -1,14 +1,14 @@
 {
   "project": "appointment_system",
   "lastUpdated": "2026-02-18",
-  "currentPhase": "P6",
-  "currentFeature": "FEAT-032",
+  "currentPhase": "P7",
+  "currentFeature": "FEAT-033",
   "statistics": {
     "totalFeatures": 36,
-    "completedFeatures": 32,
+    "completedFeatures": 33,
     "inProgressFeatures": 0,
-    "pendingFeatures": 4,
-    "completionPercentage": 88.9
+    "pendingFeatures": 3,
+    "completionPercentage": 91.7
   },
   "phases": [
     { "id": "P0", "name": "基础设施", "status": "completed", "features": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"] },
@@ -17,8 +17,8 @@
     { "id": "P3", "name": "业务服务", "status": "completed", "features": ["FEAT-014", "FEAT-015", "FEAT-016", "FEAT-017"] },
     { "id": "P4", "name": "API 层", "status": "completed", "features": ["FEAT-018", "FEAT-019", "FEAT-020", "FEAT-021", "FEAT-022", "FEAT-023"] },
     { "id": "P5", "name": "企业级特性", "status": "completed", "features": ["FEAT-024", "FEAT-025", "FEAT-026", "FEAT-027", "FEAT-028"] },
-    { "id": "P6", "name": "前端开发", "status": "in_progress", "features": ["FEAT-029", "FEAT-030", "FEAT-031", "FEAT-032"] },
-    { "id": "P7", "name": "测试与部署", "status": "pending", "features": ["FEAT-033", "FEAT-034", "FEAT-035", "FEAT-036"] }
+    { "id": "P6", "name": "前端开发", "status": "completed", "features": ["FEAT-029", "FEAT-030", "FEAT-031", "FEAT-032"] },
+    { "id": "P7", "name": "测试与部署", "status": "in_progress", "features": ["FEAT-033", "FEAT-034", "FEAT-035", "FEAT-036"] }
   ],
   "completedFeaturesDetail": [
     { "id": "FEAT-001", "title": "项目依赖配置与 Maven 设置", "completedAt": "2026-02-15", "commit": "8bcd857" },
@@ -52,7 +52,8 @@
     { "id": "FEAT-029", "title": "Vue 项目初始化", "completedAt": "2026-02-18", "commit": "0f5b957" },
     { "id": "FEAT-030", "title": "登录/注册页面", "completedAt": "2026-02-18", "commit": null },
     { "id": "FEAT-031", "title": "商户管理页面", "completedAt": "2026-02-18", "commit": null },
-    { "id": "FEAT-032", "title": "用户预约页面", "completedAt": "2026-02-18", "commit": null }
+    { "id": "FEAT-032", "title": "用户预约页面", "completedAt": "2026-02-18", "commit": null },
+    { "id": "FEAT-033", "title": "单元测试", "completedAt": "2026-02-18", "commit": null }
   ],
   "techEnhancementsIntegrated": {
     "description": "以下技术增强点已融合到对应的开发任务中",
@@ -80,7 +81,6 @@
     ]
   },
   "nextSteps": [
-    "FEAT-033: 单元测试",
     "FEAT-034: 集成测试",
     "FEAT-035: Docker 部署",
     "FEAT-036: 压力测试"
