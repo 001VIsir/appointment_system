@@ -976,6 +976,38 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 23 - FEAT-023 完成
+日期: 2026-02-18 00:25
+处理的 Feature: FEAT-023 - Stats Controller
+完成内容:
+- 创建 AdminController REST API
+  - GET /api/admin/metrics - 获取系统指标 (API 调用、错误率、响应时间)
+  - GET /api/admin/stats/bookings - 获取预约统计 (支持日期范围)
+  - GET /api/admin/stats/users - 获取用户统计
+  - GET /api/admin/stats/dashboard - 获取仪表板综合统计
+- 创建 DashboardStatsResponse 内嵌 DTO
+  - bookings: BookingStatsResponse
+  - users: UserStatsResponse
+  - system: SystemStatsResponse
+- 更新 MerchantController
+  - GET /api/merchants/stats - 获取商户预约统计
+- 更新 MerchantService
+  - getCurrentMerchantId(): 获取当前商户 ID
+- 添加 OpenAPI 注解 (@Tag, @Operation, @ApiResponse)
+- 权限控制: /api/admin/** 需要 ADMIN 角色
+- 编写单元测试
+  - AdminControllerTest: 6 个测试用例
+  - MerchantControllerTest: 新增 2 个测试用例
+- 项目编译成功，所有相关测试通过 (41 tests)
+- 更新 feature_list.json 标记 FEAT-023 passes=true
+问题/备注:
+- 复用已有的 StatisticsService 和 DTO
+- 管理端点使用 ADMIN 角色保护
+- 商户端点复用 MERCHANT 角色保护
+提交: 22357f4
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

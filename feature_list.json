@@ -610,7 +610,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/controller/AdminController.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-024",
