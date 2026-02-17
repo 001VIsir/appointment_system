@@ -533,7 +533,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/controller/ServiceItemController.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-021",

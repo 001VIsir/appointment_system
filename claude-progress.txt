@@ -815,6 +815,46 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 20 - FEAT-020 完成
+日期: 2026-02-17 23:02
+处理的 Feature: FEAT-020 - Service Controller
+完成内容:
+- 创建 ServiceItemController REST API
+  - POST /api/merchants/services - 创建服务项 (201 Created)
+  - GET /api/merchants/services - 获取所有服务项 (200)
+  - GET /api/merchants/services/{id} - 获取服务项详情 (200/404)
+  - PUT /api/merchants/services/{id} - 更新服务项 (200)
+  - DELETE /api/merchants/services/{id} - 删除服务项 (204)
+  - POST /api/merchants/services/{id}/reactivate - 重新激活服务项 (200)
+  - GET /api/merchants/services/active - 获取活跃服务项 (200)
+  - GET /api/merchants/services/inactive - 获取已删除服务项 (200)
+  - GET /api/merchants/services/count - 统计服务项数量 (200)
+  - GET /api/merchants/services/exists - 检查服务名称是否存在 (200)
+- 添加 OpenAPI 注解 (@Tag, @Operation, @ApiResponse, @Parameter)
+- 添加参数校验 (@Valid)
+- 权限控制: /api/merchants/services/** 需要 MERCHANT 或 ADMIN 角色
+- 编写单元测试 (ServiceItemControllerTest)
+  - 17 个测试用例
+  - createServiceItem: 2 个测试 (成功、默认active)
+  - getAllServiceItems: 2 个测试 (有数据、空列表)
+  - getServiceItemById: 2 个测试 (成功、不存在)
+  - updateServiceItem: 1 个测试
+  - deleteServiceItem: 1 个测试
+  - reactivateServiceItem: 1 个测试
+  - getActiveServiceItems: 1 个测试
+  - getInactiveServiceItems: 1 个测试
+  - countServiceItems: 3 个测试 (总数、活跃数、默认)
+  - checkNameExists: 2 个测试 (存在、不存在)
+- 项目编译成功，所有测试通过 (484 tests)
+- 更新 feature_list.json 标记 FEAT-020 passes=true
+问题/备注:
+- 软删除通过设置 active=false 实现
+- 使用 MockMvc.standaloneSetup 进行单元测试
+- 集成测试将在 FEAT-034 完成
+提交: 4f7e826
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
