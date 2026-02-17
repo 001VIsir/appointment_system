@@ -564,7 +564,7 @@
         "src/main/java/org/example/appointment_system/websocket/AppointmentWebSocketServer.java",
         "src/main/java/org/example/appointment_system/websocket/NotificationService.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-022",

@@ -855,6 +855,60 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 21 - FEAT-021 完成
+日期: 2026-02-17 23:26
+处理的 Feature: FEAT-021 - Booking Controller（含 WebSocket 实时通知）
+完成内容:
+- 添加 spring-boot-starter-websocket 依赖到 pom.xml
+- 创建 BookingController REST API
+  - POST /api/bookings - 创建预约 (201 Created)
+  - GET /api/bookings/my - 获取我的预约 (分页)
+  - GET /api/bookings/my/active - 获取活跃预约
+  - GET /api/bookings/my/status/{status} - 按状态筛选
+  - GET /api/bookings/{id} - 获取预约详情 (200/404)
+  - DELETE /api/bookings/{id} - 取消预约 (200)
+  - GET /api/merchants/bookings - 商户查看预约 (分页)
+  - GET /api/merchants/bookings/status/{status} - 商户按状态筛选
+  - PUT /api/merchants/bookings/{id}/confirm - 确认预约
+  - PUT /api/merchants/bookings/{id}/complete - 完成预约
+  - DELETE /api/merchants/bookings/{id} - 商户取消预约
+  - GET /api/tasks/{taskId}/slots - 获取任务时段 (公开)
+  - GET /api/tasks/{taskId}/slots/available - 获取有容量时段
+  - GET /api/slots/{slotId} - 获取时段详情
+  - GET /api/bookings/my/count - 统计用户预约数
+  - GET /api/bookings/my/count/active - 统计活跃预约数
+  - GET /api/bookings/my/has-booking/{slotId} - 检查是否已预约
+- 创建 WebSocketConfig 配置类
+  - @EnableWebSocketMessageBroker 启用 STOMP 协议
+  - 端点: /ws (支持原生 WebSocket)
+  - 消息代理: /topic, /queue
+  - 认证拦截器: AuthenticationHandshakeInterceptor
+  - STOMP 连接认证验证
+- 创建 NotificationService 通知服务
+  - notifyNewBooking() - 通知商户新预约
+  - notifyBookingCancelled() - 通知取消
+  - notifyBookingConfirmed() - 通知确认
+  - notifyBookingCompleted() - 通知完成
+  - notifyBookingReminder() - 发送提醒
+  - 支持自定义通知
+- 创建 BookingNotification DTO
+  - 包含通知类型、预约详情、时间戳等
+- 添加 OpenAPI 注解 (@Tag, @Operation, @ApiResponse, @Parameter)
+- 权限控制: 用户端点需要认证，商户端点需要 MERCHANT 角色
+- 编写单元测试
+  - BookingControllerTest: 23 个测试用例
+  - NotificationServiceTest: 16 个测试用例
+- 项目编译成功，所有测试通过 (520 tests)
+- 更新 feature_list.json 标记 FEAT-021 passes=true
+问题/备注:
+- WebSocket 使用 STOMP 协议，支持订阅模式
+- 商户订阅 /topic/merchant/{merchantId} 接收预约通知
+- 用户订阅 /topic/user/{userId} 接收预约状态变更通知
+- 使用 SimpMessagingTemplate 发送 WebSocket 消息
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
