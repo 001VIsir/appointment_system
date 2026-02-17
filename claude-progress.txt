@@ -1224,6 +1224,72 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 29 - FEAT-029 完成
+日期: 2026-02-18 02:15
+处理的 Feature: FEAT-029 - Vue 项目初始化
+完成内容:
+- 使用 Vite 创建 Vue 3 + TypeScript 项目
+- 安装并配置 Element Plus UI 框架
+- 安装并配置 Vue Router 4 (路由管理)
+- 安装并配置 Pinia 3 (状态管理)
+- 安装并配置 Axios (HTTP 客户端)
+- 配置 vite.config.ts
+  - 路径别名 (@api, @components, @views, @stores, @utils, @types, @layouts, @assets)
+  - API 代理配置 (代理到后端 8080 端口)
+  - WebSocket 代理配置
+  - 构建优化 (代码分割: element-plus, vue-vendor)
+- 配置 tsconfig.json
+  - 添加路径别名映射
+  - 严格类型检查
+- 配置 ESLint 和 Prettier
+  - Vue 3 推荐规则
+  - TypeScript 支持
+  - Prettier 集成
+- 创建项目目录结构
+  - src/api/ - API 模块 (auth, merchant, service, booking, task, link, admin)
+  - src/stores/ - Pinia 状态管理 (auth store)
+  - src/views/ - 页面组件 (auth, merchant, user, admin)
+  - src/router/ - Vue Router 配置
+  - src/layouts/ - 布局组件 (Default, Merchant, Admin)
+  - src/utils/ - 工具函数
+  - src/types/ - TypeScript 类型定义
+  - src/components/ - 组件 (common, business)
+- 创建 API 客户端
+  - Axios 实例配置 (withCredentials 支持 Session)
+  - 请求/响应拦截器
+  - 错误处理
+- 创建类型定义
+  - API 响应类型
+  - 用户/认证类型
+  - 商户/服务/任务/时段/预约类型
+  - 统计类型
+- 创建布局组件
+  - DefaultLayout (普通用户布局)
+  - MerchantLayout (商户后台布局)
+  - AdminLayout (管理员后台布局)
+- 创建页面组件
+  - HomeView (首页)
+  - LoginView (登录页)
+  - RegisterView (注册页)
+  - NotFoundView (404 页面)
+  - 商户页面占位组件
+  - 用户页面占位组件
+  - 管理员页面占位组件
+- 创建 Docker 部署配置
+  - Dockerfile (多阶段构建)
+  - nginx.conf (反向代理配置)
+- 环境配置文件
+  - .env, .env.development, .env.production
+- 项目构建成功 (npm run build)
+- 更新 feature_list.json 标记 FEAT-029 passes=true
+问题/备注:
+- Node.js 版本警告 (v22.11.0，部分包建议 >=22.12.0)，但不影响功能
+- 使用 Session Cookie 进行认证 (withCredentials: true)
+- Element Plus 使用中文语言包
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

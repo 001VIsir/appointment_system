@@ -765,7 +765,7 @@
         "frontend/vite.config.ts",
         "frontend/tsconfig.json"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-030",
