@@ -588,7 +588,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/controller/AppointmentTaskController.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-023",

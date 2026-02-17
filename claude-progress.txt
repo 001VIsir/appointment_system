@@ -909,6 +909,73 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 22 - FEAT-022 完成
+日期: 2026-02-17 23:51
+处理的 Feature: FEAT-022 - Task Controller
+完成内容:
+- 创建 AppointmentTaskRequest DTO
+  - 包含验证规则: @NotBlank, @Size, @NotNull, @Min
+  - serviceId: 必填，服务项 ID
+  - title: 必填, 2-100 字符
+  - description: 可选, 最大 1000 字符
+  - taskDate: 必填, 预约日期
+  - totalCapacity: 必填, 最小 1
+  - active: 可选, 默认 true
+- 创建 AppointmentSlotRequest DTO
+  - startTime: 必填, 开始时间
+  - endTime: 必填, 结束时间
+  - capacity: 必填, 最小 1
+- 创建 AppointmentTaskResponse DTO
+  - 包含完整任务信息和统计数据
+  - 包含关联的服务、商户信息
+  - 包含时段统计: slotCount, totalSlotCapacity, totalBookedCount
+- 创建 AppointmentTaskService 服务类
+  - createTask(): 创建预约任务
+    - 验证服务归属
+    - 防止同一天重复创建任务
+  - updateTask(): 更新任务
+  - deleteTask(): 软删除任务
+  - reactivateTask(): 重新激活任务
+  - getTaskById(): 商户查询任务
+  - getTaskByIdPublic(): 公开查询任务（签名链接）
+  - getAllTasks/getActiveTasks/getInactiveTasks(): 任务列表查询
+  - getTasksByService(): 按服务查询
+  - getTasksByDateRange(): 按日期范围查询
+  - createSlot(): 创建时段
+  - createSlots(): 批量创建时段
+  - deleteSlot(): 删除时段（无预约时可删）
+  - getSlots(): 获取时段列表
+  - getSlotsPublic(): 公开获取时段
+  - getSlotsWithCapacity(): 获取有容量的时段
+- 创建 AppointmentTaskController REST API
+  - POST /api/merchants/tasks - 创建预约任务 (201 Created)
+  - GET /api/merchants/tasks - 获取所有任务 (200)
+  - GET /api/merchants/tasks/active - 获取活跃任务 (200)
+  - GET /api/merchants/tasks/inactive - 获取已删除任务 (200)
+  - GET /api/merchants/tasks/by-service/{serviceId} - 按服务查询 (200)
+  - GET /api/merchants/tasks/by-date - 按日期范围查询 (200)
+  - GET /api/merchants/tasks/{id} - 获取任务详情 (200/404)
+  - PUT /api/merchants/tasks/{id} - 更新任务 (200)
+  - DELETE /api/merchants/tasks/{id} - 删除任务 (204)
+  - POST /api/merchants/tasks/{id}/reactivate - 重新激活任务 (200)
+  - GET /api/merchants/tasks/count - 统计任务数 (200)
+  - POST /api/merchants/tasks/{taskId}/slots - 创建时段 (201)
+  - GET /api/merchants/tasks/{taskId}/slots - 获取时段列表 (200)
+  - DELETE /api/merchants/tasks/{taskId}/slots/{slotId} - 删除时段 (204)
+  - GET /api/tasks/{id} - 公开获取任务 (200/404) - 签名链接访问
+- 更新 SecurityConfig 允许公开访问 /api/tasks/**
+- 编写单元测试
+  - AppointmentTaskControllerTest: 21 个测试用例
+  - AppointmentTaskServiceTest: 20 个测试用例
+- 项目编译成功，所有测试通过 (559 tests)
+- 更新 feature_list.json 标记 FEAT-022 passes=true
+问题/备注:
+- 注意避免与 BookingController 的公开时段端点冲突
+- 公开时段查询端点已存在于 BookingController
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

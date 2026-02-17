@@ -83,6 +83,7 @@ public class SecurityConfig {
                     "/api/auth/register",
                     "/api/auth/login",
                     "/api/public/**",
+                    "/api/tasks/**",  // Public task viewing for signed link access
                     "/error"
                 ).permitAll()
 
