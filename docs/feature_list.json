@@ -839,11 +839,11 @@
       ],
       "dependencies": ["FEAT-030", "FEAT-021", "FEAT-022"],
       "files": [
-        "frontend/src/views/user/BookingView.vue",
+        "frontend/src/views/user/PublicBookingView.vue",
         "frontend/src/views/user/MyBookingsView.vue",
         "frontend/src/components/business/TimeSlotPicker.vue"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-033",
