@@ -2,13 +2,13 @@
   "project": "appointment_system",
   "lastUpdated": "2026-02-18",
   "currentPhase": "P7",
-  "currentFeature": "FEAT-033",
+  "currentFeature": "FEAT-035",
   "statistics": {
     "totalFeatures": 36,
-    "completedFeatures": 33,
+    "completedFeatures": 34,
     "inProgressFeatures": 0,
-    "pendingFeatures": 3,
-    "completionPercentage": 91.7
+    "pendingFeatures": 2,
+    "completionPercentage": 94.4
   },
   "phases": [
     { "id": "P0", "name": "基础设施", "status": "completed", "features": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"] },
@@ -53,7 +53,8 @@
     { "id": "FEAT-030", "title": "登录/注册页面", "completedAt": "2026-02-18", "commit": null },
     { "id": "FEAT-031", "title": "商户管理页面", "completedAt": "2026-02-18", "commit": null },
     { "id": "FEAT-032", "title": "用户预约页面", "completedAt": "2026-02-18", "commit": null },
-    { "id": "FEAT-033", "title": "单元测试", "completedAt": "2026-02-18", "commit": null }
+    { "id": "FEAT-033", "title": "单元测试", "completedAt": "2026-02-18", "commit": null },
+    { "id": "FEAT-034", "title": "集成测试", "completedAt": "2026-02-18", "commit": null }
   ],
   "techEnhancementsIntegrated": {
     "description": "以下技术增强点已融合到对应的开发任务中",
@@ -81,7 +82,6 @@
     ]
   },
   "nextSteps": [
-    "FEAT-034: 集成测试",
     "FEAT-035: Docker 部署",
     "FEAT-036: 压力测试"
   ]

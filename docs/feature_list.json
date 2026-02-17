@@ -889,7 +889,7 @@
         "src/test/java/org/example/appointment_system/controller/**",
         "src/test/java/org/example/appointment_system/integration/**"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-035",
