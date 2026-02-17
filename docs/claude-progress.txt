@@ -1290,6 +1290,38 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 30 - FEAT-030/FEAT-031 完成
+日期: 2026-02-18 03:00
+处理的 Feature: FEAT-030 登录/注册页面, FEAT-031 商户管理页面
+完成内容:
+FEAT-030 - 登录/注册页面（验证已完整实现）:
+- Auth Store (Pinia) - 已实现
+- LoginView.vue - 已实现
+- RegisterView.vue - 已实现
+- 表单验证 - 已实现
+- 集成登录/注册 API - 已实现
+- 处理登录状态 - 已实现
+- 路由守卫 - 已实现
+- 错误提示 - 已实现
+FEAT-031 - 商户管理页面:
+- MerchantLayout.vue - 已实现（侧边栏导航、顶部用户信息）
+- DashboardView.vue - 商户仪表板（统计卡片、最近预约列表）
+- ProfileView.vue - 商户档案管理（创建/编辑档案、设置管理）
+- ServicesView.vue - 服务项管理（CRUD、软删除/恢复）
+- TasksView.vue - 预约任务管理（CRUD、时段管理、签名链接生成）
+- BookingsView.vue - 预约管理（列表、状态筛选、确认/完成/取消操作）
+- 所有表单验证完整
+- 所有 API 集成完整
+- 前端构建成功 (npm run build)
+- 更新 feature_list.json 标记 FEAT-030/FEAT-031 passes=true
+问题/备注:
+- TypeScript 类型检查修复（split 返回值、未使用变量等）
+- 商户页面完整实现了 CRUD 操作
+- 支持签名链接生成和复制到剪贴板
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]

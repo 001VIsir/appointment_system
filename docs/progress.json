@@ -1,23 +1,23 @@
 {
   "project": "appointment_system",
-  "lastUpdated": "2026-02-15",
-  "currentPhase": "P3",
-  "currentFeature": "FEAT-017",
+  "lastUpdated": "2026-02-18",
+  "currentPhase": "P6",
+  "currentFeature": "FEAT-032",
   "statistics": {
     "totalFeatures": 36,
-    "completedFeatures": 16,
+    "completedFeatures": 31,
     "inProgressFeatures": 0,
-    "pendingFeatures": 20,
-    "completionPercentage": 44.4
+    "pendingFeatures": 5,
+    "completionPercentage": 86.1
   },
   "phases": [
     { "id": "P0", "name": "基础设施", "status": "completed", "features": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"] },
     { "id": "P1", "name": "核心实体与仓库", "status": "completed", "features": ["FEAT-005", "FEAT-006", "FEAT-007", "FEAT-008", "FEAT-009"] },
     { "id": "P2", "name": "认证授权", "status": "completed", "features": ["FEAT-010", "FEAT-011", "FEAT-012", "FEAT-013"] },
-    { "id": "P3", "name": "业务服务", "status": "in_progress", "features": ["FEAT-014", "FEAT-015", "FEAT-016", "FEAT-017"] },
-    { "id": "P4", "name": "API 层", "status": "pending", "features": ["FEAT-018", "FEAT-019", "FEAT-020", "FEAT-021", "FEAT-022", "FEAT-023"] },
-    { "id": "P5", "name": "企业级特性", "status": "pending", "features": ["FEAT-024", "FEAT-025", "FEAT-026", "FEAT-027", "FEAT-028"] },
-    { "id": "P6", "name": "前端开发", "status": "pending", "features": ["FEAT-029", "FEAT-030", "FEAT-031", "FEAT-032"] },
+    { "id": "P3", "name": "业务服务", "status": "completed", "features": ["FEAT-014", "FEAT-015", "FEAT-016", "FEAT-017"] },
+    { "id": "P4", "name": "API 层", "status": "completed", "features": ["FEAT-018", "FEAT-019", "FEAT-020", "FEAT-021", "FEAT-022", "FEAT-023"] },
+    { "id": "P5", "name": "企业级特性", "status": "completed", "features": ["FEAT-024", "FEAT-025", "FEAT-026", "FEAT-027", "FEAT-028"] },
+    { "id": "P6", "name": "前端开发", "status": "in_progress", "features": ["FEAT-029", "FEAT-030", "FEAT-031", "FEAT-032"] },
     { "id": "P7", "name": "测试与部署", "status": "pending", "features": ["FEAT-033", "FEAT-034", "FEAT-035", "FEAT-036"] }
   ],
   "completedFeaturesDetail": [
@@ -36,7 +36,22 @@
     { "id": "FEAT-013", "title": "签名链接生成与验证", "completedAt": "2026-02-15", "commit": "8c068ea" },
     { "id": "FEAT-014", "title": "商户服务 CRUD", "completedAt": "2026-02-15", "commit": "cfe1154" },
     { "id": "FEAT-015", "title": "服务项 CRUD", "completedAt": "2026-02-15", "commit": "14df6d9" },
-    { "id": "FEAT-016", "title": "预约服务（乐观锁）", "completedAt": "2026-02-15", "commit": "631fe5f" }
+    { "id": "FEAT-016", "title": "预约服务（乐观锁）", "completedAt": "2026-02-15", "commit": "631fe5f" },
+    { "id": "FEAT-017", "title": "统计服务（含 Spring Task）", "completedAt": "2026-02-15", "commit": null },
+    { "id": "FEAT-018", "title": "Auth Controller", "completedAt": "2026-02-17", "commit": null },
+    { "id": "FEAT-019", "title": "Merchant Controller", "completedAt": "2026-02-17", "commit": "e5d9a09" },
+    { "id": "FEAT-020", "title": "Service Controller", "completedAt": "2026-02-17", "commit": "4f7e826" },
+    { "id": "FEAT-021", "title": "Booking Controller（含 WebSocket）", "completedAt": "2026-02-17", "commit": null },
+    { "id": "FEAT-022", "title": "Task Controller", "completedAt": "2026-02-17", "commit": null },
+    { "id": "FEAT-023", "title": "Stats Controller", "completedAt": "2026-02-18", "commit": "22357f4" },
+    { "id": "FEAT-024", "title": "限流过滤器（含 Spring Cache）", "completedAt": "2026-02-18", "commit": "8b3d5d0" },
+    { "id": "FEAT-025", "title": "全局异常处理（含 AOP）", "completedAt": "2026-02-18", "commit": "742d889" },
+    { "id": "FEAT-026", "title": "OpenAPI 文档", "completedAt": "2026-02-18", "commit": null },
+    { "id": "FEAT-027", "title": "Prometheus 指标", "completedAt": "2026-02-18", "commit": null },
+    { "id": "FEAT-028", "title": "日志配置", "completedAt": "2026-02-18", "commit": null },
+    { "id": "FEAT-029", "title": "Vue 项目初始化", "completedAt": "2026-02-18", "commit": "0f5b957" },
+    { "id": "FEAT-030", "title": "登录/注册页面", "completedAt": "2026-02-18", "commit": null },
+    { "id": "FEAT-031", "title": "商户管理页面", "completedAt": "2026-02-18", "commit": null }
   ],
   "techEnhancementsIntegrated": {
     "description": "以下技术增强点已融合到对应的开发任务中",
@@ -64,9 +79,9 @@
     ]
   },
   "nextSteps": [
-    "FEAT-017: 统计服务（含 Spring Task 定时任务）",
-    "FEAT-018: Auth Controller",
-    "FEAT-019: Merchant Controller",
-    "FEAT-020: Service Controller"
+    "FEAT-032: 用户预约页面",
+    "FEAT-033: 单元测试",
+    "FEAT-034: 集成测试",
+    "FEAT-035: Docker 部署"
   ]
 }

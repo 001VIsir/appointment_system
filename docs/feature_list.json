@@ -791,7 +791,7 @@
         "frontend/src/stores/auth.ts",
         "frontend/src/api/auth.ts"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-031",
@@ -818,7 +818,7 @@
         "frontend/src/views/merchant/TasksView.vue",
         "frontend/src/views/merchant/BookingsView.vue"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-032",
