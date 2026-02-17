@@ -760,6 +760,28 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 18 - FEAT-018 验证
+日期: 2026-02-17 22:38
+处理的 Feature: FEAT-018 - Auth Controller
+完成内容:
+- 验证 AuthController 已完整实现：
+  - POST /api/auth/register - 用户注册
+  - POST /api/auth/login - 用户登录
+  - POST /api/auth/logout - 用户登出
+  - GET /api/auth/me - 获取当前用户
+  - GET /api/auth/check-username - 检查用户名可用性
+  - GET /api/auth/check-email - 检查邮箱可用性
+- 验证 OpenAPI 注解已添加 (@Operation, @ApiResponse, @Tag)
+- 验证参数校验已实现 (@Valid)
+- 验证单元测试通过 (9 tests)
+- 更新 feature_list.json 标记 FEAT-018 passes=true
+问题/备注:
+- AuthController 在 FEAT-010/FEAT-011 已完成基本实现
+- 集成测试将在 FEAT-034 完成
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
