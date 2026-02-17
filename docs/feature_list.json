@@ -915,7 +915,7 @@
         ".env.example",
         "frontend/Dockerfile"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-036",

@@ -7,10 +7,10 @@ services:
     container_name: appointment-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root123}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Cqian1231}
       MYSQL_DATABASE: ${DB_NAME:-yuyue}
-      MYSQL_USER: ${DB_USERNAME:-app_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-app123}
+      MYSQL_USER: ${DB_USERNAME:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-Cqian1231}
     ports:
       - "${DB_PORT:-3306}:3306"
     volumes:

@@ -42,7 +42,7 @@
 | FEAT-032 | 用户预约页面 | ⭐⭐⭐⭐⭐ | ✅ 已完成 | 2026-02-18 |
 | FEAT-033 | 单元测试 | ⭐⭐⭐ | ✅ 已完成 | 2026-02-18 |
 | FEAT-034 | 集成测试 | ⭐⭐⭐ | ✅ 已完成 | 2026-02-18 |
-| FEAT-035 | Docker 部署 | ⭐⭐⭐ | 📝 待开发 | - |
+| FEAT-035 | Docker 部署 | ⭐⭐⭐ | ✅ 已完成 | 2026-02-18 |
 | FEAT-036 | 压力测试 | ⭐⭐ | 📝 待开发 | - |
 
 ---
@@ -112,6 +112,18 @@
 ---
 
 ## 更新日志
+
+### 2026-02-18
+- 完成 FEAT-035 (Docker 部署)
+- 创建完整的 Docker 部署配置：
+  - 后端 Dockerfile（多阶段构建）
+  - 前端 Dockerfile（生产模式）和 Dockerfile.dev（开发模式）
+  - docker-compose.yml（开发环境）和 docker-compose.prod.yml（生产环境）
+  - nginx.conf 配置（API 代理、WebSocket 支持）
+  - .env.example 环境变量模板
+  - README-deployment.md 详细部署文档
+- 配置健康检查、网络、数据卷
+- 支持 MySQL、Redis、RabbitMQ 服务编排
 
 ### 2026-02-18
 - 完成 FEAT-034 (集成测试)

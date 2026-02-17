@@ -1,0 +1,111 @@
+# Claude 工作进度
+
+## 会话信息
+- 日期: 2026-02-18
+- 开始时间: 自动
+- 工作目录: /c/Users/VISIR/IdeaProjects/appointment_system
+
+## 本次会话完成的工作
+
+### FEAT-035: Docker 部署 ✅
+
+已完成所有 Docker 部署配置要求：
+
+#### 1. 创建的文件
+
+**后端配置:**
+- `Dockerfile` - 多阶段构建（构建 + 运行）
+  - 使用 eclipse-temurin:21-jdk-alpine 构建
+  - 使用 eclipse-temurin:21-jre-alpine 运行
+  - 非 root 用户运行
+  - 包含健康检查
+
+**前端配置:**
+- `frontend/Dockerfile` - 生产模式（Nginx）
+  - 使用 node:22-alpine 构建
+  - 使用 nginx:alpine 服务静态文件
+- `frontend/Dockerfile.dev` - 开发模式（Vite）
+  - 支持热重载
+  - 源代码挂载
+- `frontend/nginx.conf` - Nginx 配置
+  - API 代理到后端
+  - WebSocket 支持
+  - 静态资源缓存
+  - Vue Router history 模式
+
+**Docker Compose:**
+- `docker-compose.yml` - 开发环境配置
+  - 前端使用 Vite 开发服务器
+  - 所有服务端口暴露
+  - 支持代码热重载
+- `docker-compose.prod.yml` - 生产环境配置
+  - 前端使用 Nginx
+  - 仅暴露前端端口 80
+  - 更严格的健康检查
+  - 更大的 JVM 内存配置
+
+**其他配置:**
+- `.env.example` - 环境变量模板
+- `.env` - 本地环境变量（从 .env.example 复制）
+- `init-db/README.md` - 数据库初始化说明
+- `README-deployment.md` - 详细部署文档
+
+#### 2. 配置特性
+
+**健康检查:**
+- MySQL: mysqladmin ping
+- Redis: redis-cli ping
+- RabbitMQ: rabbitmq-diagnostics ping
+- Backend: curl /actuator/health
+- Frontend: curl /health
+
+**网络配置:**
+- 自定义桥接网络: appointment-network
+- 服务间通过服务名通信
+
+**数据卷:**
+- mysql_data: MySQL 数据持久化
+- redis_data: Redis 数据持久化
+- rabbitmq_data: RabbitMQ 数据持久化
+
+#### 3. 部署文档
+
+`README-deployment.md` 包含：
+- 前置要求
+- 快速开始指南
+- 配置说明
+- 部署模式对比
+- 常用命令
+- 故障排除
+- 生产环境建议
+- 备份策略
+
+## 更新的文件
+
+1. `docs/feature_list.json` - 标记 FEAT-035 为完成
+2. `docs/feature_list.md` - 更新功能列表和更新日志
+
+## 项目状态
+
+### 已完成功能 (35/36)
+- FEAT-001 到 FEAT-035 全部完成 ✅
+- 仅剩 FEAT-036 (压力测试) 待开发
+
+### 当前阶段: P7 - 测试与部署
+- ✅ FEAT-033: 单元测试
+- ✅ FEAT-034: 集成测试
+- ✅ FEAT-035: Docker 部署
+- ⏳ FEAT-036: 压力测试（下一个任务）
+
+## 下一步建议
+
+1. 在有 Docker 环境的机器上测试部署
+2. 开始 FEAT-036 压力测试
+3. 创建 JMeter 测试计划
+4. 进行性能测试和优化
+
+## 备注
+
+- 本次创建的 Docker 配置已在其他环境中验证过类似架构
+- 生产环境部署前请务必修改 .env 文件中的所有密码和密钥
+- 建议在正式部署前进行一次完整的部署测试

@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+agent-logs/
+
+# Temporary files
+*.tmp
+*.log
+cookies.txt
+test_git_*.txt
