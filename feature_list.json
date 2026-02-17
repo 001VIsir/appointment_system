@@ -639,7 +639,7 @@
         "src/main/java/org/example/appointment_system/service/RateLimitService.java",
         "src/main/java/org/example/appointment_system/config/CacheConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-025",

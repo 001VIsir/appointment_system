@@ -1008,6 +1008,46 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 24 - FEAT-024 完成
+日期: 2026-02-18 00:50
+处理的 Feature: FEAT-024 - 限流过滤器（含 Spring Cache 缓存）
+完成内容:
+- 创建 RateLimitService 服务类
+  - 滑动时间窗算法实现
+  - Redis 计数器支持
+  - 支持匿名用户 (IP) 和认证用户 (User ID) 限流
+  - 默认匿名 60 req/min，认证用户 120 req/min
+- 创建 RateLimitFilter 过滤器
+  - 基于 Redis 的请求限流
+  - 认证端点更严格限制 (10 req/min)
+  - 公开端点限制 (30 req/min)
+  - 返回 X-RateLimit-* 响应头
+  - 超限返回 HTTP 429 Too Many Requests
+- 创建 CacheConfig 配置类
+  - @EnableCaching 启用声明式缓存
+  - Redis 缓存管理器
+  - 配置不同缓存区域 TTL (merchantProfiles: 30min, serviceItems: 15min, etc.)
+- 更新 MerchantService 应用缓存
+  - @Cacheable 缓存档案查询
+  - @Cacheable 缓存设置查询
+  - @CacheEvict 更新/删除时清除缓存
+- 更新 ServiceItemService 应用缓存
+  - @Cacheable 缓存服务项列表查询
+  - @Cacheable 缓存单个服务项查询
+  - @CacheEvict 增删改时清除缓存
+- 编写单元测试
+  - RateLimitServiceTest: 16 个测试用例
+  - RateLimitFilterTest: 12 个测试用例
+- 项目编译成功，所有新增测试通过 (28 tests)
+- 更新 feature_list.json 标记 FEAT-024 passes=true
+问题/备注:
+- HTTP 429 状态码需直接使用数值 (jakarta.servlet 不提供常量)
+- 缓存使用 Redis 作为后端，支持分布式缓存
+- 限流支持 X-Forwarded-For 和 X-Real-IP 头获取真实 IP
+提交: 8b3d5d0
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
