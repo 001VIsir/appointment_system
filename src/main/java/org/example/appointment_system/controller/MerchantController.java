@@ -10,9 +10,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.appointment_system.dto.request.MerchantProfileRequest;
 import org.example.appointment_system.dto.request.MerchantSettingsRequest;
+import org.example.appointment_system.dto.response.BookingStatsResponse;
 import org.example.appointment_system.dto.response.MerchantProfileResponse;
 import org.example.appointment_system.dto.response.MerchantSettingsResponse;
 import org.example.appointment_system.service.MerchantService;
+import org.example.appointment_system.service.StatisticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,6 +55,7 @@ import java.net.URI;
 public class MerchantController {
 
     private final MerchantService merchantService;
+    private final StatisticsService statisticsService;
 
     /**
      * Create a new merchant profile for the current user.
@@ -252,5 +255,45 @@ public class MerchantController {
     public ResponseEntity<Boolean> hasProfile() {
         boolean hasProfile = merchantService.hasMerchantProfile();
         return ResponseEntity.ok(hasProfile);
+    }
+
+    /**
+     * Get booking statistics for the current merchant.
+     *
+     * <p>Returns booking counts, rates, and today's statistics for the
+     * current authenticated merchant.</p>
+     *
+     * @return BookingStatsResponse with merchant-specific booking statistics
+     */
+    @GetMapping("/stats")
+    @Operation(
+        summary = "Get merchant booking statistics",
+        description = "Retrieves booking statistics for the current authenticated merchant. " +
+                      "Includes total bookings, status breakdowns, completion rates, " +
+                      "and today's booking statistics.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Merchant booking statistics retrieved successfully",
+                content = @Content(schema = @Schema(implementation = BookingStatsResponse.class))
+            ),
+            @ApiResponse(
+                responseCode = "404",
+                description = "Merchant profile not found for current user"
+            ),
+            @ApiResponse(
+                responseCode = "403",
+                description = "Access denied - MERCHANT role required"
+            )
+        }
+    )
+    public ResponseEntity<BookingStatsResponse> getMerchantStats() {
+        log.info("Getting booking stats for current merchant");
+
+        Long merchantId = merchantService.getCurrentMerchantId()
+                .orElseThrow(() -> new IllegalArgumentException("Merchant profile not found for current user"));
+
+        BookingStatsResponse response = statisticsService.getMerchantBookingStats(merchantId);
+        return ResponseEntity.ok(response);
     }
 }

@@ -3,9 +3,11 @@ package org.example.appointment_system.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.appointment_system.dto.request.MerchantProfileRequest;
 import org.example.appointment_system.dto.request.MerchantSettingsRequest;
+import org.example.appointment_system.dto.response.BookingStatsResponse;
 import org.example.appointment_system.dto.response.MerchantProfileResponse;
 import org.example.appointment_system.dto.response.MerchantSettingsResponse;
 import org.example.appointment_system.service.MerchantService;
+import org.example.appointment_system.service.StatisticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,6 +46,9 @@ class MerchantControllerTest {
 
     @Mock
     private MerchantService merchantService;
+
+    @Mock
+    private StatisticsService statisticsService;
 
     @InjectMocks
     private MerchantController merchantController;
@@ -330,6 +335,81 @@ class MerchantControllerTest {
             mockMvc.perform(get("/api/merchants/profile/exists"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/merchants/stats")
+    class GetMerchantStatsEndpointTests {
+
+        @Test
+        @DisplayName("should return booking stats for merchant")
+        void getMerchantStats_whenProfileExists_shouldReturnStats() throws Exception {
+            // Given
+            Long merchantId = 1L;
+            BookingStatsResponse statsResponse = BookingStatsResponse.builder()
+                    .totalBookings(50L)
+                    .activeBookings(10L)
+                    .pendingBookings(5L)
+                    .confirmedBookings(5L)
+                    .cancelledBookings(15L)
+                    .completedBookings(25L)
+                    .todayBookings(3L)
+                    .todayActiveBookings(2L)
+                    .todayCompletedBookings(1L)
+                    .completionRate(50.0)
+                    .cancellationRate(30.0)
+                    .confirmationRate(10.0)
+                    .build();
+
+            when(merchantService.getCurrentMerchantId()).thenReturn(Optional.of(merchantId));
+            when(statisticsService.getMerchantBookingStats(merchantId)).thenReturn(statsResponse);
+
+            // When/Then
+            mockMvc.perform(get("/api/merchants/stats"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalBookings").value(50))
+                .andExpect(jsonPath("$.activeBookings").value(10))
+                .andExpect(jsonPath("$.pendingBookings").value(5))
+                .andExpect(jsonPath("$.confirmedBookings").value(5))
+                .andExpect(jsonPath("$.cancelledBookings").value(15))
+                .andExpect(jsonPath("$.completedBookings").value(25))
+                .andExpect(jsonPath("$.todayBookings").value(3))
+                .andExpect(jsonPath("$.completionRate").value(50.0));
+
+            verify(merchantService).getCurrentMerchantId();
+            verify(statisticsService).getMerchantBookingStats(merchantId);
+        }
+
+        @Test
+        @DisplayName("should throw exception when profile not found")
+        void getMerchantStats_whenProfileNotExists_shouldThrowException() throws Exception {
+            // Given
+            when(merchantService.getCurrentMerchantId()).thenReturn(Optional.empty());
+
+            // When/Then - The exception is thrown because there's no global exception handler
+            // In actual application with GlobalExceptionHandler, this would return 404 or 400
+            try {
+                mockMvc.perform(get("/api/merchants/stats"));
+                // If no exception, the test should fail
+                org.junit.jupiter.api.Assertions.fail("Expected IllegalArgumentException to be thrown");
+            } catch (Exception e) {
+                // Verify that the root cause is IllegalArgumentException
+                Throwable rootCause = e;
+                while (rootCause.getCause() != null) {
+                    rootCause = rootCause.getCause();
+                }
+                org.junit.jupiter.api.Assertions.assertTrue(
+                        rootCause instanceof IllegalArgumentException,
+                        "Expected IllegalArgumentException but got: " + rootCause.getClass().getName()
+                );
+                org.junit.jupiter.api.Assertions.assertTrue(
+                        rootCause.getMessage().contains("Merchant profile not found"),
+                        "Expected message to contain 'Merchant profile not found' but got: " + rootCause.getMessage()
+                );
+            }
+
+            verify(merchantService).getCurrentMerchantId();
         }
     }
 }

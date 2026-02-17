@@ -260,6 +260,18 @@ public class MerchantService {
     }
 
     /**
+     * Get the current merchant's profile ID.
+     *
+     * @return Optional containing the merchant profile ID if found
+     */
+    @Transactional(readOnly = true)
+    public Optional<Long> getCurrentMerchantId() {
+        User currentUser = getCurrentUserOrThrow();
+        return merchantProfileRepository.findByUserId(currentUser.getId())
+                .map(MerchantProfile::getId);
+    }
+
+    /**
      * Get the current authenticated user.
      *
      * @return Optional containing the current User
