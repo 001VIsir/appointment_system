@@ -693,7 +693,7 @@
       "files": [
         "src/main/java/org/example/appointment_system/config/OpenApiConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-027",

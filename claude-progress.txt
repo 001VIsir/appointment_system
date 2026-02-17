@@ -1108,6 +1108,37 @@ FEAT-012 - 角色权限控制 (RBAC):
 
 ---
 
+## 会话 26 - FEAT-026 完成
+日期: 2026-02-18 01:22
+处理的 Feature: FEAT-026 - OpenAPI 文档
+完成内容:
+- 创建 OpenApiConfig 配置类
+  - API 元信息: 标题、描述、版本、联系方式、许可证
+  - 服务器配置: 开发环境和生产环境
+  - Session-based 认证安全方案 (Cookie: SESSION)
+  - 安全需求应用于所有端点
+- 更新 application.properties 添加 springdoc 配置
+  - 启用 api-docs 和 swagger-ui
+  - 配置排序和展开方式
+  - 配置扫描包路径
+- 验证所有 Controller 已有完整的 OpenAPI 注解
+  - AuthController, MerchantController, ServiceItemController
+  - BookingController, AppointmentTaskController
+  - AdminController, SignedLinkController
+  - 所有端点都有 @Tag, @Operation, @ApiResponse 注解
+- 编写 OpenApiConfigTest 单元测试
+  - 8 个测试用例覆盖配置验证
+- 项目编译成功，测试通过 (8 tests)
+- 更新 feature_list.json 标记 FEAT-026 passes=true
+问题/备注:
+- 所有 Controller 在之前的会话中已添加完整 OpenAPI 注解
+- Swagger UI 访问地址: /swagger-ui.html
+- OpenAPI JSON: /api-docs
+- 使用 Session Cookie 进行认证
+提交: [待提交]
+
+---
+
 ## 会话模板
 ```
 ## 会话 N - [简要描述]
