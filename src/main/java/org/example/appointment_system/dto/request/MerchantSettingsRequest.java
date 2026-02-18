@@ -8,18 +8,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for merchant settings update request.
+ * 商户设置更新请求DTO。
  *
- * <p>Contains configurable settings for a merchant account.
- * Settings are stored as JSON in the database for flexibility.</p>
+ * <p>包含商户账户的可配置设置。
+ * 设置以 JSON 格式存储在数据库中以提供灵活性。</p>
  *
- * <h3>Available Settings:</h3>
+ * <h3>可用设置：</h3>
  * <ul>
- *   <li>sessionTimeout: Session timeout in seconds (default: 14400 = 4 hours)</li>
- *   <li>notifications: Enable/disable email notifications</li>
- *   <li>timezone: Business timezone (e.g., "Asia/Shanghai")</li>
- *   <li>bookingAdvanceDays: How many days in advance bookings can be made</li>
- *   <li>cancelDeadline: Hours before appointment when cancellation is allowed</li>
+ *   <li>sessionTimeout：会话超时时间，单位秒（默认：14400 = 4小时）</li>
+ *   <li>notifications：启用/禁用邮件通知</li>
+ *   <li>timezone：商户时区（例如："Asia/Shanghai"）</li>
+ *   <li>bookingAdvanceDays：提前多少天可以预约</li>
+ *   <li>cancelDeadline：预约开始前多少小时允许取消</li>
  * </ul>
  */
 @Getter
@@ -31,44 +31,44 @@ import lombok.Setter;
 public class MerchantSettingsRequest {
 
     /**
-     * Session timeout in seconds.
-     * Default: 14400 (4 hours).
-     * Min: 1800 (30 minutes), Max: 86400 (24 hours).
+     * 会话超时时间，单位秒。
+     * 默认值：14400（4小时）。
+     * 最小值：1800（30分钟），最大值：86400（24小时）。
      */
     private Integer sessionTimeout;
 
     /**
-     * Enable email notifications for new bookings.
+     * 启用新预约的邮件通知。
      */
     private Boolean notificationsEnabled;
 
     /**
-     * Business timezone for displaying times to customers.
-     * Example: "Asia/Shanghai", "America/New_York".
+     * 向客户显示时间的商户时区。
+     * 示例："Asia/Shanghai"、"America/New_York"。
      */
     private String timezone;
 
     /**
-     * Number of days in advance that bookings can be made.
-     * Default: 30 days.
+     * 提前多少天可以预约。
+     * 默认值：30天。
      */
     private Integer bookingAdvanceDays;
 
     /**
-     * Hours before appointment when cancellation is still allowed.
-     * Default: 24 hours.
+     * 预约开始前多少小时仍允许取消。
+     * 默认值：24小时。
      */
     private Integer cancelDeadlineHours;
 
     /**
-     * Enable automatic confirmation of bookings.
-     * If true, bookings are automatically confirmed instead of pending.
+     * 启用自动确认预约。
+     * 如果为 true，预约将自动确认而非待确认状态。
      */
     private Boolean autoConfirmBookings;
 
     /**
-     * Maximum bookings per user per day.
-     * 0 or null means unlimited.
+     * 每个用户每天的最大预约数。
+     * 0 或 null 表示无限制。
      */
     private Integer maxBookingsPerUserPerDay;
 }
