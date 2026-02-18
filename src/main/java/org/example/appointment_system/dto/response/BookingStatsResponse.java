@@ -7,14 +7,14 @@ import java.time.LocalDate;
 import java.util.Map;
 
 /**
- * Response DTO for booking statistics.
+ * 预约统计响应数据传输对象。
  *
- * <p>Contains various booking metrics and statistics:</p>
+ * <p>包含各种预约指标和统计数据：</p>
  * <ul>
- *   <li>Total booking counts by status</li>
- *   <li>Today's booking statistics</li>
- *   <li>Date range statistics</li>
- *   <li>Merchant-specific statistics</li>
+ *   <li>按状态统计的预约总数</li>
+ *   <li>今日预约统计</li>
+ *   <li>日期范围统计</li>
+ *   <li>商户特定统计</li>
  * </ul>
  */
 @Data
@@ -22,98 +22,98 @@ import java.util.Map;
 public class BookingStatsResponse {
 
     // ============================================
-    // Overall Statistics
+    // 总体统计
     // ============================================
 
     /**
-     * Total number of bookings (all time).
+     * 预约总数（所有时间）。
      */
     private long totalBookings;
 
     /**
-     * Total number of active bookings (PENDING + CONFIRMED).
+     * 活跃预约总数（PENDING + CONFIRMED）。
      */
     private long activeBookings;
 
     /**
-     * Total number of pending bookings.
+     * 待处理预约总数。
      */
     private long pendingBookings;
 
     /**
-     * Total number of confirmed bookings.
+     * 已确认预约总数。
      */
     private long confirmedBookings;
 
     /**
-     * Total number of cancelled bookings.
+     * 已取消预约总数。
      */
     private long cancelledBookings;
 
     /**
-     * Total number of completed bookings.
+     * 已完成预约总数。
      */
     private long completedBookings;
 
     // ============================================
-    // Today's Statistics
+    // 今日统计
     // ============================================
 
     /**
-     * Number of bookings created today.
+     * 今日创建的预约数。
      */
     private long todayBookings;
 
     /**
-     * Number of active bookings for today.
+     * 今日活跃预约数。
      */
     private long todayActiveBookings;
 
     /**
-     * Number of completed bookings today.
+     * 今日完成的预约数。
      */
     private long todayCompletedBookings;
 
     // ============================================
-    // Date Range Statistics
+    // 日期范围统计
     // ============================================
 
     /**
-     * Start date for the statistics period.
+     * 统计周期的开始日期。
      */
     private LocalDate startDate;
 
     /**
-     * End date for the statistics period.
+     * 统计周期的结束日期。
      */
     private LocalDate endDate;
 
     /**
-     * Number of bookings in the date range.
+     * 日期范围内的预约数。
      */
     private long periodBookings;
 
     /**
-     * Daily breakdown of bookings (date -> count).
+     * 每日预约明细（日期 -> 数量）。
      */
     private Map<LocalDate, Long> dailyBookings;
 
     // ============================================
-    // Success Metrics
+    // 成功率指标
     // ============================================
 
     /**
-     * Booking completion rate (completed / total).
+     * 预约完成率（已完成 / 总数）。
      */
     private double completionRate;
 
     /**
-     * Booking cancellation rate (cancelled / total).
+     * 预约取消率（已取消 / 总数）。
      */
     private double cancellationRate;
 
     /**
-     * Booking confirmation rate (confirmed / total).
+     * 预约确认率（已确认 / 总数）。
      */
     private double confirmationRate;
 }
