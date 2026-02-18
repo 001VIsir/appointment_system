@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for user login request.
+ * 用户登录请求DTO。
  *
- * <p>Contains credentials for authenticating a user.</p>
+ * <p>包含用户认证所需的凭证信息。</p>
  *
- * <h3>Validation Rules:</h3>
+ * <h3>校验规则：</h3>
  * <ul>
- *   <li>Username: required, 3-50 characters</li>
- *   <li>Password: required, minimum 6 characters</li>
+ *   <li>用户名：必填，3-50个字符</li>
+ *   <li>密码：必填，最少6个字符</li>
  * </ul>
  */
 @Getter
@@ -23,16 +23,16 @@ import lombok.Setter;
 public class LoginRequest {
 
     /**
-     * Username for authentication.
+     * 用于认证的用户名。
      */
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @NotBlank(message = "用户名不能为空")
+    @Size(min = 3, max = 50, message = "用户名长度必须在3到50个字符之间")
     private String username;
 
     /**
-     * Password for authentication.
+     * 用于认证的密码。
      */
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 6, max = 100, message = "密码长度必须在6到100个字符之间")
     private String password;
 }
