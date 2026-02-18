@@ -10,16 +10,16 @@ import lombok.Setter;
 import org.example.appointment_system.enums.UserRole;
 
 /**
- * DTO for user registration request.
+ * 用户注册请求DTO。
  *
- * <p>Contains all required fields for creating a new user account.</p>
+ * <p>包含创建新用户账户所需的所有字段。</p>
  *
- * <h3>Validation Rules:</h3>
+ * <h3>校验规则：</h3>
  * <ul>
- *   <li>Username: 3-50 characters, alphanumeric with underscores</li>
- *   <li>Password: minimum 6 characters</li>
- *   <li>Email: valid email format</li>
- *   <li>Role: optional, defaults to USER</li>
+ *   <li>用户名：3-50个字符，可包含字母数字和下划线</li>
+ *   <li>密码：最少6个字符</li>
+ *   <li>邮箱：有效的邮箱格式</li>
+ *   <li>角色：可选，默认为 USER</li>
  * </ul>
  */
 @Getter
@@ -28,35 +28,35 @@ import org.example.appointment_system.enums.UserRole;
 public class RegisterRequest {
 
     /**
-     * Desired username for the account.
-     * Must be unique in the system.
+     * 账户的用户名。
+     * 必须在系统中唯一。
      */
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username can only contain letters, numbers, and underscores")
+    @NotBlank(message = "用户名不能为空")
+    @Size(min = 3, max = 50, message = "用户名长度必须在3到50个字符之间")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "用户名只能包含字母、数字和下划线")
     private String username;
 
     /**
-     * Password for the account.
-     * Will be hashed using BCrypt before storage.
+     * 账户的密码。
+     * 存储前会使用 BCrypt 进行哈希处理。
      */
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 6, max = 100, message = "密码长度必须在6到100个字符之间")
     private String password;
 
     /**
-     * Email address for the account.
-     * Must be unique in the system.
+     * 账户的邮箱地址。
+     * 必须在系统中唯一。
      */
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    @Size(max = 100, message = "Email must not exceed 100 characters")
+    @NotBlank(message = "邮箱不能为空")
+    @Email(message = "邮箱格式无效")
+    @Size(max = 100, message = "邮箱长度不能超过100个字符")
     private String email;
 
     /**
-     * Role for the new user.
-     * Optional - defaults to USER if not specified.
-     * Only ADMIN can create MERCHANT or ADMIN accounts.
+     * 新用户的角色。
+     * 可选，如果不指定默认为 USER。
+     * 只有 ADMIN 可以创建 MERCHANT 或 ADMIN 账户。
      */
     private UserRole role;
 }
