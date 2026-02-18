@@ -5,15 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * Business Logger
+ * 业务日志记录器
  *
- * Provides structured logging for business events with MDC context.
- * Each business event is logged with:
- * - Event type
- * - Event data (as key-value pairs)
- * - Current trace context (TraceId, UserId, etc.)
+ * 提供基于MDC上下文的结构化业务事件日志记录。
+ * 每个业务事件记录包含：
+ * - 事件类型
+ * - 事件数据（键值对形式）
+ * - 当前追踪上下文（TraceId、UserId等）
  *
- * Usage:
+ * 使用示例：
  * <pre>
  * BusinessLogger.logBookingCreated(bookingId, userId, serviceId);
  * BusinessLogger.logBookingCancelled(bookingId, reason);
@@ -23,7 +23,7 @@ public final class BusinessLogger {
 
     private static final Logger BUSINESS_LOG = LoggerFactory.getLogger("BUSINESS_LOG");
 
-    // Event types
+    // 事件类型
     public static final String EVENT_USER_REGISTERED = "USER_REGISTERED";
     public static final String EVENT_USER_LOGIN = "USER_LOGIN";
     public static final String EVENT_USER_LOGOUT = "USER_LOGOUT";
@@ -47,13 +47,13 @@ public final class BusinessLogger {
     public static final String EVENT_WEBSOCKET_NOTIFICATION = "WEBSOCKET_NOTIFICATION";
 
     private BusinessLogger() {
-        // Utility class
+        // 工具类，禁止实例化
     }
 
-    // ==================== Generic Event Logging ====================
+    // ==================== 通用事件日志 ====================
 
     /**
-     * Log a business event with data
+     * 记录业务事件（info级别）
      */
     public static void logEvent(String eventType, Object... data) {
         StringBuilder message = new StringBuilder("[EVENT:").append(eventType).append("]");
@@ -70,7 +70,7 @@ public final class BusinessLogger {
     }
 
     /**
-     * Log a business event with warning level
+     * 记录业务事件（warn级别）
      */
     public static void logWarning(String eventType, Object... data) {
         StringBuilder message = new StringBuilder("[EVENT:").append(eventType).append("]");
@@ -87,7 +87,7 @@ public final class BusinessLogger {
     }
 
     /**
-     * Log a business event with error level
+     * 记录业务事件（error级别）
      */
     public static void logError(String eventType, String errorMessage, Object... data) {
         StringBuilder message = new StringBuilder("[EVENT:").append(eventType).append("]");
@@ -104,8 +104,11 @@ public final class BusinessLogger {
         BUSINESS_LOG.error(message.toString());
     }
 
-    // ==================== User Events ====================
+    // ==================== 用户事件 ====================
 
+    /**
+     * 记录用户注册事件
+     */
     public static void logUserRegistered(Long userId, String username, String email) {
         logEvent(EVENT_USER_REGISTERED,
                 "userId", userId,
@@ -126,8 +129,11 @@ public final class BusinessLogger {
                 "username", username);
     }
 
-    // ==================== Merchant Events ====================
+    // ==================== 商户事件 ====================
 
+    /**
+     * 记录商户资料创建事件
+     */
     public static void logMerchantProfileCreated(Long merchantId, Long userId, String businessName) {
         logEvent(EVENT_MERCHANT_PROFILE_CREATED,
                 "merchantId", merchantId,
@@ -141,8 +147,11 @@ public final class BusinessLogger {
                 "businessName", businessName);
     }
 
-    // ==================== Service Item Events ====================
+    // ==================== 服务项目事件 ====================
 
+    /**
+     * 记录服务项目创建事件
+     */
     public static void logServiceItemCreated(Long serviceId, Long merchantId, String name, String category) {
         logEvent(EVENT_SERVICE_ITEM_CREATED,
                 "serviceId", serviceId,
@@ -165,8 +174,11 @@ public final class BusinessLogger {
                 "name", name);
     }
 
-    // ==================== Appointment Task Events ====================
+    // ==================== 预约任务事件 ====================
 
+    /**
+     * 记录预约任务创建事件
+     */
     public static void logTaskCreated(Long taskId, Long serviceId, String taskDate, int totalCapacity) {
         logEvent(EVENT_TASK_CREATED,
                 "taskId", taskId,
@@ -191,8 +203,11 @@ public final class BusinessLogger {
                 "capacity", capacity);
     }
 
-    // ==================== Booking Events ====================
+    // ==================== 预约事件 ====================
 
+    /**
+     * 记录预约创建事件
+     */
     public static void logBookingCreated(Long bookingId, Long userId, Long slotId, Long taskId) {
         logEvent(EVENT_BOOKING_CREATED,
                 "bookingId", bookingId,
@@ -228,8 +243,11 @@ public final class BusinessLogger {
                 "userId", userId);
     }
 
-    // ==================== Signed Link Events ====================
+    // ==================== 签名链接事件 ====================
 
+    /**
+     * 记录签名链接生成事件
+     */
     public static void logSignedLinkGenerated(Long taskId, Long merchantId, String expiresAt) {
         logEvent(EVENT_SIGNED_LINK_GENERATED,
                 "taskId", taskId,
@@ -250,8 +268,11 @@ public final class BusinessLogger {
                 "clientIp", clientIp);
     }
 
-    // ==================== Security Events ====================
+    // ==================== 安全事件 ====================
 
+    /**
+     * 记录限流事件
+     */
     public static void logRateLimitExceeded(String clientIp, String requestUri, String limitType) {
         logWarning(EVENT_RATE_LIMIT_EXCEEDED,
                 "clientIp", clientIp,
@@ -259,8 +280,11 @@ public final class BusinessLogger {
                 "limitType", limitType);
     }
 
-    // ==================== WebSocket Events ====================
+    // ==================== WebSocket事件 ====================
 
+    /**
+     * 记录WebSocket通知事件
+     */
     public static void logWebSocketNotification(Long merchantId, Long bookingId, String notificationType) {
         logEvent(EVENT_WEBSOCKET_NOTIFICATION,
                 "merchantId", merchantId,
@@ -268,10 +292,10 @@ public final class BusinessLogger {
                 "notificationType", notificationType);
     }
 
-    // ==================== Helper Methods ====================
+    // ==================== 辅助方法 ====================
 
     /**
-     * Mask email for privacy
+     * 脱敏邮箱地址以保护隐私
      */
     private static String maskEmail(String email) {
         if (email == null || !email.contains("@")) {
