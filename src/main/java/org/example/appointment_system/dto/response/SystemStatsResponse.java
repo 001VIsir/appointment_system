@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Response DTO for system-wide statistics.
+ * 系统级统计响应数据传输对象。
  *
- * <p>Contains system metrics including:</p>
+ * <p>包含系统指标，包括：</p>
  * <ul>
- *   <li>API call statistics</li>
- *   <li>Error rate statistics</li>
- *   <li>Response time statistics</li>
+ *   <li>API调用统计</li>
+ *   <li>错误率统计</li>
+ *   <li>响应时间统计</li>
  * </ul>
  */
 @Data
@@ -18,98 +18,98 @@ import lombok.Data;
 public class SystemStatsResponse {
 
     // ============================================
-    // API Call Statistics
+    // API调用统计
     // ============================================
 
     /**
-     * Total API calls today.
+     * 今日API调用总数。
      */
     private long todayApiCalls;
 
     /**
-     * API calls in the last hour.
+     * 上小时的API调用数。
      */
     private long lastHourApiCalls;
 
     /**
-     * API calls per minute average.
+     * 每分钟平均API调用数。
      */
     private double apiCallsPerMinute;
 
     // ============================================
-    // Error Rate Statistics
+    // 错误率统计
     // ============================================
 
     /**
-     * Total errors today.
+     * 今日错误总数。
      */
     private long todayErrors;
 
     /**
-     * Errors in the last hour.
+     * 上小时的错误数。
      */
     private long lastHourErrors;
 
     /**
-     * Error rate (percentage).
+     * 错误率（百分比）。
      */
     private double errorRate;
 
     /**
-     * 4xx errors (client errors).
+     * 4xx错误（客户端错误）。
      */
     private long clientErrors;
 
     /**
-     * 5xx errors (server errors).
+     * 5xx错误（服务端错误）。
      */
     private long serverErrors;
 
     // ============================================
-    // Response Time Statistics
+    // 响应时间统计
     // ============================================
 
     /**
-     * Average response time in milliseconds.
+     * 平均响应时间（毫秒）。
      */
     private double averageResponseTimeMs;
 
     /**
-     * Maximum response time in milliseconds.
+     * 最大响应时间（毫秒）。
      */
     private long maxResponseTimeMs;
 
     /**
-     * Minimum response time in milliseconds.
+     * 最小响应时间（毫秒）。
      */
     private long minResponseTimeMs;
 
     /**
-     * P95 response time in milliseconds.
+     * P95响应时间（毫秒）。
      */
     private long p95ResponseTimeMs;
 
     // ============================================
-    // Resource Statistics
+    // 资源统计
     // ============================================
 
     /**
-     * Number of active sessions.
+     * 活跃会话数。
      */
     private long activeSessions;
 
     /**
-     * JVM heap used (MB).
+     * JVM堆内存使用量（MB）。
      */
     private long heapUsedMb;
 
     /**
-     * JVM heap max (MB).
+     * JVM堆内存最大值（MB）。
      */
     private long heapMaxMb;
 
     /**
-     * System uptime in seconds.
+     * 系统运行时间（秒）。
      */
     private long uptimeSeconds;
 }

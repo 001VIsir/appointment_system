@@ -10,9 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * DTO for appointment task response data.
+ * 预约任务响应数据传输对象。
  *
- * <p>Contains complete task information including related service details.</p>
+ * <p>包含完整的任务信息，包括相关的服务详情。</p>
  */
 @Getter
 @Setter
@@ -22,77 +22,77 @@ import java.time.LocalDateTime;
 public class AppointmentTaskResponse {
 
     /**
-     * Unique identifier of the task.
+     * 任务的唯一标识符。
      */
     private Long id;
 
     /**
-     * ID of the associated service item.
+     * 关联服务项目的ID。
      */
     private Long serviceId;
 
     /**
-     * Name of the associated service.
+     * 关联服务的名称。
      */
     private String serviceName;
 
     /**
-     * ID of the merchant who owns this task.
+     * 拥有此任务的商户ID。
      */
     private Long merchantId;
 
     /**
-     * Business name of the merchant.
+     * 商户的商家名称。
      */
     private String merchantBusinessName;
 
     /**
-     * Title of the task.
+     * 任务标题。
      */
     private String title;
 
     /**
-     * Description of the task.
+     * 任务描述。
      */
     private String description;
 
     /**
-     * Date of the task.
+     * 任务日期。
      */
     private LocalDate taskDate;
 
     /**
-     * Maximum total bookings for this task.
+     * 此任务的最大预约总数。
      */
     private Integer totalCapacity;
 
     /**
-     * Total number of slots in this task.
+     * 此任务中的时段总数。
      */
     private Integer slotCount;
 
     /**
-     * Total capacity across all slots.
+     * 所有时段的容量总和。
      */
     private Integer totalSlotCapacity;
 
     /**
-     * Total bookings made across all slots.
+     * 所有时段的已预约总数。
      */
     private Integer totalBookedCount;
 
     /**
-     * Whether the task is active.
+     * 任务是否启用。
      */
     private Boolean active;
 
     /**
-     * Timestamp when the task was created.
+     * 任务创建的时间戳。
      */
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp when the task was last updated.
+     * 任务最后更新的时间戳。
      */
     private LocalDateTime updatedAt;
 }

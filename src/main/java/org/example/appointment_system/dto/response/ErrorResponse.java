@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Standard error response format for all API errors.
+ * 所有API错误的标准化错误响应格式。
  */
 @Getter
 @Builder
@@ -16,47 +16,47 @@ import java.util.List;
 public class ErrorResponse {
 
     /**
-     * Timestamp when the error occurred.
+     * 错误发生的时间戳。
      */
     private final LocalDateTime timestamp;
 
     /**
-     * HTTP status code.
+     * HTTP状态码。
      */
     private final int status;
 
     /**
-     * Error code for programmatic handling.
+     * 用于程序化处理的错误代码。
      */
     private final int code;
 
     /**
-     * Short error message.
+     * 简短的错误信息。
      */
     private final String error;
 
     /**
-     * Detailed error message.
+     * 详细的错误信息。
      */
     private final String message;
 
     /**
-     * Request path that caused the error.
+     * 引发错误的请求路径。
      */
     private final String path;
 
     /**
-     * Trace ID for log correlation (optional).
+     * 用于日志关联的跟踪ID（可选）。
      */
     private final String traceId;
 
     /**
-     * Validation errors (optional, for validation failures).
+     * 验证错误（可选，用于验证失败）。
      */
     private final List<FieldError> fieldErrors;
 
     /**
-     * Field-level validation error.
+     * 字段级别的验证错误。
      */
     @Getter
     @Builder
@@ -67,7 +67,7 @@ public class ErrorResponse {
     }
 
     /**
-     * Create a simple error response.
+     * 创建简单的错误响应。
      */
     public static ErrorResponse of(int status, int code, String error, String message, String path) {
         return ErrorResponse.builder()
@@ -81,7 +81,7 @@ public class ErrorResponse {
     }
 
     /**
-     * Create an error response with field errors.
+     * 创建包含字段错误的错误响应。
      */
     public static ErrorResponse of(int status, int code, String error, String message,
                                    String path, List<FieldError> fieldErrors) {
