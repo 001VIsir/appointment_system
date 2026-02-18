@@ -101,14 +101,14 @@ Please follow these steps:
 1. **Get your bearings:**
    - Run `pwd` to confirm your working directory
    - Read the git log (last 10 commits) to see recent work: `git log --oneline -10`
-   - Read the progress file: `claude-progress.txt`
+   - Read the progress file: `claude-progress.txt` and `progress.json`
 
 2. **Check for init script:**
    - If `init.sh` exists, run it to start the development environment
    - Verify the basic functionality is working
 
 3. **Pick a task:**
-   - Read `feature_list.json` to see all features
+   - Read `feature_list.json` and `feature_list.md` to see all features
    - Choose the HIGHEST PRIORITY feature that has `"passes": false`
    - Focus on ONLY ONE feature per session
 
@@ -124,14 +124,17 @@ Please follow these steps:
 6. **Commit and update progress:**
    - Commit your changes with a descriptive message
    - Update `claude-progress.txt` with what you did
-   - Update `feature_list.json` ONLY by changing `passes` to `true` for completed features
+   - Update `feature_list.json` and `feature_list.md` ONLY by changing `passes` to `true` for completed features
    - NEVER remove or modify test requirements
+
 
 IMPORTANT:
 - Work incrementally - do not try to implement multiple features at once
 - Leave the codebase in a clean state
 - Always commit after completing work
 - If you find bugs in existing code, fix them before starting new work
+-做好git的管理，方便我监督、检查、回滚，文档的主语言为中文
+-当你遇到问题时，把问题记录到problems.md里，然后在你解决问题的过程中，把原因、你的思考过程、解决过程等也写进problems.md里，要详细令人信服
 '
 
 # Main execution
