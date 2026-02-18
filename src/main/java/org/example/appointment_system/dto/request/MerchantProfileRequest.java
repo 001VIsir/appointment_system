@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for merchant profile create/update request.
+ * 商户资料创建/更新请求DTO。
  *
- * <p>Contains all fields that can be set or modified on a merchant profile.</p>
+ * <p>包含商户资料上所有可以设置或修改的字段。</p>
  *
- * <h3>Validation Rules:</h3>
+ * <h3>校验规则：</h3>
  * <ul>
- *   <li>businessName: Required, 2-100 characters</li>
- *   <li>description: Optional, max 1000 characters</li>
- *   <li>phone: Optional, max 20 characters, valid phone format</li>
- *   <li>address: Optional, max 255 characters</li>
+ *   <li>商户名称：必填，2-100个字符</li>
+ *   <li>描述：可选，最多1000个字符</li>
+ *   <li>电话：可选，最多20个字符，有效的电话格式</li>
+ *   <li>地址：可选，最多255个字符</li>
  * </ul>
  */
 @Getter
@@ -30,32 +30,32 @@ import lombok.Setter;
 public class MerchantProfileRequest {
 
     /**
-     * The business name of the merchant.
-     * Required field, displayed to customers.
+     * 商户的商家名称。
+     * 必填字段，展示给客户。
      */
-    @NotBlank(message = "Business name is required")
-    @Size(min = 2, max = 100, message = "Business name must be between 2 and 100 characters")
+    @NotBlank(message = "商户名称不能为空")
+    @Size(min = 2, max = 100, message = "商户名称长度必须在2到100个字符之间")
     private String businessName;
 
     /**
-     * Optional description of the business.
-     * Can be used to describe services offered.
+     * 商户的可选描述。
+     * 可用于描述所提供的服务。
      */
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    @Size(max = 1000, message = "描述长度不能超过1000个字符")
     private String description;
 
     /**
-     * Contact phone number.
-     * Optional but recommended for customer contact.
+     * 联系电话。
+     * 可选，但建议填写以便客户联系。
      */
-    @Size(max = 20, message = "Phone number must not exceed 20 characters")
-    @Pattern(regexp = "^[+]?[0-9\\s\\-()]*$", message = "Invalid phone number format")
+    @Size(max = 20, message = "电话号码长度不能超过20个字符")
+    @Pattern(regexp = "^[+]?[0-9\\s\\-()]*$", message = "电话号码格式无效")
     private String phone;
 
     /**
-     * Business address.
-     * Optional, useful for physical locations.
+     * 商户地址。
+     * 可选，适用于实体店铺。
      */
-    @Size(max = 255, message = "Address must not exceed 255 characters")
+    @Size(max = 255, message = "地址长度不能超过255个字符")
     private String address;
 }
