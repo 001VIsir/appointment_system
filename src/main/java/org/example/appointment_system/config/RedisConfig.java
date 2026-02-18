@@ -68,12 +68,13 @@ public class RedisConfig {
 
     /**
      * Configure the default Redis serializer for session attributes.
-     * Using JSON serializer for better compatibility and readability.
+     * Using JDK serialization for Spring Security compatibility.
      *
      * @return the Redis serializer for session attributes
      */
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer(createObjectMapper());
+        // Use JDK serialization for session to properly handle Spring Security objects
+        return RedisSerializer.java();
     }
 }

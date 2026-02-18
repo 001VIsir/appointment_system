@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.appointment_system.enums.UserRole;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -29,7 +30,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Unique identifier for the user.

@@ -8,6 +8,7 @@
 -- 1. Users Table
 -- Stores all user accounts (Admin, Merchant, User)
 -- =============================================
+USE appointment_system;
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
