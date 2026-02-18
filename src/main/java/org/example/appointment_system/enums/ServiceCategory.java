@@ -1,60 +1,60 @@
 package org.example.appointment_system.enums;
 
 /**
- * Service category enumeration for classifying service items.
+ * 服务类别枚举，用于对服务项目进行分类。
  *
- * <p>Defines the types of services that merchants can offer:</p>
+ * <p>定义商家可以提供的服务类型：</p>
  * <ul>
- *   <li>{@link #GENERAL} - General services</li>
- *   <li>{@link #MEDICAL} - Medical and healthcare services</li>
- *   <li>{@link #BEAUTY} - Beauty and wellness services</li>
- *   <li>{@link #CONSULTATION} - Consulting and advisory services</li>
- *   <li>{@link #EDUCATION} - Educational and training services</li>
- *   <li>{@link #FITNESS} - Fitness and sports services</li>
- *   <li>{@link #OTHER} - Other uncategorized services</li>
+ *   <li>{@link #GENERAL} - 一般服务</li>
+ *   <li>{@link #MEDICAL} - 医疗保健服务</li>
+ *   <li>{@link #BEAUTY} - 美容养生服务</li>
+ *   <li>{@link #CONSULTATION} - 咨询顾问服务</li>
+ *   <li>{@link #EDUCATION} - 教育培训服务</li>
+ *   <li>{@link #FITNESS} - 健身运动服务</li>
+ *   <li>{@link #OTHER} - 其他未分类服务</li>
  * </ul>
  */
 public enum ServiceCategory {
 
     /**
-     * General services category.
-     * Default category for services that don't fit other categories.
+     * 一般服务类别。
+     * 不适合其他类别的服务的默认类别。
      */
     GENERAL("General", "General Services"),
 
     /**
-     * Medical and healthcare services.
-     * Includes clinics, hospitals, dental services, etc.
+     * 医疗和保健服务。
+     * 包括诊所、医院、牙科服务等。
      */
     MEDICAL("Medical", "Medical & Healthcare"),
 
     /**
-     * Beauty and wellness services.
-     * Includes salons, spas, skincare, etc.
+     * 美容和养生服务。
+     * 包括沙龙、水疗、皮肤护理等。
      */
     BEAUTY("Beauty", "Beauty & Wellness"),
 
     /**
-     * Consulting and advisory services.
-     * Includes business consulting, legal advice, financial planning, etc.
+     * 咨询和顾问服务。
+     * 包括商业咨询、法律建议、财务规划等。
      */
     CONSULTATION("Consultation", "Consulting Services"),
 
     /**
-     * Educational and training services.
-     * Includes tutoring, courses, workshops, etc.
+     * 教育和培训服务。
+     * 包括辅导、课程、工作坊等。
      */
     EDUCATION("Education", "Education & Training"),
 
     /**
-     * Fitness and sports services.
-     * Includes gyms, personal training, sports coaching, etc.
+     * 健身和运动服务。
+     * 包括健身房、私人教练、体育指导等。
      */
     FITNESS("Fitness", "Fitness & Sports"),
 
     /**
-     * Other uncategorized services.
-     * Fallback category for services that don't fit standard categories.
+     * 其他未分类服务。
+     * 不适合标准类别的服务的备用类别。
      */
     OTHER("Other", "Other Services");
 
@@ -67,18 +67,18 @@ public enum ServiceCategory {
     }
 
     /**
-     * Get the short code for the category.
+     * 获取类别的短代码。
      *
-     * @return the category code
+     * @return 类别代码
      */
     public String getCode() {
         return code;
     }
 
     /**
-     * Get the human-readable display name.
+     * 获取人类可读的显示名称。
      *
-     * @return the display name
+     * @return 显示名称
      */
     public String getDisplayName() {
         return displayName;

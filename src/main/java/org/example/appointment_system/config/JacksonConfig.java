@@ -9,26 +9,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Jackson JSON configuration.
+ * Jackson JSON配置。
  *
- * <p>Provides a configured ObjectMapper bean for JSON serialization/deserialization.</p>
+ * <p>提供配置好的ObjectMapper Bean用于JSON序列化/反序列化。</p>
  */
 @Configuration
 public class JacksonConfig {
 
     /**
-     * Configure and provide the ObjectMapper bean.
+     * 配置并提供ObjectMapper Bean。
      *
-     * @return configured ObjectMapper instance
+     * @return 配置好的ObjectMapper实例
      */
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
 
-        // Register Java 8 time module for LocalDateTime, etc.
+        // 注册Java 8时间模块，用于LocalDateTime等
         mapper.registerModule(new JavaTimeModule());
 
-        // Configuration
+        // 配置
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

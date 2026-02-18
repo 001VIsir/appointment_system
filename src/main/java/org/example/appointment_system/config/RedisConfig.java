@@ -14,19 +14,19 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
- * Redis Configuration for session management and caching.
+ * Redis配置，用于会话管理和缓存。
  *
- * <p>This configuration enables Redis-based HTTP session storage,
- * allowing for distributed session management across multiple application instances.</p>
+ * <p>此配置启用基于Redis的HTTP会话存储，
+ * 允许在多个应用程序实例之间进行分布式会话管理。</p>
  */
 @Configuration
 @EnableRedisHttpSession
 public class RedisConfig {
 
     /**
-     * Create a configured ObjectMapper for Redis serialization.
+     * 创建用于Redis序列化的配置好的ObjectMapper。
      *
-     * @return configured ObjectMapper
+     * @return 配置好的ObjectMapper
      */
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -41,22 +41,22 @@ public class RedisConfig {
     }
 
     /**
-     * Configure RedisTemplate with proper serializers.
+     * 使用适当的序列化器配置RedisTemplate。
      *
-     * @param connectionFactory the Redis connection factory
-     * @return configured RedisTemplate
+     * @param connectionFactory Redis连接工厂
+     * @return 配置好的RedisTemplate
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // Use String serializer for keys
+        // 使用String序列化器作为键
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
 
-        // Use JSON serializer for values with custom ObjectMapper
+        // 使用自定义ObjectMapper的JSON序列化器作为值
         GenericJackson2JsonRedisSerializer jsonSerializer =
                 new GenericJackson2JsonRedisSerializer(createObjectMapper());
         template.setValueSerializer(jsonSerializer);
@@ -67,14 +67,14 @@ public class RedisConfig {
     }
 
     /**
-     * Configure the default Redis serializer for session attributes.
-     * Using JDK serialization for Spring Security compatibility.
+     * 配置会话属性的默认Redis序列化器。
+     * 使用JDK序列化以兼容Spring Security。
      *
-     * @return the Redis serializer for session attributes
+     * @return 会话属性的Redis序列化器
      */
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-        // Use JDK serialization for session to properly handle Spring Security objects
+        // 使用JDK序列化会话以正确处理Spring Security对象
         return RedisSerializer.java();
     }
 }

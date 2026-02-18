@@ -23,16 +23,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for authentication operations.
+ * 认证操作的REST控制器。
  *
- * <p>Provides endpoints for user registration, login, and logout.</p>
+ * <p>提供用户注册、登录和登出的接口。</p>
  *
- * <h3>Endpoints:</h3>
+ * <h3>接口列表：</h3>
  * <ul>
- *   <li>POST /api/auth/register - Register a new user (public)</li>
- *   <li>POST /api/auth/login - Login (public, handled by Spring Security)</li>
- *   <li>POST /api/auth/logout - Logout (requires authentication)</li>
- *   <li>GET /api/auth/me - Get current user (requires authentication)</li>
+ *   <li>POST /api/auth/register - 注册新用户（公开）</li>
+ *   <li>POST /api/auth/login - 登录（公开，由Spring Security处理）</li>
+ *   <li>POST /api/auth/logout - 登出（需要认证）</li>
+ *   <li>GET /api/auth/me - 获取当前用户（需要认证）</li>
  * </ul>
  */
 @RestController
@@ -45,12 +45,12 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * Register a new user.
+     * 注册新用户。
      *
-     * <p>Creates a new user account. This endpoint is publicly accessible.</p>
+     * <p>创建新的用户账户。此接口公开可访问。</p>
      *
-     * @param request the registration request
-     * @return the created user information
+     * @param request 注册请求
+     * @return 创建的用户信息
      */
     @PostMapping("/register")
     @Operation(
@@ -75,10 +75,10 @@ public class AuthController {
     }
 
     /**
-     * Check if a username is available.
+     * 检查用户名是否可用。
      *
-     * @param username the username to check
-     * @return true if available, false otherwise
+     * @param username 要检查的用户名
+     * @return 可用返回true，否则返回false
      */
     @GetMapping("/check-username")
     @Operation(
@@ -91,10 +91,10 @@ public class AuthController {
     }
 
     /**
-     * Check if an email is available.
+     * 检查邮箱是否可用。
      *
-     * @param email the email to check
-     * @return true if available, false otherwise
+     * @param email 要检查的邮箱
+     * @return 可用返回true，否则返回false
      */
     @GetMapping("/check-email")
     @Operation(
@@ -107,13 +107,13 @@ public class AuthController {
     }
 
     /**
-     * Login a user.
+     * 用户登录。
      *
-     * <p>Authenticates the user and creates a session. This endpoint is publicly accessible.</p>
+     * <p>验证用户凭据并创建会话。此接口公开可访问。</p>
      *
-     * @param request the login request containing credentials
-     * @param httpRequest the HTTP request for session creation
-     * @return the authenticated user information
+     * @param request 包含凭据的登录请求
+     * @param httpRequest 用于创建会话的HTTP请求
+     * @return 已认证的用户信息
      */
     @PostMapping("/login")
     @Operation(
@@ -139,12 +139,12 @@ public class AuthController {
     }
 
     /**
-     * Logout the current user.
+     * 登出当前用户。
      *
-     * <p>Invalidates the current session. Requires authentication.</p>
+     * <p>使当前会话失效。需要认证。</p>
      *
-     * @param httpRequest the HTTP request containing the session
-     * @return empty response with 204 status
+     * @param httpRequest 包含会话的HTTP请求
+     * @return 空的204状态响应
      */
     @PostMapping("/logout")
     @Operation(
@@ -158,11 +158,11 @@ public class AuthController {
     }
 
     /**
-     * Get the current authenticated user.
+     * 获取当前已认证的用户。
      *
-     * <p>Requires authentication. Returns the currently logged-in user's information.</p>
-     *
-     * @return the current user information or 401 if not authenticated
+     * <p>需要认证。返回当前已登录用户的信息。</p>
+ *
+     * @return 当前用户信息，未认证则返回401
      */
     @GetMapping("/me")
     @Operation(

@@ -14,25 +14,25 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 
 /**
- * Service for generating and verifying HMAC-signed links.
+ * 用于生成和验证HMAC签名链接的服务类。
  *
- * <p>This service provides secure, time-limited links for public access to
- * appointment booking pages without requiring user authentication.</p>
+ * <p>此服务提供安全的、有时间限制的链接，用于公开访问预约页面，
+ * 无需用户认证。</p>
  *
- * <h3>Key Features:</h3>
+ * <h3>主要功能：</h3>
  * <ul>
- *   <li>HMAC-SHA256 signature generation</li>
- *   <li>Configurable link expiration time</li>
- *   <li>Secure token verification</li>
- *   <li>Time-based expiration checking</li>
+ *   <li>HMAC-SHA256签名生成</li>
+ *   <li>可配置的链接过期时间</li>
+ *   <li>安全的令牌验证</li>
+ *   <li>基于时间的过期检查</li>
  * </ul>
  *
- * <h3>Link Format:</h3>
+ * <h3>链接格式：</h3>
  * <pre>
  * /book/{taskId}?token={signature}&exp={expiryTimestamp}
  * </pre>
  *
- * <h3>Signature Algorithm:</h3>
+ * <h3>签名算法：</h3>
  * <pre>
  * signature = HMAC-SHA256(secretKey, taskId + ":" + expiryTimestamp)
  * token = Base64URL(signature)
@@ -52,24 +52,24 @@ public class SignedLinkService {
     private int expirationHours;
 
     /**
-     * Generate a signed link for an appointment task.
+     * 为预约任务生成签名链接。
      *
-     * <p>Creates a time-limited, cryptographically signed URL that allows
-     * public access to the booking page for a specific appointment task.</p>
+     * <p>创建加密签名的、有时间限制的URL，允许
+     * 公开访问特定预约任务的预约页面。</p>
      *
-     * @param taskId the ID of the appointment task
-     * @return the signed link path (without base URL)
+     * @param taskId 预约任务的ID
+     * @return 签名链接路径（不含基础URL）
      */
     public String generateSignedLink(Long taskId) {
         return generateSignedLink(taskId, Instant.now().plus(expirationHours, ChronoUnit.HOURS));
     }
 
     /**
-     * Generate a signed link with a custom expiration time.
+     * 生成具有自定义过期时间的签名链接。
      *
-     * @param taskId the ID of the appointment task
-     * @param expirationTime the instant when the link expires
-     * @return the signed link path (without base URL)
+     * @param taskId 预约任务的ID
+     * @param expirationTime 链接过期的时刻
+     * @return 签名链接路径（不含基础URL）
      */
     public String generateSignedLink(Long taskId, Instant expirationTime) {
         if (taskId == null) {
@@ -87,14 +87,14 @@ public class SignedLinkService {
     }
 
     /**
-     * Verify a signed link token.
+     * 验证签名链接令牌。
      *
-     * <p>Validates the signature and checks if the link has not expired.</p>
+     * <p>验证签名并检查链接是否未过期。</p>
      *
-     * @param taskId the ID of the appointment task
-     * @param token the signature token from the URL
-     * @param expiryTimestamp the expiration timestamp from the URL
-     * @return true if the link is valid and not expired
+     * @param taskId 预约任务的ID
+     * @param token URL中的签名令牌
+     * @param expiryTimestamp URL中的过期时间戳
+     * @return 如果链接有效且未过期返回true
      */
     public boolean verifySignedLink(Long taskId, String token, long expiryTimestamp) {
         if (taskId == null || token == null) {
@@ -102,13 +102,13 @@ public class SignedLinkService {
             return false;
         }
 
-        // Check expiration first
+        // 首先检查过期时间
         if (isExpired(expiryTimestamp)) {
             log.warn("Signed link expired for task {}: expiry={}", taskId, Instant.ofEpochMilli(expiryTimestamp));
             return false;
         }
 
-        // Verify signature
+        // 验证签名
         String expectedSignature = generateSignature(taskId, expiryTimestamp);
         String expectedToken = encodeToken(expectedSignature);
 
@@ -121,30 +121,30 @@ public class SignedLinkService {
     }
 
     /**
-     * Check if a link has expired.
+     * 检查链接是否已过期。
      *
-     * @param expiryTimestamp the expiration timestamp in milliseconds
-     * @return true if the current time is past the expiration
+     * @param expiryTimestamp 过期时间戳（毫秒）
+     * @return 如果当前时间已超过过期时间返回true
      */
     public boolean isExpired(long expiryTimestamp) {
         return Instant.now().toEpochMilli() > expiryTimestamp;
     }
 
     /**
-     * Get the configured expiration time from now.
+     * 获取从现在开始的配置的过期时间。
      *
-     * @return the expiration instant
+     * @return 过期时刻
      */
     public Instant getDefaultExpirationTime() {
         return Instant.now().plus(expirationHours, ChronoUnit.HOURS);
     }
 
     /**
-     * Generate HMAC-SHA256 signature.
+     * 生成HMAC-SHA256签名。
      *
-     * @param taskId the task ID
-     * @param expiryTimestamp the expiration timestamp
-     * @return the hex-encoded signature
+     * @param taskId 任务ID
+     * @param expiryTimestamp 过期时间戳
+     * @return 十六进制编码的签名
      */
     private String generateSignature(Long taskId, long expiryTimestamp) {
         String message = taskId + ":" + expiryTimestamp;
@@ -161,22 +161,22 @@ public class SignedLinkService {
     }
 
     /**
-     * Encode signature to URL-safe token.
+     * 将签名编码为URL安全的令牌。
      *
-     * @param signature the hex-encoded signature
-     * @return the URL-safe encoded token
+     * @param signature 十六进制编码的签名
+     * @return URL安全编码的令牌
      */
     private String encodeToken(String signature) {
-        // Use Base64URL encoding for URL safety
+        // 使用Base64URL编码以确保URL安全
         return Base64.getUrlEncoder().withoutPadding()
             .encodeToString(signature.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
-     * Convert byte array to hexadecimal string.
+     * 将字节数组转换为十六进制字符串。
      *
-     * @param bytes the byte array
-     * @return the hex string
+     * @param bytes 字节数组
+     * @return 十六进制字符串
      */
     private String bytesToHex(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
@@ -191,11 +191,11 @@ public class SignedLinkService {
     }
 
     /**
-     * Constant-time string comparison to prevent timing attacks.
+     * 恒定时间的字符串比较以防止时序攻击。
      *
-     * @param a the first string
-     * @param b the second string
-     * @return true if strings are equal
+     * @param a 第一个字符串
+     * @param b 第二个字符串
+     * @return 如果字符串相等返回true
      */
     private boolean constantTimeEquals(String a, String b) {
         if (a.length() != b.length()) {

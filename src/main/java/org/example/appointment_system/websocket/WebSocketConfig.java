@@ -23,26 +23,24 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import java.util.Map;
 
 /**
- * WebSocket configuration for real-time notifications.
+ * 用于实时通知的WebSocket配置。
  *
- * <p>Enables STOMP protocol over WebSocket for bidirectional communication
- * between the server and clients.</p>
+ * <p>启用STOMP协议通过WebSocket实现服务器与客户端之间的双向通信。</p>
  *
- * <h3>Endpoint:</h3>
+ * <h3>接口：</h3>
  * <ul>
- *   <li>/ws - WebSocket connection endpoint (with SockJS fallback)</li>
+ *   <li>/ws - WebSocket连接端点（带SockJS回退）</li>
  * </ul>
  *
- * <h3>Message Destinations:</h3>
+ * <h3>消息目的地：</h3>
  * <ul>
- *   <li>/topic/merchant/{merchantId} - Merchant-specific notifications</li>
- *   <li>/topic/user/{userId} - User-specific notifications</li>
- *   <li>/topic/public - Public broadcast messages</li>
+ *   <li>/topic/merchant/{merchantId} - 商家特定通知</li>
+ *   <li>/topic/user/{userId} - 用户特定通知</li>
+ *   <li>/topic/public - 公共广播消息</li>
  * </ul>
  *
- * <h3>Security:</h3>
- * <p>WebSocket connections require authentication. The user's session is
- * validated during the handshake and STOMP connect phase.</p>
+ * <h3>安全性：</h3>
+ * <p>WebSocket连接需要认证。用户的会话在握手和STOMP连接阶段进行验证。</p>
  */
 @Configuration
 @EnableWebSocketMessageBroker
@@ -51,41 +49,41 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Enable a simple memory-based message broker
-        // Messages destined for /topic are routed to the message broker
-        // Messages destined for /queue are for user-specific messages
+        // 启用简单的基于内存的消息代理
+        // 目标是/topic的消息路由到消息代理
+        // 目标是/queue的消息用于用户特定消息
         config.enableSimpleBroker("/topic", "/queue");
 
-        // Prefix for messages bound for @MessageMapping methods
+        // 目标为@MessageMapping方法的消息前缀
         config.setApplicationDestinationPrefixes("/app");
 
-        // Prefix for user-specific destinations
+        // 用户特定目的地的前缀
         config.setUserDestinationPrefix("/user");
 
-        log.info("WebSocket message broker configured");
+        log.info("WebSocket消息代理已配置");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Register STOMP endpoint at /ws with SockJS fallback
-        // Use addInterceptors for handshake interceptor
+        // 在/ws注册STOMP端点，带SockJS回退
+        // 使用addInterceptors添加握手拦截器
         registry.addEndpoint("/ws")
             .addInterceptors(new AuthenticationHandshakeInterceptor())
-            .setAllowedOriginPatterns("*");  // Allow all origins for development
+            .setAllowedOriginPatterns("*");  // 开发环境允许所有源
 
-        log.info("WebSocket STOMP endpoints registered at /ws");
+        log.info("WebSocket STOMP端点已在/ws注册");
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        // Add interceptor to validate authentication for STOMP messages
+        // 添加拦截器验证STOMP消息的认证
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
                 if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    // Validate user is authenticated
+                    // 验证用户已认证
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     if (auth == null || !auth.isAuthenticated()) {
                         log.warn("WebSocket connection rejected - not authenticated");
@@ -101,7 +99,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     /**
-     * Handshake interceptor to capture authentication during WebSocket handshake.
+     * 握手拦截器，用于在WebSocket握手期间捕获认证信息。
      */
     private static class AuthenticationHandshakeInterceptor implements HandshakeInterceptor {
 
@@ -113,7 +111,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             Map<String, Object> attributes
         ) throws Exception {
 
-            // Get authentication from Spring Security context
+            // 从Spring Security上下文获取认证信息
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
             if (auth != null && auth.isAuthenticated()) {

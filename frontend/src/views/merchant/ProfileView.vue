@@ -238,7 +238,7 @@ const loadProfile = async () => {
   loading.value = true
   try {
     const response = await merchantApi.hasProfile()
-    hasProfile.value = response.data.data
+    hasProfile.value = response.data
 
     if (hasProfile.value) {
       const profileRes = await merchantApi.getProfile()

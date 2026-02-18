@@ -4,6 +4,58 @@
 
 ---
 
+## 2026-02-18 (续)
+
+### 问题 23: Session Cookie 未正确保存
+
+**问题描述：**
+Playwright 浏览器登录后，SESSION cookie 没有被正确保存，登录后 API 调用返回 403 Forbidden。
+
+**原因分析：**
+1. SecurityConfig 登出配置错误：删除的是 `JSESSIONID`，但 Spring Session 使用 `SESSION` cookie
+2. Redis 序列化问题：GenericJackson2JsonRedisSerializer 与 JDK 序列化混用
+3. 商户资料自动创建缺失
+
+**修复措施：**
+1. 修改 SecurityConfig.java: `deleteCookies("SESSION")`
+2. AuthService.register() 中添加商户资料自动创建
+3. 清除 Redis: `redis-cli FLUSHALL`
+
+---
+
+### 问题 24: 商户资料未自动创建
+
+**问题描述：**
+用户注册 MERCHANT 角色后，没有自动创建商户资料，导致 403 Forbidden。
+
+**修复措施：**
+在 AuthService.register() 中添加：
+```java
+if (role == UserRole.MERCHANT) {
+    MerchantProfile profile = new MerchantProfile(savedUser, ...);
+    merchantProfileRepository.save(profile);
+}
+```
+
+---
+
+### 问题 25: API 请求体解析失败
+
+**问题描述：**
+curl 发送中文字符 JSON 时返回 400 Bad Request。
+
+**原因：**
+Jackson 枚举处理 + curl 编码问题
+
+---
+
+### 问题 26: 任务创建 500 错误
+
+**问题描述：**
+创建任务时返回 500，需要 `title` 和 `totalCapacity` 字段。
+
+---
+
 ## 2026-02-18
 
 ### 问题 22: 单元测试失败

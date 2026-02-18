@@ -25,22 +25,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST Controller for booking operations.
+ * 预约操作的REST控制器。
  *
- * <p>Provides endpoints for:</p>
+ * <p>提供以下接口：</p>
  * <ul>
- *   <li>User booking creation and management</li>
- *   <li>Merchant booking management</li>
- *   <li>Viewing available time slots</li>
- *   <li>Booking status updates</li>
+ *   <li>用户预约创建和管理</li>
+ *   <li>商家预约管理</li>
+ *   <li>查看可用时间段</li>
+ *   <li>预约状态更新</li>
  * </ul>
  *
- * <h3>Real-time Notifications:</h3>
- * <p>When bookings are created or updated, WebSocket notifications are sent
- * to the relevant merchant via the NotificationService.</p>
+ * <h3>实时通知：</h3>
+ * <p>当预约被创建或更新时，通过NotificationService向相关商家发送WebSocket通知。</p>
  *
- * <h3>WebSocket Integration:</h3>
- * <p>Merchants can connect to /ws to receive real-time booking notifications.</p>
+ * <h3>WebSocket集成：</h3>
+ * <p>商家可以连接到/ws接收实时预约通知。</p>
  */
 @RestController
 @RequiredArgsConstructor
@@ -53,19 +52,19 @@ public class BookingController {
     private final NotificationService notificationService;
 
     // ============================================
-    // User Booking Endpoints
+    // 用户预约接口
     // ============================================
 
     /**
-     * Create a new booking.
+     * 创建新预约。
      *
-     * <p>Creates a booking for the current authenticated user on the specified time slot.
-     * Uses optimistic locking to prevent overbooking.</p>
+     * <p>为当前已认证用户在指定时段创建预约。
+     * 使用乐观锁防止超售。</p>
      *
-     * <p>Upon successful booking, a WebSocket notification is sent to the merchant.</p>
+     * <p>预约成功后，向商家发送WebSocket通知。</p>
      *
-     * @param request the booking request containing slotId and optional remark
-     * @return BookingResponse with created booking details
+     * @param request 包含slotId和可选备注的预约请求
+     * @return 包含已创建预约详情的BookingResponse
      */
     @PostMapping("/api/bookings")
     @Operation(summary = "Create a booking", description = "Create a new booking for the current user")
@@ -80,7 +79,7 @@ public class BookingController {
 
         BookingResponse response = bookingService.createBooking(request);
 
-        // Send WebSocket notification to merchant
+        // 发送WebSocket通知给商家
         notificationService.notifyNewBooking(response);
 
         log.info("Booking created successfully: id={}", response.getId());
@@ -88,10 +87,10 @@ public class BookingController {
     }
 
     /**
-     * Get all bookings for the current user.
+     * 获取当前用户的所有预约。
      *
-     * @param pageable pagination parameters
-     * @return page of booking responses
+     * @param pageable 分页参数
+     * @return 预约响应分页
      */
     @GetMapping("/api/bookings/my")
     @Operation(summary = "Get my bookings", description = "Get all bookings for the current authenticated user")
@@ -108,9 +107,9 @@ public class BookingController {
     }
 
     /**
-     * Get active bookings for the current user.
+     * 获取当前用户的活动预约。
      *
-     * @return list of active bookings
+     * @return 活动预约列表
      */
     @GetMapping("/api/bookings/my/active")
     @Operation(summary = "Get my active bookings", description = "Get active (pending/confirmed) bookings for current user")
@@ -125,10 +124,10 @@ public class BookingController {
     }
 
     /**
-     * Get bookings for the current user filtered by status.
+     * 按状态筛选获取当前用户的预约。
      *
-     * @param status the booking status to filter by
-     * @return list of bookings with the specified status
+     * @param status 要筛选的预约状态
+     * @return 具有指定状态的预约列表
      */
     @GetMapping("/api/bookings/my/status/{status}")
     @Operation(summary = "Get my bookings by status", description = "Get bookings filtered by status for current user")
@@ -147,10 +146,10 @@ public class BookingController {
     }
 
     /**
-     * Get a specific booking by ID.
+     * 根据ID获取特定预约。
      *
-     * @param id the booking ID
-     * @return booking details
+     * @param id 预约ID
+     * @return 预约详情
      */
     @GetMapping("/api/bookings/{id}")
     @Operation(summary = "Get booking by ID", description = "Get details of a specific booking")
@@ -169,13 +168,13 @@ public class BookingController {
     }
 
     /**
-     * Cancel a booking.
+     * 取消预约。
      *
-     * <p>Only the user who created the booking can cancel it.
-     * A WebSocket notification is sent to the merchant upon cancellation.</p>
+     * <p>只有创建预约的用户可以取消它。
+     * 取消时向商家发送WebSocket通知。</p>
      *
-     * @param id the booking ID to cancel
-     * @return updated booking details
+     * @param id 要取消的预约ID
+     * @return 更新后的预约详情
      */
     @DeleteMapping("/api/bookings/{id}")
     @Operation(summary = "Cancel booking", description = "Cancel a booking (user operation)")
@@ -192,7 +191,7 @@ public class BookingController {
 
         BookingResponse response = bookingService.cancelBooking(id);
 
-        // Send WebSocket notification to merchant
+        // 发送WebSocket通知给商家
         notificationService.notifyBookingCancelled(response);
 
         log.info("Booking cancelled: id={}", id);
@@ -200,14 +199,14 @@ public class BookingController {
     }
 
     // ============================================
-    // Merchant Booking Endpoints
+    // 商家预约接口
     // ============================================
 
     /**
-     * Get all bookings for the current merchant.
+     * 获取当前商家的所有预约。
      *
-     * @param pageable pagination parameters
-     * @return page of booking responses
+     * @param pageable 分页参数
+     * @return 预约响应分页
      */
     @GetMapping("/api/merchants/bookings")
     @Operation(summary = "Get merchant bookings", description = "Get all bookings for the current merchant's tasks")
@@ -227,10 +226,10 @@ public class BookingController {
     }
 
     /**
-     * Get merchant bookings filtered by status.
+     * 按状态筛选获取商家的预约。
      *
-     * @param status the booking status to filter by
-     * @return list of bookings with the specified status
+     * @param status 要筛选的预约状态
+     * @return 具有指定状态的预约列表
      */
     @GetMapping("/api/merchants/bookings/status/{status}")
     @Operation(summary = "Get merchant bookings by status", description = "Get merchant bookings filtered by status")
@@ -251,13 +250,13 @@ public class BookingController {
     }
 
     /**
-     * Confirm a booking (merchant operation).
+     * 确认预约（商家操作）。
      *
-     * <p>Changes the booking status from PENDING to CONFIRMED.
-     * A WebSocket notification is sent to the user.</p>
+     * <p>将预约状态从PENDING更改为CONFIRMED。
+     * 向用户发送WebSocket通知。</p>
      *
-     * @param id the booking ID to confirm
-     * @return updated booking details
+     * @param id 要确认的预约ID
+     * @return 更新后的预约详情
      */
     @PutMapping("/api/merchants/bookings/{id}/confirm")
     @Operation(summary = "Confirm booking", description = "Confirm a booking (merchant operation)")
@@ -276,7 +275,7 @@ public class BookingController {
         Long merchantId = getCurrentMerchantId();
         BookingResponse response = bookingService.confirmBooking(id, merchantId);
 
-        // Send WebSocket notification to user
+        // 发送WebSocket通知给用户
         notificationService.notifyBookingConfirmed(response);
 
         log.info("Booking confirmed: id={}", id);
@@ -284,13 +283,13 @@ public class BookingController {
     }
 
     /**
-     * Mark a booking as completed (merchant operation).
+     * 将预约标记为已完成（商家操作）。
      *
-     * <p>Changes the booking status from CONFIRMED to COMPLETED.
-     * A WebSocket notification is sent to the user.</p>
+     * <p>将预约状态从CONFIRMED更改为COMPLETED。
+     * 向用户发送WebSocket通知。</p>
      *
-     * @param id the booking ID to complete
-     * @return updated booking details
+     * @param id 要完成的预约ID
+     * @return 更新后的预约详情
      */
     @PutMapping("/api/merchants/bookings/{id}/complete")
     @Operation(summary = "Complete booking", description = "Mark a booking as completed (merchant operation)")
@@ -309,7 +308,7 @@ public class BookingController {
         Long merchantId = getCurrentMerchantId();
         BookingResponse response = bookingService.completeBooking(id, merchantId);
 
-        // Send WebSocket notification to user
+        // 发送WebSocket通知给用户
         notificationService.notifyBookingCompleted(response);
 
         log.info("Booking completed: id={}", id);
@@ -317,13 +316,13 @@ public class BookingController {
     }
 
     /**
-     * Cancel a booking (merchant operation).
+     * 取消预约（商家操作）。
      *
-     * <p>Merchants can cancel bookings on their own tasks.
-     * A WebSocket notification is sent to the user.</p>
+     * <p>商家可以取消自己任务上的预约。
+     * 向用户发送WebSocket通知。</p>
      *
-     * @param id the booking ID to cancel
-     * @return updated booking details
+     * @param id 要取消的预约ID
+     * @return 更新后的预约详情
      */
     @DeleteMapping("/api/merchants/bookings/{id}")
     @Operation(summary = "Cancel booking (merchant)", description = "Cancel a booking as a merchant")
@@ -342,7 +341,7 @@ public class BookingController {
         Long merchantId = getCurrentMerchantId();
         BookingResponse response = bookingService.cancelBookingByMerchant(id, merchantId);
 
-        // Send WebSocket notification to user
+        // 发送WebSocket通知给用户
         notificationService.notifyBookingCancelled(response);
 
         log.info("Booking cancelled by merchant: id={}", id);
@@ -350,14 +349,14 @@ public class BookingController {
     }
 
     // ============================================
-    // Slot Query Endpoints
+    // 时段查询接口
     // ============================================
 
     /**
-     * Get available slots for a task.
+     * 获取任务的可用时段。
      *
-     * @param taskId the task ID
-     * @return list of available slots with capacity information
+     * @param taskId 任务ID
+     * @return 包含容量信息的可用时段列表
      */
     @GetMapping("/api/tasks/{taskId}/slots")
     @Operation(summary = "Get available slots", description = "Get all time slots for a task (public endpoint)")
@@ -374,10 +373,10 @@ public class BookingController {
     }
 
     /**
-     * Get only slots with available capacity for a task.
+     * 只获取有可用容量的时段。
      *
-     * @param taskId the task ID
-     * @return list of slots that have available capacity
+     * @param taskId 任务ID
+     * @return 有可用容量的时段列表
      */
     @GetMapping("/api/tasks/{taskId}/slots/available")
     @Operation(summary = "Get slots with capacity", description = "Get only slots that have available capacity")
@@ -394,10 +393,10 @@ public class BookingController {
     }
 
     /**
-     * Get a specific slot by ID.
+     * 根据ID获取特定时段。
      *
-     * @param slotId the slot ID
-     * @return slot details with capacity information
+     * @param slotId 时段ID
+     * @return 包含容量信息的时段详情
      */
     @GetMapping("/api/slots/{slotId}")
     @Operation(summary = "Get slot by ID", description = "Get details of a specific time slot")
@@ -415,13 +414,13 @@ public class BookingController {
     }
 
     // ============================================
-    // Statistics Endpoints
+    // 统计接口
     // ============================================
 
     /**
-     * Count bookings for the current user.
+     * 统计当前用户的预约数量。
      *
-     * @return total count of user's bookings
+     * @return 用户预约总数
      */
     @GetMapping("/api/bookings/my/count")
     @Operation(summary = "Count my bookings", description = "Get total count of current user's bookings")
@@ -435,9 +434,9 @@ public class BookingController {
     }
 
     /**
-     * Count active bookings for the current user.
+     * 统计当前用户的活动预约数量。
      *
-     * @return count of active bookings
+     * @return 活动预约数量
      */
     @GetMapping("/api/bookings/my/count/active")
     @Operation(summary = "Count my active bookings", description = "Get count of active bookings for current user")
@@ -451,10 +450,10 @@ public class BookingController {
     }
 
     /**
-     * Check if current user has an active booking for a slot.
+     * 检查当前用户是否在某时段有活动预约。
      *
-     * @param slotId the slot ID to check
-     * @return true if user has an active booking for the slot
+     * @param slotId 要检查的时段ID
+     * @return 如果用户在此时段有活动预约返回true
      */
     @GetMapping("/api/bookings/my/has-booking/{slotId}")
     @Operation(summary = "Check booking exists", description = "Check if current user has an active booking for a slot")
@@ -470,14 +469,14 @@ public class BookingController {
     }
 
     // ============================================
-    // Helper Methods
+    // 辅助方法
     // ============================================
 
     /**
-     * Get the current merchant's profile ID.
+     * 获取当前商家的资料ID。
      *
-     * @return the merchant profile ID
-     * @throws IllegalStateException if user is not a merchant or has no profile
+     * @return 商家资料ID
+     * @throws IllegalStateException 如果用户不是商家或没有资料
      */
     private Long getCurrentMerchantId() {
         return merchantService.getCurrentMerchantProfile()

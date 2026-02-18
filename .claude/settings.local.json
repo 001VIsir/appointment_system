@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(source /dev/stdin:*)",
+      "Bash(bash -c '\nunix_to_windows_path\\(\\) {\n    local unix_path=\"\"$1\"\"\n    local drive=$\\(echo \"\"${unix_path:1:1}\"\" | tr \"\"[:lower:]\"\" \"\"[:upper:]\"\"\\)\n    local rest=\"\"${unix_path:2}\"\"\n    local rest_win=\"\"${rest//\\\\//\\\\\\\\\\\\\\\\}\"\"\n    printf \"\"%s:%s\\\\n\"\" \"\"$drive\"\" \"\"$rest_win\"\"\n}\n\necho \"\"Test path conversion:\"\"\nunix_to_windows_path \"\"/d/Git/bin/bash.exe\"\"\nunix_to_windows_path \"\"/c/Program Files/Git/bin/bash.exe\"\"\n')",
+      "Bash(bash -c '\n# Source the functions from the script\nunix_to_windows_path\\(\\) {\n    local unix_path=\"\"$1\"\"\n    local drive=$\\(echo \"\"${unix_path:1:1}\"\" | tr \"\"[:lower:]\"\" \"\"[:upper:]\"\"\\)\n    local rest=\"\"${unix_path:2}\"\"\n    local rest_win=\"\"${rest//\\\\//\\\\\\\\\\\\\\\\}\"\"\n    printf \"\"%s:%s\\\\n\"\" \"\"$drive\"\" \"\"$rest_win\"\"\n}\n\nfind_git_bash\\(\\) {\n    local unix_paths=\\(\n        \"\"/d/Git/bin/bash.exe\"\"\n        \"\"/c/Program Files/Git/bin/bash.exe\"\"\n        \"\"/c/Program Files \\(x86\\)/Git/bin/bash.exe\"\"\n    \\)\n\n    for unix_path in \"\"${unix_paths[@]}\"\"; do\n        if [ -f \"\"$unix_path\"\" ]; then\n            unix_to_windows_path \"\"$unix_path\"\"\n            return 0\n        fi\n    done\n    return 1\n}\n\n# Simulate the script logic\nif [ -z \"\"$CLAUDE_CODE_GIT_BASH_PATH\"\" ]; then\n    DETECTED_PATH=$\\(find_git_bash\\)\n    if [ -n \"\"$DETECTED_PATH\"\" ]; then\n        export CLAUDE_CODE_GIT_BASH_PATH=\"\"$DETECTED_PATH\"\"\n    else\n        export CLAUDE_CODE_GIT_BASH_PATH=\"\"D:\\\\\\\\Git\\\\\\\\bin\\\\\\\\bash.exe\"\"\n    fi\nelse\n    CLAUDE_CODE_GIT_BASH_PATH=\"\"${CLAUDE_CODE_GIT_BASH_PATH//\\\\//\\\\\\\\\\\\\\\\}\"\"\nfi\n\necho \"\"CLAUDE_CODE_GIT_BASH_PATH=$CLAUDE_CODE_GIT_BASH_PATH\"\"\n\n# Verify the path actually exists\nUNIX_CHECK=$\\(echo \"\"$CLAUDE_CODE_GIT_BASH_PATH\"\" | sed \"\"s|\\\\\\\\\\\\\\\\|/|g\"\" | sed \"\"s|^\\\\\\\\\\([A-Za-z]\\\\\\\\\\):|/\\\\\\\\L\\\\\\\\1|\"\"\\)\necho \"\"Unix path for checking: $UNIX_CHECK\"\"\nif [ -f \"\"$UNIX_CHECK\"\" ]; then\n    echo \"\"File exists: YES\"\"\nelse\n    echo \"\"File exists: NO\"\"\nfi\n')",
+      "Bash(bash -c '\ntest_path=\"\"/d/Git/bin/bash.exe\"\"\ndrive=$\\(echo \"\"${test_path:1:1}\"\" | tr \"\"[:lower:]\"\" \"\"[:upper:]\"\"\\)\nrest=\"\"${test_path:2}\"\"\nrest_win=\"\"${rest//\\\\//\\\\\\\\}\"\"\nprintf \"\"%s:%s\\\\n\"\" \"\"$drive\"\" \"\"$rest_win\"\"\n')",
+      "Bash(bash test-path.sh)"
+
+    ],
+    "bypassPermissions": true
+  }
+}

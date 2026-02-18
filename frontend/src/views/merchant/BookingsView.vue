@@ -155,12 +155,12 @@ const loadBookings = async () => {
 
     if (filterStatus.value === 'all') {
       const response = await bookingApi.getMerchantBookings(page, pageSize.value)
-      const pageData = response.data.data
+      const pageData = response.data
       bookings.value = pageData.content || []
       totalElements.value = pageData.totalElements || 0
     } else {
       const response = await bookingApi.getMerchantBookingsByStatus(filterStatus.value)
-      const data = response.data.data
+      const data = response.data
       bookings.value = Array.isArray(data) ? data : []
       totalElements.value = bookings.value.length
     }

@@ -196,7 +196,7 @@ const loadRecentBookings = async () => {
   loadingBookings.value = true
   try {
     const response = await bookingApi.getMerchantBookings(0, 5)
-    recentBookings.value = response.data.data?.content || []
+    recentBookings.value = response.data?.content || []
   } catch {
     // 忽略错误
   } finally {

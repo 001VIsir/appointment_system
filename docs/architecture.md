@@ -53,7 +53,7 @@
 | 数据库迁移 | Flyway 10.x |
 | API 文档 | Springdoc OpenAPI 2.x |
 | 监控 | Micrometer + Prometheus |
-| 容器化 | Docker + Docker Compose |
+| 容器化 | - (本地开发不使用容器) |
 
 ## 2. 后端架构
 

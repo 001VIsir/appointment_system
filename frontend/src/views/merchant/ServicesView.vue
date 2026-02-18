@@ -180,7 +180,7 @@ const loadServices = async () => {
     } else {
       response = await serviceApi.getAll()
     }
-    services.value = response.data.data
+    services.value = response.data
   } catch {
     ElMessage.error('加载服务列表失败')
   } finally {

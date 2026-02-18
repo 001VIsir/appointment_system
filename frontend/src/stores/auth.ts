@@ -38,7 +38,11 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const response = await authApi.register(data)
-      // Backend returns UserResponse directly
+      // 注册成功后自动登录以创建 Session
+      await authApi.login({
+        username: data.username,
+        password: data.password
+      })
       user.value = response.data
       return true
     } catch (e: unknown) {

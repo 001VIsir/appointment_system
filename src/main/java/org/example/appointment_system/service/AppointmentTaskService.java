@@ -25,20 +25,20 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service for appointment task management operations.
+ * 预约任务管理操作服务类。
  *
- * <p>Handles CRUD operations for appointment tasks and slots including:</p>
+ * <p>处理预约任务和时段的CRUD操作，包括：</p>
  * <ul>
- *   <li>Creating appointment tasks for merchant services</li>
- *   <li>Managing time slots within tasks</li>
- *   <li>Soft-deleting tasks (setting active=false)</li>
- *   <li>Retrieving tasks for merchants and public access</li>
+ *   <li>为商家服务创建预约任务</li>
+ *   <li>管理任务内的时段</li>
+ *   <li>软删除任务（设置active=false）</li>
+ *   <li>获取商家和公开访问的任务</li>
  * </ul>
  *
- * <h3>Security:</h3>
- * <p>Task creation and modification requires the current user to have MERCHANT role
- * and an existing merchant profile. Users can only access and modify their own tasks.
- * Public task viewing is allowed for signed link access.</p>
+ * <h3>安全性：</h3>
+ * <p>任务创建和修改需要当前用户具有MERCHANT角色
+ * 和现有的商家资料。用户只能访问和修改自己的任务。
+ * 允许公开访问任务用于签名链接访问。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class AppointmentTaskService {
     private final ServiceItemRepository serviceItemRepository;
 
     // ============================================
-    // Task CRUD Operations
+    // 任务CRUD操作
     // ============================================
 
     /**
@@ -68,13 +68,13 @@ public class AppointmentTaskService {
     public AppointmentTaskResponse createTask(AppointmentTaskRequest request) {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
-        // Find the service item and verify ownership
+        // 查找服务项目并验证所有权
         ServiceItem serviceItem = serviceItemRepository.findByIdAndMerchant(
                 request.getServiceId(), merchantProfile)
             .orElseThrow(() -> new IllegalArgumentException(
                 "Service not found or not owned by current merchant"));
 
-        // Check if a task already exists for this service on this date
+        // 检查此服务在此日期是否已存在任务
         if (taskRepository.existsByServiceIdAndTaskDate(request.getServiceId(), request.getTaskDate())) {
             log.warn("Task already exists for service {} on date {}",
                 request.getServiceId(), request.getTaskDate());
@@ -115,12 +115,12 @@ public class AppointmentTaskService {
         AppointmentTask task = taskRepository.findById(taskId)
             .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        // Verify ownership through service -> merchant chain
+        // 通过服务 -> 商家链验证所有权
         if (!task.getService().getMerchant().getId().equals(merchantProfile.getId())) {
             throw new IllegalArgumentException("Task not found or not owned by current merchant");
         }
 
-        // If changing date, check for conflicts
+        // 如果更改日期，检查冲突
         if (!task.getTaskDate().equals(request.getTaskDate())) {
             if (taskRepository.existsByServiceIdAndTaskDate(
                     task.getService().getId(), request.getTaskDate())) {
@@ -129,7 +129,7 @@ public class AppointmentTaskService {
             }
         }
 
-        // Update fields
+        // 更新字段
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setTaskDate(request.getTaskDate());
@@ -159,12 +159,12 @@ public class AppointmentTaskService {
         AppointmentTask task = taskRepository.findById(taskId)
             .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        // Verify ownership
+        // 验证所有权
         if (!task.getService().getMerchant().getId().equals(merchantProfile.getId())) {
             throw new IllegalArgumentException("Task not found or not owned by current merchant");
         }
 
-        // Soft delete by setting active=false
+        // 通过设置active=false进行软删除
         task.setActive(false);
         taskRepository.save(task);
         log.info("Soft deleted task {} for merchant {}", taskId, merchantProfile.getId());
@@ -184,7 +184,7 @@ public class AppointmentTaskService {
         AppointmentTask task = taskRepository.findById(taskId)
             .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        // Verify ownership
+        // 验证所有权
         if (!task.getService().getMerchant().getId().equals(merchantProfile.getId())) {
             throw new IllegalArgumentException("Task not found or not owned by current merchant");
         }
@@ -197,7 +197,7 @@ public class AppointmentTaskService {
     }
 
     // ============================================
-    // Task Query Operations
+    // 任务查询操作
     // ============================================
 
     /**
@@ -242,7 +242,7 @@ public class AppointmentTaskService {
     public List<AppointmentTaskResponse> getAllTasks() {
         MerchantProfile merchantProfile = getCurrentMerchantProfileOrThrow();
 
-        // Get all services for the merchant, then get tasks for each
+        // 获取商家的所有服务，然后获取每个服务的任务
         return serviceItemRepository.findByMerchant(merchantProfile).stream()
             .flatMap(service -> taskRepository.findByService(service).stream())
             .map(this::mapToResponse)
@@ -341,7 +341,7 @@ public class AppointmentTaskService {
     }
 
     // ============================================
-    // Slot CRUD Operations
+    // 时段CRUD操作
     // ============================================
 
     /**
@@ -361,17 +361,17 @@ public class AppointmentTaskService {
         AppointmentTask task = taskRepository.findById(taskId)
             .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        // Verify ownership
+        // 验证所有权
         if (!task.getService().getMerchant().getId().equals(merchantProfile.getId())) {
             throw new IllegalArgumentException("Task not found or not owned by current merchant");
         }
 
-        // Validate time range
+        // 验证时间范围
         if (!request.getEndTime().isAfter(request.getStartTime())) {
             throw new IllegalArgumentException("End time must be after start time");
         }
 
-        // Check for duplicate start time
+        // 检查重复的开始时间
         if (slotRepository.existsByTaskAndStartTime(task, request.getStartTime())) {
             throw new IllegalArgumentException(
                 "A slot with this start time already exists for this task");
@@ -422,7 +422,7 @@ public class AppointmentTaskService {
         AppointmentTask task = taskRepository.findById(taskId)
             .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        // Verify ownership
+        // 验证所有权
         if (!task.getService().getMerchant().getId().equals(merchantProfile.getId())) {
             throw new IllegalArgumentException("Task not found or not owned by current merchant");
         }
@@ -430,7 +430,7 @@ public class AppointmentTaskService {
         AppointmentSlot slot = slotRepository.findByIdAndTaskId(slotId, taskId)
             .orElseThrow(() -> new IllegalArgumentException("Slot not found in the specified task"));
 
-        // Check if slot has bookings
+        // 检查时段是否有预约
         if (slot.getBookedCount() > 0) {
             throw new IllegalArgumentException("Cannot delete slot with existing bookings");
         }
@@ -440,7 +440,7 @@ public class AppointmentTaskService {
     }
 
     // ============================================
-    // Slot Query Operations
+    // 时段查询操作
     // ============================================
 
     /**
@@ -464,7 +464,7 @@ public class AppointmentTaskService {
      */
     @Transactional(readOnly = true)
     public List<SlotResponse> getSlotsPublic(Long taskId) {
-        // Verify task exists and is active
+        // 验证任务存在且有效
         if (!taskRepository.findByIdAndActive(taskId, true).isPresent()) {
             throw new IllegalArgumentException("Task not found or not active");
         }
@@ -479,7 +479,7 @@ public class AppointmentTaskService {
      */
     @Transactional(readOnly = true)
     public List<SlotResponse> getSlotsWithCapacity(Long taskId) {
-        // Verify task exists and is active
+        // 验证任务存在且有效
         if (!taskRepository.findByIdAndActive(taskId, true).isPresent()) {
             throw new IllegalArgumentException("Task not found or not active");
         }
@@ -489,7 +489,7 @@ public class AppointmentTaskService {
     }
 
     // ============================================
-    // Helper Methods
+    // 辅助方法
     // ============================================
 
     /**
@@ -533,7 +533,7 @@ public class AppointmentTaskService {
         ServiceItem service = task.getService();
         MerchantProfile merchant = service.getMerchant();
 
-        // Get slot statistics
+        // 获取时段统计数据
         int slotCount = (int) slotRepository.countByTask(task);
         int totalSlotCapacity = slotRepository.sumCapacityByTaskId(task.getId());
         int totalBookedCount = slotRepository.sumBookedCountByTaskId(task.getId());

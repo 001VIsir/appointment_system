@@ -223,11 +223,9 @@ public interface AppointmentTaskRepository extends JpaRepository<AppointmentTask
      */
     @Query("SELECT t FROM AppointmentTask t JOIN t.service s WHERE t.active = true AND " +
            "(:keyword IS NULL OR :keyword = '' OR " +
-           "LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
-           "(:category IS NULL OR :category = '' OR s.category = :category)")
+           "LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<AppointmentTask> searchTasks(
             @Param("keyword") String keyword,
-            @Param("category") String category,
             Pageable pageable);
 
     /**

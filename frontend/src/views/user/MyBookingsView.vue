@@ -217,12 +217,12 @@ const loadBookings = async () => {
 
     if (filterStatus.value === 'all') {
       const response = await bookingApi.getMyBookings(page, pageSize.value)
-      const pageData = response.data.data
+      const pageData = response.data
       bookings.value = pageData.content || []
       totalElements.value = pageData.totalElements || 0
     } else {
       const response = await bookingApi.getMyBookingsByStatus(filterStatus.value)
-      const data = response.data.data
+      const data = response.data
       bookings.value = Array.isArray(data) ? data : []
       totalElements.value = bookings.value.length
     }
@@ -237,13 +237,13 @@ const loadStats = async () => {
   try {
     // 加载总数
     const totalRes = await bookingApi.countMyBookings()
-    stats.total = totalRes.data.data || 0
+    stats.total = totalRes.data || 0
 
     // 按状态统计
     const statusList: BookingStatus[] = ['PENDING', 'CONFIRMED', 'COMPLETED']
     for (const status of statusList) {
       const res = await bookingApi.getMyBookingsByStatus(status)
-      stats[status.toLowerCase() as keyof typeof stats] = (res.data.data || []).length
+      stats[status.toLowerCase() as keyof typeof stats] = (res.data || []).length
     }
   } catch {
     // 忽略统计错误

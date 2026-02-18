@@ -74,7 +74,7 @@ const loadSlots = async () => {
     const response = props.onlyAvailable
       ? await bookingApi.getAvailableSlots(props.taskId)
       : await bookingApi.getTaskSlots(props.taskId)
-    slots.value = response.data.data || []
+    slots.value = response.data || []
 
     // 计算是否有容量
     slots.value = slots.value.map((slot) => ({

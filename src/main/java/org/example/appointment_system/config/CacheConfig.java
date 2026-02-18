@@ -20,31 +20,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Spring Cache Configuration with Redis backend.
+ * Spring缓存配置，使用Redis作为后端。
  *
- * <p>This configuration enables declarative caching using Spring Cache annotations
- * with Redis as the cache store. It provides:</p>
+ * <p>此配置使用Spring缓存注解启用声明式缓存，
+ * 使用Redis作为缓存存储。提供：</p>
  *
- * <h3>Features:</h3>
+ * <h3>功能：</h3>
  * <ul>
- *   <li>@EnableCaching for declarative cache support</li>
- *   <li>Redis-backed cache storage</li>
- *   <li>Configurable TTL per cache</li>
- *   <li>JSON serialization for cached values</li>
- *   <li>Null value caching disabled</li>
+ *   <li>@EnableCaching用于声明式缓存支持</li>
+ *   <li>Redis支持的缓存存储</li>
+ *   <li>每个缓存可配置的TTL</li>
+ *   <li>缓存值的JSON序列化</li>
+ *   <li>禁用空值缓存</li>
  * </ul>
  *
- * <h3>Cache Regions:</h3>
+ * <h3>缓存区域：</h3>
  * <ul>
- *   <li>merchantProfiles: 30 minutes TTL</li>
- *   <li>merchantSettings: 30 minutes TTL</li>
- *   <li>serviceItems: 15 minutes TTL</li>
- *   <li>serviceItemLists: 10 minutes TTL</li>
- *   <li>appointmentTasks: 5 minutes TTL</li>
- *   <li>publicTasks: 2 minutes TTL</li>
+ *   <li>merchantProfiles: 30分钟TTL</li>
+ *   <li>merchantSettings: 30分钟TTL</li>
+ *   <li>serviceItems: 15分钟TTL</li>
+ *   <li>serviceItemLists: 10分钟TTL</li>
+ *   <li>appointmentTasks: 5分钟TTL</li>
+ *   <li>publicTasks: 2分钟TTL</li>
  * </ul>
  *
- * <h3>Usage:</h3>
+ * <h3>用法：</h3>
  * <pre>
  * &#64;Cacheable(value = "merchantProfiles", key = "#userId")
  * public MerchantProfile getProfileByUserId(Long userId) { ... }
@@ -60,7 +60,7 @@ import java.util.Map;
 @EnableCaching
 public class CacheConfig {
 
-    // Cache names with their default TTL in minutes
+    // 缓存名称及其默认TTL（分钟）
     public static final String CACHE_MERCHANT_PROFILES = "merchantProfiles";
     public static final String CACHE_MERCHANT_SETTINGS = "merchantSettings";
     public static final String CACHE_SERVICE_ITEMS = "serviceItems";
@@ -69,7 +69,7 @@ public class CacheConfig {
     public static final String CACHE_PUBLIC_TASKS = "publicTasks";
     public static final String CACHE_SLOTS = "slots";
 
-    // TTL configurations (in minutes)
+    // TTL配置（分钟）
     private static final int TTL_MERCHANT_PROFILES = 30;
     private static final int TTL_MERCHANT_SETTINGS = 30;
     private static final int TTL_SERVICE_ITEMS = 15;
@@ -80,40 +80,40 @@ public class CacheConfig {
     private static final int TTL_DEFAULT = 10;
 
     /**
-     * Create the Redis Cache Manager.
+     * 创建Redis缓存管理器。
      *
-     * <p>Configures cache-specific TTLs and serialization settings.</p>
+     * <p>配置特定缓存的TTL和序列化设置。</p>
      *
-     * @param connectionFactory the Redis connection factory
-     * @return the configured CacheManager
+     * @param connectionFactory Redis连接工厂
+     * @return 配置好的CacheManager
      */
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // Create default cache configuration
+        // 创建默认缓存配置
         RedisCacheConfiguration defaultConfig = createCacheConfiguration(Duration.ofMinutes(TTL_DEFAULT));
 
-        // Create cache-specific configurations
+        // 创建特定缓存的配置
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-        // Merchant-related caches (longer TTL)
+        // 商家相关缓存（较长TTL）
         cacheConfigurations.put(CACHE_MERCHANT_PROFILES,
             createCacheConfiguration(Duration.ofMinutes(TTL_MERCHANT_PROFILES)));
         cacheConfigurations.put(CACHE_MERCHANT_SETTINGS,
             createCacheConfiguration(Duration.ofMinutes(TTL_MERCHANT_SETTINGS)));
 
-        // Service item caches
+        // 服务项目缓存
         cacheConfigurations.put(CACHE_SERVICE_ITEMS,
             createCacheConfiguration(Duration.ofMinutes(TTL_SERVICE_ITEMS)));
         cacheConfigurations.put(CACHE_SERVICE_ITEM_LISTS,
             createCacheConfiguration(Duration.ofMinutes(TTL_SERVICE_ITEM_LISTS)));
 
-        // Appointment task caches (shorter TTL due to frequent updates)
+        // 预约任务缓存（因频繁更新使用较短TTL）
         cacheConfigurations.put(CACHE_APPOINTMENT_TASKS,
             createCacheConfiguration(Duration.ofMinutes(TTL_APPOINTMENT_TASKS)));
         cacheConfigurations.put(CACHE_PUBLIC_TASKS,
             createCacheConfiguration(Duration.ofMinutes(TTL_PUBLIC_TASKS)));
 
-        // Slot cache (very short TTL due to booking updates)
+        // 时段缓存（因预约更新使用非常短的TTL）
         cacheConfigurations.put(CACHE_SLOTS,
             createCacheConfiguration(Duration.ofMinutes(TTL_SLOTS)));
 
@@ -125,10 +125,10 @@ public class CacheConfig {
     }
 
     /**
-     * Create a cache configuration with the specified TTL.
+     * 创建具有指定TTL的缓存配置。
      *
-     * @param ttl the time-to-live duration
-     * @return the cache configuration
+     * @param ttl 生存时间
+     * @return 缓存配置
      */
     private RedisCacheConfiguration createCacheConfiguration(Duration ttl) {
         ObjectMapper objectMapper = createObjectMapper();
@@ -144,9 +144,9 @@ public class CacheConfig {
     }
 
     /**
-     * Create a configured ObjectMapper for cache serialization.
+     * 创建用于缓存序列化的配置好的ObjectMapper。
      *
-     * @return configured ObjectMapper
+     * @return 配置好的ObjectMapper
      */
     private ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();

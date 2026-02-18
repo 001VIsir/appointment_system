@@ -1,0 +1,3 @@
+[POST] http://localhost:3008/api/auth/register => [201] Created
+[GET] http://localhost:3008/api/bookings/my?page=0&size=10 => [403] Forbidden
+[GET] http://localhost:3008/api/bookings/my/count => [403] Forbidden

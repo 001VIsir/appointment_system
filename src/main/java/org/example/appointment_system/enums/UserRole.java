@@ -1,32 +1,32 @@
 package org.example.appointment_system.enums;
 
 /**
- * User role enumeration for role-based access control.
+ * 用户角色枚举，用于基于角色的访问控制。
  *
- * <p>Defines the three types of users in the appointment system:</p>
+ * <p>定义预约系统中的三种用户类型：</p>
  * <ul>
- *   <li>{@link #ADMIN} - System administrators with full access</li>
- *   <li>{@link #MERCHANT} - Business owners who create appointment tasks</li>
- *   <li>{@link #USER} - End users who book appointments</li>
+ *   <li>{@link #ADMIN} - 拥有完全访问权限的系统管理员</li>
+ *   <li>{@link #MERCHANT} - 创建预约任务的商家</li>
+ *   <li>{@link #USER} - 预约服务的终端用户</li>
  * </ul>
  */
 public enum UserRole {
 
     /**
-     * Administrator role with full system access.
-     * Can manage all users, merchants, and system settings.
+     * 管理员角色，拥有完整的系统访问权限。
+     * 可以管理所有用户、商家和系统设置。
      */
     ADMIN("ROLE_ADMIN", "Administrator"),
 
     /**
-     * Merchant role for business owners.
-     * Can create service items, appointment tasks, and manage their bookings.
+     * 商家角色，面向企业主。
+     * 可以创建服务项目、预约任务并管理其预约。
      */
     MERCHANT("ROLE_MERCHANT", "Merchant"),
 
     /**
-     * Standard user role for appointment booking.
-     * Can view available tasks and create bookings.
+     * 标准用户角色，用于预约预订。
+     * 可以查看可用任务并创建预约。
      */
     USER("ROLE_USER", "User");
 
@@ -39,18 +39,18 @@ public enum UserRole {
     }
 
     /**
-     * Get the Spring Security authority name.
+     * 获取Spring Security权限名称。
      *
-     * @return the authority string (e.g., "ROLE_ADMIN")
+     * @return 权限字符串（例如："ROLE_ADMIN"）
      */
     public String getAuthority() {
         return authority;
     }
 
     /**
-     * Get the human-readable display name.
+     * 获取人类可读的显示名称。
      *
-     * @return the display name
+     * @return 显示名称
      */
     public String getDisplayName() {
         return displayName;

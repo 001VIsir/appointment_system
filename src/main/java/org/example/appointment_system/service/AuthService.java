@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.appointment_system.dto.request.LoginRequest;
 import org.example.appointment_system.dto.request.RegisterRequest;
 import org.example.appointment_system.dto.response.UserResponse;
+import org.example.appointment_system.entity.MerchantProfile;
 import org.example.appointment_system.entity.User;
 import org.example.appointment_system.enums.UserRole;
+import org.example.appointment_system.repository.MerchantProfileRepository;
 import org.example.appointment_system.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,18 +29,18 @@ import java.util.Optional;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 /**
- * Service for authentication operations.
+ * 认证操作服务类。
  *
- * <p>Handles user registration, login, and session management.</p>
+ * <p>处理用户注册、登录和会话管理。</p>
  *
- * <h3>Key Features:</h3>
+ * <h3>主要功能：</h3>
  * <ul>
- *   <li>User registration with validation</li>
- *   <li>Username and email uniqueness checks</li>
- *   <li>BCrypt password hashing</li>
- *   <li>Role assignment with security checks</li>
- *   <li>Session-based authentication</li>
- *   <li>Login and logout management</li>
+ *   <li>带验证的用户注册</li>
+ *   <li>用户名和邮箱唯一性检查</li>
+ *   <li>BCrypt密码哈希</li>
+ *   <li>带安全检查的角色分配</li>
+ *   <li>基于会话的认证</li>
+ *   <li>登录和登出管理</li>
  * </ul>
  */
 @Service
@@ -47,47 +49,48 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final MerchantProfileRepository merchantProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
     /**
-     * Register a new user.
+     * 注册新用户。
      *
-     * <p>Creates a new user account with the following validations:</p>
+     * <p>创建新用户账户，包含以下验证：</p>
      * <ul>
-     *   <li>Username must be unique</li>
-     *   <li>Email must be unique</li>
-     *   <li>Password is hashed using BCrypt</li>
-     *   <li>Role defaults to USER if not specified</li>
+     *   <li>用户名必须唯一</li>
+     *   <li>邮箱必须唯一</li>
+     *   <li>密码使用BCrypt哈希</li>
+     *   <li>如未指定角色，默认为USER</li>
      * </ul>
      *
-     * @param request the registration request containing user details
-     * @return UserResponse containing the created user's information
-     * @throws IllegalArgumentException if username or email already exists
+     * @param request 包含用户详情的注册请求
+     * @return 包含已创建用户信息的UserResponse
+     * @throws IllegalArgumentException 如果用户名或邮箱已存在
      */
     @Transactional
     public UserResponse register(RegisterRequest request) {
         log.info("Attempting to register user with username: {}", request.getUsername());
 
-        // Validate username uniqueness
+        // 验证用户名唯一性
         if (userRepository.existsByUsername(request.getUsername())) {
             log.warn("Registration failed: username '{}' already exists", request.getUsername());
             throw new IllegalArgumentException("Username already exists: " + request.getUsername());
         }
 
-        // Validate email uniqueness
+        // 验证邮箱唯一性
         if (userRepository.existsByEmail(request.getEmail())) {
             log.warn("Registration failed: email '{}' already exists", request.getEmail());
             throw new IllegalArgumentException("Email already exists: " + request.getEmail());
         }
 
-        // Determine role - default to USER
+        // 确定角色 - 默认为USER
         UserRole role = request.getRole();
         if (role == null) {
             role = UserRole.USER;
         }
 
-        // Create user entity with hashed password
+        // 创建带有哈希密码的用户实体
         User user = new User(
             request.getUsername(),
             passwordEncoder.encode(request.getPassword()),
@@ -95,62 +98,76 @@ public class AuthService {
             role
         );
 
-        // Save user
+        // 保存用户
         User savedUser = userRepository.save(user);
         log.info("User registered successfully: id={}, username={}, role={}",
             savedUser.getId(), savedUser.getUsername(), savedUser.getRole());
 
-        // Return response (without password)
+        // 如果是商户角色，自动创建商户资料
+        if (role == UserRole.MERCHANT) {
+            MerchantProfile profile = new MerchantProfile(
+                savedUser,
+                savedUser.getUsername() + "的店铺",  // 默认店铺名
+                "欢迎使用预约系统",                 // 默认描述
+                null,                               // 电话
+                null,                               // 地址
+                null                                // 设置
+            );
+            merchantProfileRepository.save(profile);
+            log.info("Created default merchant profile for user: {}", savedUser.getUsername());
+        }
+
+        // 返回响应（不含密码）
         return mapToResponse(savedUser);
     }
 
     /**
-     * Check if a username is available.
+     * 检查用户名是否可用。
      *
-     * @param username the username to check
-     * @return true if available, false if already taken
+     * @param username 要检查的用户名
+     * @return 可用返回true，已占用返回false
      */
     public boolean isUsernameAvailable(String username) {
         return !userRepository.existsByUsername(username);
     }
 
     /**
-     * Check if an email is available.
+     * 检查邮箱是否可用。
      *
-     * @param email the email to check
-     * @return true if available, false if already taken
+     * @param email 要检查的邮箱
+     * @return 可用返回true，已占用返回false
      */
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);
     }
 
     /**
-     * Authenticate a user and create a session.
+     * 验证用户并创建会话。
      *
-     * <p>Validates credentials and creates a Spring Security session.</p>
+     * <p>验证凭据并创建Spring Security会话。</p>
      *
-     * @param request the login request containing credentials
-     * @param httpRequest the HTTP request for session creation
-     * @return UserResponse containing the authenticated user's information
-     * @throws BadCredentialsException if username or password is invalid
-     * @throws DisabledException if the user account is disabled
+     * @param request 包含凭据的登录请求
+     * @param httpRequest 用于创建会话的HTTP请求
+     * @return 包含已认证用户信息的UserResponse
+     * @throws BadCredentialsException 用户名或密码无效
+     * @throws DisabledException 用户账户已被禁用
      */
     @Transactional(readOnly = true)
     public UserResponse login(LoginRequest request, HttpServletRequest httpRequest) {
         log.info("Attempting to login user: {}", request.getUsername());
 
         try {
-            // Authenticate using Spring Security
+            // 使用Spring Security进行认证
             UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
 
             Authentication authentication = authenticationManager.authenticate(authToken);
 
-            // Get the authenticated user
+            // 获取已认证的用户
             User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
-            // Create session and set security context
+            // 创建会话并设置安全上下文
             SecurityContext securityContext = SecurityContextHolder.getContext();
             securityContext.setAuthentication(authentication);
 
@@ -172,9 +189,9 @@ public class AuthService {
     }
 
     /**
-     * Logout the current user by invalidating the session.
+     * 通过使会话失效来登出当前用户。
      *
-     * @param httpRequest the HTTP request containing the session
+     * @param httpRequest 包含会话的HTTP请求
      */
     public void logout(HttpServletRequest httpRequest) {
         SecurityContextHolder.clearContext();
@@ -188,9 +205,9 @@ public class AuthService {
     }
 
     /**
-     * Get the currently authenticated user.
+     * 获取当前已认证的用户。
      *
-     * @return Optional containing UserResponse if authenticated, empty otherwise
+     * @return 如果已认证返回包含UserResponse的Optional，否则返回空
      */
     @Transactional(readOnly = true)
     public Optional<UserResponse> getCurrentUser() {
@@ -209,7 +226,7 @@ public class AuthService {
             return Optional.empty();
         }
 
-        // Handle anonymous user
+        // 处理匿名用户
         if ("anonymousUser".equals(username)) {
             return Optional.empty();
         }
@@ -219,10 +236,10 @@ public class AuthService {
     }
 
     /**
-     * Get username from session for logging purposes.
+     * 从会话中获取用户名，用于日志记录。
      *
-     * @param session the HTTP session
-     * @return the username or "unknown"
+     * @param session HTTP会话
+     * @return 用户名或"unknown"
      */
     private String getUsernameFromSession(HttpSession session) {
         SecurityContext context = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
@@ -233,10 +250,10 @@ public class AuthService {
     }
 
     /**
-     * Map User entity to UserResponse DTO.
+     * 将User实体映射到UserResponse DTO。
      *
-     * @param user the user entity
-     * @return the user response DTO
+     * @param user 用户实体
+     * @return 用户响应DTO
      */
     private UserResponse mapToResponse(User user) {
         return UserResponse.builder()

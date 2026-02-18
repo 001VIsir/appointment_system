@@ -262,11 +262,11 @@ public class AppointmentScheduledTask {
     // ============================================
 
     /**
-     * Generate daily statistics.
-     * Creates summary reports for the previous day.
+     * 生成每日统计。
+     * 为前一天创建汇总报告。
      *
-     * <p>This task runs daily at 1:00 AM to generate statistics
-     * for the previous day and store them for reporting.</p>
+     * <p>此任务每天凌晨1点运行，为前一天生成统计
+     * 数据并存储以供报告使用。</p>
      */
     @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点
     @Transactional
@@ -290,9 +290,9 @@ public class AppointmentScheduledTask {
     }
 
     /**
-     * Log daily metrics for monitoring.
+     * 记录每日的监控指标。
      *
-     * @param date the date to log metrics for
+     * @param date 要记录指标的日期
      */
     private void logDailyMetrics(LocalDate date) {
         LocalDateTime dayStart = date.atStartOfDay();
@@ -341,14 +341,14 @@ public class AppointmentScheduledTask {
     // ============================================
 
     /**
-     * Cleanup old data.
-     * Removes or archives old data to keep the system efficient.
+     * 清理旧数据。
+     * 删除或归档旧数据以保持系统高效。
      *
-     * <p>This task runs daily at 2:00 AM to clean up:</p>
+     * <p>此任务每天凌晨2点运行进行清理：</p>
      * <ul>
-     *   <li>Old completed/cancelled bookings (archive to history)</li>
-     *   <li>Old inactive tasks</li>
-     *   <li>Expired Redis keys</li>
+     *   <li>旧的已完成/已取消预约（归档到历史）</li>
+     *   <li>旧的非活动任务</li>
+     *   <li>过期的Redis键</li>
      * </ul>
      */
     @Scheduled(cron = "0 0 2 * * ?") // 每天凌晨2点

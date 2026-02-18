@@ -8,6 +8,7 @@ import org.example.appointment_system.dto.response.SearchResultResponse.SearchRe
 import org.example.appointment_system.entity.AppointmentTask;
 import org.example.appointment_system.entity.MerchantProfile;
 import org.example.appointment_system.entity.ServiceItem;
+import org.example.appointment_system.enums.ServiceCategory;
 import org.example.appointment_system.repository.AppointmentSlotRepository;
 import org.example.appointment_system.repository.AppointmentTaskRepository;
 import org.example.appointment_system.repository.MerchantProfileRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 搜索服务。
@@ -69,18 +71,30 @@ public class SearchService {
         // 搜索预约任务（仅公开的激活状态任务）
         Page<AppointmentTask> taskPage = taskRepository.searchTasks(
                 request.getKeyword(),
-                request.getCategory(),
                 pageable);
 
-        for (AppointmentTask task : taskPage.getContent()) {
+        // 在 Service 层过滤 category
+        List<AppointmentTask> filteredTasks = taskPage.getContent();
+        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
+            try {
+                ServiceCategory category = ServiceCategory.valueOf(request.getCategory());
+                filteredTasks = taskPage.getContent().stream()
+                        .filter(task -> task.getService() != null && task.getService().getCategory() == category)
+                        .collect(Collectors.toList());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid category: {}", request.getCategory());
+            }
+        }
+
+        for (AppointmentTask task : filteredTasks) {
             allItems.add(convertToSearchResult(task));
         }
 
         // 合并结果并排序
         allItems = sortResults(allItems, request.getSortBy(), request.getSortOrder());
 
-        // 计算分页信息
-        long totalCount = merchantPage.getTotalElements() + taskPage.getTotalElements();
+        // 计算分页信息（只计算过滤后的任务数量）
+        long totalCount = merchantPage.getTotalElements() + filteredTasks.size();
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
         return SearchResultResponse.builder()
@@ -140,16 +154,24 @@ public class SearchService {
                     int result;
                     switch (sortBy != null ? sortBy.toLowerCase() : "createdtime") {
                         case "taskdate":
-                            if (a.getTaskDate() == null || b.getTaskDate() == null) {
+                            // 只对任务类型排序，商户外排
+                            if (!"TASK".equals(a.getType()) || !"TASK".equals(b.getType())) {
+                                result = "TASK".equals(a.getType()) ? 1 : -1;
+                            } else if (a.getTaskDate() == null || b.getTaskDate() == null) {
                                 result = 0;
                             } else {
                                 result = a.getTaskDate().compareTo(b.getTaskDate());
                             }
                             break;
                         case "bookedcount":
-                            Integer countA = a.getBookedCount() != null ? a.getBookedCount() : 0;
-                            Integer countB = b.getBookedCount() != null ? b.getBookedCount() : 0;
-                            result = countA.compareTo(countB);
+                            // 只对任务类型排序
+                            if (!"TASK".equals(a.getType()) || !"TASK".equals(b.getType())) {
+                                result = "TASK".equals(a.getType()) ? 1 : -1;
+                            } else {
+                                Integer countA = a.getBookedCount() != null ? a.getBookedCount() : 0;
+                                Integer countB = b.getBookedCount() != null ? b.getBookedCount() : 0;
+                                result = countA.compareTo(countB);
+                            }
                             break;
                         case "createdtime":
                         default:

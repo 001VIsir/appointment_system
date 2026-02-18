@@ -13,7 +13,7 @@
 - **JDK 21+**: 运行后端应用
 - **JMeter 5.6+**: 执行压力测试
   - 下载地址: https://jmeter.apache.org/download_jmeter.cgi
-- **Docker** (可选): 使用 Docker Compose 启动完整环境
+- **本地服务**: 手动启动 MySQL、Redis
 - **MySQL 8.0+**: 数据库
 - **Redis 7.x**: 缓存服务
 
@@ -22,12 +22,11 @@
 1. **启动后端服务**
 
    ```bash
-   # 方式1: 使用 Maven
+   # 使用 Maven
    ./mvnw spring-boot:run
-
-   # 方式2: 使用 Docker Compose
-   docker-compose up -d
    ```
+
+   确保本地 MySQL、Redis、RabbitMQ 服务已启动。
 
 2. **准备测试数据**
 

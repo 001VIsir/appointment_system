@@ -296,7 +296,7 @@ const loadTask = async () => {
 
     // 获取任务详情
     const response = await taskApi.getPublicById(taskId.value)
-    task.value = response.data.data
+    task.value = response.data
 
     if (!task.value) {
       error.value = '预约任务不存在'
@@ -344,7 +344,7 @@ const handleSubmit = async () => {
       slotId: selectedSlot.value.id,
       remark: form.remark || undefined,
     })
-    bookingResult.value = response.data.data
+    bookingResult.value = response.data
     bookingSuccess.value = true
     ElMessage.success('预约成功！')
   } catch (e: unknown) {

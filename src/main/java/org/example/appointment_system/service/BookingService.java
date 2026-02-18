@@ -31,25 +31,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Service for booking management operations.
+ * 预约管理操作服务类。
  *
- * <p>Handles booking operations including:</p>
+ * <p>处理预约操作，包括：</p>
  * <ul>
- *   <li>Creating bookings with optimistic locking for concurrency control</li>
- *   <li>Querying available time slots</li>
- *   <li>Cancelling bookings</li>
- *   <li>Updating booking status</li>
- *   <li>Retrieving user and merchant bookings</li>
+ *   <li>使用乐观锁创建预约以控制并发</li>
+ *   <li>查询可用时间段</li>
+ *   <li>取消预约</li>
+ *   <li>更新预约状态</li>
+ *   <li>获取用户和商家的预约</li>
  * </ul>
  *
- * <h3>Concurrency Control:</h3>
- * <p>This service uses optimistic locking via the @Version annotation on the Booking entity.
- * When concurrent booking attempts occur, only one will succeed. The others will receive
- * an ObjectOptimisticLockingFailureException.</p>
+ * <h3>并发控制：</h3>
+ * <p>此服务通过Booking实体上的@Version注解使用乐观锁。
+ * 当并发预约尝试发生时，只有一个会成功。其他将收到
+ * ObjectOptimisticLockingFailureException。</p>
  *
- * <h3>Capacity Management:</h3>
- * <p>The service also manages slot capacity by atomically incrementing/decrementing
- * the bookedCount on slots when bookings are created/cancelled.</p>
+ * <h3>容量管理：</h3>
+ * <p>服务还通过在创建/取消预约时原子增加/减少
+ * 时段的bookedCount来管理时段容量。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -63,59 +63,58 @@ public class BookingService {
     private final MerchantProfileRepository merchantProfileRepository;
 
     // ============================================
-    // Create Booking
+    // 创建预约
     // ============================================
 
     /**
-     * Create a new booking for the current user.
+     * 为当前用户创建新预约。
      *
-     * <p>This method uses optimistic locking to handle concurrent booking attempts.
-     * If the slot is already fully booked, or if the user has already booked this slot,
-     * an exception will be thrown.</p>
+     * <p>此方法使用乐观锁处理并发预约尝试。
+     * 如果时段已满，或用户已预约此时段，将抛出异常。</p>
      *
-     * <p>The booking process:</p>
+     * <p>预约流程：</p>
      * <ol>
-     *   <li>Verify the slot exists and has capacity</li>
-     *   <li>Check for duplicate bookings (same user + slot)</li>
-     *   <li>Increment slot's bookedCount atomically</li>
-     *   <li>Create and save the booking</li>
+     *   <li>验证时段存在且有容量</li>
+     *   <li>检查重复预约（同一用户+时段）</li>
+     *   <li>原子增加时段的bookedCount</li>
+     *   <li>创建并保存预约</li>
      * </ol>
      *
-     * @param request the booking request containing slotId and optional remark
-     * @return BookingResponse containing the created booking details
-     * @throws IllegalArgumentException if slot not found, no capacity, or duplicate booking
-     * @throws ObjectOptimisticLockingFailureException if concurrent modification detected
-     * @throws IllegalStateException if no authenticated user found
+     * @param request 包含slotId和可选备注的预约请求
+     * @return 包含已创建预约详情的BookingResponse
+     * @throws IllegalArgumentException 时段未找到、无容量或重复预约
+     * @throws ObjectOptimisticLockingFailureException 检测到并发修改
+     * @throws IllegalStateException 未找到已认证用户
      */
     @Transactional
     public BookingResponse createBooking(BookingRequest request) {
         User currentUser = getCurrentUserOrThrow();
 
-        // Fetch and validate the slot
+        // 获取并验证时段
         AppointmentSlot slot = slotRepository.findById(request.getSlotId())
             .orElseThrow(() -> new IllegalArgumentException("Slot not found with id: " + request.getSlotId()));
 
-        // Check if slot has capacity
+        // 检查时段是否有容量
         if (!slot.hasAvailableCapacity()) {
             log.warn("Slot {} is fully booked (capacity: {}, booked: {})",
                 slot.getId(), slot.getCapacity(), slot.getBookedCount());
             throw new IllegalArgumentException("This time slot is fully booked");
         }
 
-        // Check for duplicate booking (same user + slot)
+        // 检查重复预约（同一用户+时段）
         if (bookingRepository.existsActiveBookingByUserIdAndSlotId(currentUser.getId(), slot.getId())) {
             log.warn("User {} already has an active booking for slot {}", currentUser.getId(), slot.getId());
             throw new IllegalArgumentException("You already have an active booking for this time slot");
         }
 
-        // Increment booked count atomically
+        // 原子增加已预约计数
         if (!slot.incrementBookedCount()) {
             log.warn("Failed to increment booked count for slot {} - may be full", slot.getId());
             throw new IllegalArgumentException("This time slot is fully booked");
         }
         slotRepository.save(slot);
 
-        // Create the booking
+        // 创建预约
         Booking booking = new Booking(currentUser, slot, request.getRemark());
         Booking savedBooking = bookingRepository.save(booking);
 
@@ -126,9 +125,9 @@ public class BookingService {
     }
 
     /**
-     * Create a booking for a specific user (used by merchants/admins or signed links).
+     * 为特定用户创建预约（由商家/管理员或签名链接使用）。
      *
-     * <p>This overload allows creating bookings for other users, useful for
+     * <p>此重载允许为其他用户创建预约，适用于
      * merchant-assisted bookings or signed link access.</p>
      *
      * @param userId the ID of the user to book for
@@ -164,7 +163,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Cancel Booking
+    // 取消预约
     // ============================================
 
     /**
@@ -202,7 +201,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + bookingId));
 
-        // Verify the booking belongs to the merchant's task
+        // 验证预约属于商家的任务
         Long bookingMerchantId = getMerchantIdForBooking(booking);
         if (!merchantId.equals(bookingMerchantId)) {
             throw new IllegalArgumentException("Booking does not belong to this merchant");
@@ -221,11 +220,11 @@ public class BookingService {
                 "Booking cannot be cancelled. Current status: " + booking.getStatus().getDisplayName());
         }
 
-        // Cancel the booking
+        // 取消预约
         booking.cancel();
         Booking savedBooking = bookingRepository.save(booking);
 
-        // Decrement slot's booked count
+        // 减少时段的已预约计数
         AppointmentSlot slot = booking.getSlot();
         slot.decrementBookedCount();
         slotRepository.save(slot);
@@ -236,7 +235,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Update Booking Status
+    // 更新预约状态
     // ============================================
 
     /**
@@ -253,7 +252,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + bookingId));
 
-        // Verify ownership
+        // 验证所有权
         Long bookingMerchantId = getMerchantIdForBooking(booking);
         if (!merchantId.equals(bookingMerchantId)) {
             throw new IllegalArgumentException("Booking does not belong to this merchant");
@@ -282,7 +281,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new IllegalArgumentException("Booking not found with id: " + bookingId));
 
-        // Verify ownership
+        // 验证所有权
         Long bookingMerchantId = getMerchantIdForBooking(booking);
         if (!merchantId.equals(bookingMerchantId)) {
             throw new IllegalArgumentException("Booking does not belong to this merchant");
@@ -300,7 +299,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Query Bookings
+    // 查询预约
     // ============================================
 
     /**
@@ -439,7 +438,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Query Available Slots
+    // 查询可用时段
     // ============================================
 
     /**
@@ -487,7 +486,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Count Operations
+    // 计数操作
     // ============================================
 
     /**
@@ -536,7 +535,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Check Operations
+    // 检查操作
     // ============================================
 
     /**
@@ -552,7 +551,7 @@ public class BookingService {
     }
 
     // ============================================
-    // Helper Methods
+    // 辅助方法
     // ============================================
 
     /**

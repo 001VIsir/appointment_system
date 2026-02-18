@@ -40,14 +40,14 @@ ON DUPLICATE KEY UPDATE updated_at = NOW();
 -- 2. 创建测试服务项
 -- =====================================================
 
-INSERT INTO service_items (merchant_id, name, description, category, duration_minutes, price, active, created_at, updated_at)
+INSERT INTO service_items (merchant_id, name, description, category, duration, price, active, created_at, updated_at)
 SELECT mp.id, 'Load Test 服务 A', '压力测试服务A', 'CONSULTATION', 60, 100.00, true, NOW(), NOW()
 FROM merchant_profiles mp
 JOIN users u ON mp.user_id = u.id
 WHERE u.username = 'loadtest_merchant1'
 ON DUPLICATE KEY UPDATE updated_at = NOW();
 
-INSERT INTO service_items (merchant_id, name, description, category, duration_minutes, price, active, created_at, updated_at)
+INSERT INTO service_items (merchant_id, name, description, category, duration, price, active, created_at, updated_at)
 SELECT mp.id, 'Load Test 服务 B', '压力测试服务B', 'CONSULTATION', 30, 50.00, true, NOW(), NOW()
 FROM merchant_profiles mp
 JOIN users u ON mp.user_id = u.id

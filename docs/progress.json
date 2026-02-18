@@ -82,7 +82,7 @@
     ]
   },
   "nextSteps": [
-    "FEAT-035: Docker 部署",
+    "FEAT-035: 本地开发环境",
     "FEAT-036: 压力测试"
   ]
 }

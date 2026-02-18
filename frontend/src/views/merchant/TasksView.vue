@@ -319,7 +319,7 @@ const formatTime = (timeStr: string) => {
 const loadServices = async () => {
   try {
     const response = await serviceApi.getActive()
-    services.value = response.data.data
+    services.value = response.data
   } catch {
     // ignore
   }
@@ -336,7 +336,7 @@ const loadTasks = async () => {
     } else {
       response = await taskApi.getAll()
     }
-    let taskList = response.data.data
+    let taskList = response.data
 
     if (filterService.value) {
       taskList = taskList.filter((t) => t.serviceId === filterService.value)
@@ -353,7 +353,7 @@ const loadSlots = async (taskId: number) => {
   loadingSlots.value = true
   try {
     const response = await taskApi.getSlots(taskId)
-    slots.value = response.data.data
+    slots.value = response.data
   } catch {
     ElMessage.error('加载时段失败')
   } finally {
@@ -384,7 +384,7 @@ const handleManageSlots = (task: AppointmentTask) => {
 const handleGenerateLink = async (task: AppointmentTask) => {
   try {
     const response = await linkApi.generate(task.id)
-    const data = response.data.data
+    const data = response.data
     generatedLink.value = `${window.location.origin}${data.link}`
     linkExpiresAt.value = new Date(data.expiresAtIso).toLocaleString('zh-CN')
     currentTask.value = task
@@ -461,7 +461,8 @@ const handleAddSlot = async () => {
 
   addingSlot.value = true
   try {
-    await taskApi.createSlot(currentTask.value.id, slotForm)
+    // 后端期望数组格式，所以用 [slotForm]
+    await taskApi.createSlot(currentTask.value.id, [slotForm])
     ElMessage.success('添加成功')
     slotForm.startTime = ''
     slotForm.endTime = ''
