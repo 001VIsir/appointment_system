@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,9 +54,8 @@ public class SearchService {
         int page = Math.max(1, request.getPage()) - 1; // PageRequest 使用0-based
         int pageSize = Math.min(Math.max(1, request.getPageSize()), 50); // 限制最大50条
 
-        // 创建排序
-        Sort sort = createSort(request.getSortBy(), request.getSortOrder());
-        Pageable pageable = PageRequest.of(page, pageSize, sort);
+        // 创建分页（不使用数据库排序，因为后续会在应用层进行内存排序）
+        Pageable pageable = PageRequest.of(page, pageSize);
 
         // 分别搜索商户和任务
         List<SearchResultItem> allItems = new ArrayList<>();
@@ -147,43 +147,61 @@ public class SearchService {
                                                String sortBy, String sortOrder) {
         // 由于商户和任务来自不同的表，这里在应用层简单排序
         // 实际生产环境可以使用数据库 UNION 或专门的搜索服务如 Elasticsearch
-        boolean ascending = "asc".equalsIgnoreCase(sortOrder);
 
-        return items.stream()
-                .sorted((a, b) -> {
-                    int result;
-                    switch (sortBy != null ? sortBy.toLowerCase() : "createdtime") {
-                        case "taskdate":
-                            // 只对任务类型排序，商户外排
-                            if (!"TASK".equals(a.getType()) || !"TASK".equals(b.getType())) {
-                                result = "TASK".equals(a.getType()) ? 1 : -1;
-                            } else if (a.getTaskDate() == null || b.getTaskDate() == null) {
-                                result = 0;
-                            } else {
-                                result = a.getTaskDate().compareTo(b.getTaskDate());
-                            }
-                            break;
-                        case "bookedcount":
-                            // 只对任务类型排序
-                            if (!"TASK".equals(a.getType()) || !"TASK".equals(b.getType())) {
-                                result = "TASK".equals(a.getType()) ? 1 : -1;
-                            } else {
-                                Integer countA = a.getBookedCount() != null ? a.getBookedCount() : 0;
-                                Integer countB = b.getBookedCount() != null ? b.getBookedCount() : 0;
-                                result = countA.compareTo(countB);
-                            }
-                            break;
-                        case "createdtime":
-                        default:
-                            if (a.getCreatedAt() == null || b.getCreatedAt() == null) {
-                                result = 0;
-                            } else {
-                                result = a.getCreatedAt().compareTo(b.getCreatedAt());
-                            }
-                            break;
-                    }
-                    return ascending ? result : -result;
-                })
+        // 分离商户和任务
+        List<SearchResultItem> merchants = items.stream()
+                .filter(item -> "MERCHANT".equals(item.getType()))
+                .toList();
+
+        List<SearchResultItem> tasks = items.stream()
+                .filter(item -> "TASK".equals(item.getType()))
+                .toList();
+
+        // 对任务进行排序
+        List<SearchResultItem> sortedTasks = sortTasks(tasks, sortBy, sortOrder);
+
+        // 合并结果：先任务后商户，或根据排序方向调整
+        List<SearchResultItem> result = new ArrayList<>();
+        result.addAll(sortedTasks);
+        result.addAll(merchants);
+
+        return result;
+    }
+
+    /**
+     * 对任务列表进行排序。
+     */
+    private List<SearchResultItem> sortTasks(List<SearchResultItem> tasks,
+                                            String sortBy, String sortOrder) {
+        boolean ascending = "asc".equalsIgnoreCase(sortOrder);
+        String sortField = sortBy != null ? sortBy.toLowerCase() : "createdtime";
+
+        Comparator<SearchResultItem> comparator;
+
+        switch (sortField) {
+            case "taskdate":
+                comparator = Comparator.comparing(
+                        item -> item.getTaskDate() != null ? item.getTaskDate() : java.time.LocalDate.MAX,
+                        Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+            case "bookedcount":
+                comparator = Comparator.comparing(
+                        item -> item.getBookedCount() != null ? item.getBookedCount() : 0);
+                break;
+            case "createdtime":
+            default:
+                comparator = Comparator.comparing(
+                        item -> item.getCreatedAt() != null ? item.getCreatedAt() : java.time.LocalDateTime.MIN,
+                        Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+        }
+
+        if (!ascending) {
+            comparator = comparator.reversed();
+        }
+
+        return tasks.stream()
+                .sorted(comparator)
                 .toList();
     }
 

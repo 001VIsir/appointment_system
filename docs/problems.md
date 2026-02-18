@@ -1141,6 +1141,75 @@ private MerchantProfileRepository merchantProfileRepository;
 
 ---
 
+## 2026-02-18 (搜索功能修复)
+
+### 问题 27: 搜索 API 排序功能报错
+
+**问题描述：**
+使用 `sortBy=taskDate` 或 `sortBy=bookedCount` 参数调用搜索 API 时返回 500 Internal Server Error。
+
+**发现时间：**
+2026-02-18 22:28
+
+**发现场景：**
+调用 `GET /api/search?sortBy=taskDate&sortOrder=asc` 时
+
+**原因分析：**
+1. SearchService.sortResults() 方法在处理排序时，当 sortBy 为 `taskdate` 或 `bookedcount` 时
+2. 排序逻辑试图比较商户（MERCHANT 类型）和任务（TASK 类型）的字段
+3. 商户类型没有 taskDate 或 bookedCount 字段，导致比较时出错
+
+**思考过程：**
+1. 首先测试不带排序参数的搜索 API，功能正常
+2. 测试带 `category=FITNESS` 参数，类别筛选正常工作
+3. 测试带 `sortBy=taskDate` 参数，返回 500 错误
+4. 检查 SearchService.sortResults() 方法，发现排序逻辑处理有问题
+
+**解决过程：**
+1. 第一次尝试：在 Repository 层使用 JPQL 的 `CAST(s.category AS string) = :category` 进行类别筛选
+   - 结果：Hibernate 无法处理 CAST 操作，报错
+2. 第二次尝试：在 Service 层进行 category 过滤
+   - 结果：category 筛选正常工作
+3. 第三次尝试：修改排序逻辑，处理商户和任务混合类型
+   - 结果：排序逻辑中当比较 taskdate 或 bookedcount 时，仍然报错
+
+**为什么不用别的方案：**
+- 方案 A：修改排序逻辑，当类型不同时返回固定顺序
+  - 原因：实现后仍然报错，可能是因为商户没有这些字段导致的 null 比较问题
+- 方案 B：分离商户和任务的排序逻辑
+  - 原因：需要重构较多代码
+- 最终选择方案 C：简化排序逻辑，只对任务类型进行排序字段比较
+
+**解决结果：**
+- [x] 基本搜索功能正常（关键词搜索、分页、类别筛选）
+- [ ] 排序功能仍有问题，需要进一步修复
+
+**涉及文件：**
+- `src/main/java/org/example/appointment_system/service/SearchService.java`
+- `src/main/java/org/example/appointment_system/repository/AppointmentTaskRepository.java`
+
+**测试验证：**
+```bash
+# 基本搜索 - 正常
+curl "http://localhost:8080/api/search"
+# 结果: ✅ 返回搜索结果
+
+# 类别筛选 - 正常
+curl "http://localhost:8080/api/search?category=FITNESS"
+# 结果: ✅ 返回 Fitness 类别任务
+
+# 排序功能 - 报错
+curl "http://localhost:8080/api/search?sortBy=taskDate&sortOrder=asc"
+# 结果: ❌ 500 Internal Server Error
+```
+
+**经验总结：**
+1. 在混合类型排序时，需要特别注意空值和类型不匹配的问题
+2. 可以在排序前先按类型分组，然后再按字段排序
+3. 或者使用更简洁的排序逻辑，先过滤 null 值再比较
+
+---
+
 ## 2026-02-18
 
 ### 问题 22: 单元测试失败
