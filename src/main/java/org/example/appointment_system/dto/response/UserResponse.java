@@ -10,10 +10,9 @@ import org.example.appointment_system.enums.UserRole;
 import java.time.LocalDateTime;
 
 /**
- * DTO for user response data.
+ * 用户响应数据传输对象。
  *
- * <p>Excludes sensitive information like password.
- * Used for API responses containing user information.</p>
+ * <p>不包含敏感信息（如密码）。用于包含用户信息的API响应。</p>
  */
 @Getter
 @Setter
@@ -23,37 +22,37 @@ import java.time.LocalDateTime;
 public class UserResponse {
 
     /**
-     * Unique identifier of the user.
+     * 用户的唯一标识符。
      */
     private Long id;
 
     /**
-     * Username of the account.
+     * 账户的用户名。
      */
     private String username;
 
     /**
-     * Email address of the user.
+     * 用户的电子邮箱地址。
      */
     private String email;
 
     /**
-     * Role assigned to the user.
+     * 分配给用户的角色。
      */
     private UserRole role;
 
     /**
-     * Whether the account is enabled.
+     * 账户是否已启用。
      */
     private boolean enabled;
 
     /**
-     * Timestamp when the account was created.
+     * 账户创建的时间戳。
      */
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp when the account was last updated.
+     * 账户最后更新的时间戳。
      */
     private LocalDateTime updatedAt;
 }

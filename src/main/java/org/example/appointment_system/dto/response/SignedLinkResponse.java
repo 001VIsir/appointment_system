@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 /**
- * Response DTO for signed link generation.
+ * 签名链接生成的响应数据传输对象。
  *
- * <p>Contains the generated link and related metadata.</p>
+ * <p>包含生成的链接及相关元数据。</p>
  */
 @Data
 @Builder
@@ -19,32 +19,32 @@ import java.time.Instant;
 public class SignedLinkResponse {
 
     /**
-     * The signed link path (e.g., /book/123?token=xxx&exp=xxx).
+     * 签名链接路径（例如：/book/123?token=xxx&exp=xxx）。
      */
     private String link;
 
     /**
-     * The full URL including the base path (e.g., /api/public/book/123?token=xxx&exp=xxx).
+     * 包含基础路径的完整URL（例如：/api/public/book/123?token=xxx&exp=xxx）。
      */
     private String fullUrl;
 
     /**
-     * The task ID for which the link was generated.
+     * 生成链接的任务ID。
      */
     private Long taskId;
 
     /**
-     * The expiration timestamp (Unix epoch in milliseconds).
+     * 过期时间戳（Unix时间戳，单位：毫秒）。
      */
     private Long expiresAt;
 
     /**
-     * The expiration time as ISO-8601 string.
+     * ISO-8601格式的过期时间字符串。
      */
     private String expiresAtIso;
 
     /**
-     * Whether the link is currently valid.
+     * 链接当前是否有效。
      */
     private Boolean valid;
 }

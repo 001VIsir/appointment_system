@@ -9,10 +9,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * DTO for merchant profile response data.
+ * 商户资料响应数据传输对象。
  *
- * <p>Contains all merchant profile information including settings.
- * Used for API responses containing merchant profile data.</p>
+ * <p>包含所有商户资料信息，包括设置。用于包含商户资料数据的API响应。</p>
  */
 @Getter
 @Setter
@@ -22,52 +21,52 @@ import java.time.LocalDateTime;
 public class MerchantProfileResponse {
 
     /**
-     * Unique identifier of the merchant profile.
+     * 商户资料的唯一标识符。
      */
     private Long id;
 
     /**
-     * ID of the associated user account.
+     * 关联用户账户的ID。
      */
     private Long userId;
 
     /**
-     * Username of the associated user account.
+     * 关联用户账户的用户名。
      */
     private String username;
 
     /**
-     * The business name of the merchant.
+     * 商户的商家名称。
      */
     private String businessName;
 
     /**
-     * Optional description of the business.
+     * 商家的可选描述。
      */
     private String description;
 
     /**
-     * Contact phone number.
+     * 联系电话号码。
      */
     private String phone;
 
     /**
-     * Business address.
+     * 商家地址。
      */
     private String address;
 
     /**
-     * Merchant settings stored as JSON string.
+     * 商户设置，存储为JSON字符串。
      */
     private String settings;
 
     /**
-     * Timestamp when the profile was created.
+     * 资料创建的时间戳。
      */
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp when the profile was last updated.
+     * 资料最后更新的时间戳。
      */
     private LocalDateTime updatedAt;
 }
