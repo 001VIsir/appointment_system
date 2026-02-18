@@ -7,6 +7,7 @@ import org.example.appointment_system.dto.request.RegisterRequest;
 import org.example.appointment_system.dto.response.UserResponse;
 import org.example.appointment_system.entity.User;
 import org.example.appointment_system.enums.UserRole;
+import org.example.appointment_system.repository.MerchantProfileRepository;
 import org.example.appointment_system.repository.UserRepository;
 import org.example.appointment_system.security.CustomUserDetails;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,9 @@ class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private MerchantProfileRepository merchantProfileRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;

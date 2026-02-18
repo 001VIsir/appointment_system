@@ -21,6 +21,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,6 +66,12 @@ class RateLimitFilterTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        // 设置 @Value 字段
+        ReflectionTestUtils.setField(filter, "rateLimitEnabled", true);
+        ReflectionTestUtils.setField(filter, "defaultLimit", 60);
+        ReflectionTestUtils.setField(filter, "authenticatedLimit", 120);
+        ReflectionTestUtils.setField(filter, "authEndpointLimit", 10);
+
         responseWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(responseWriter);
         lenient().when(response.getWriter()).thenReturn(printWriter);

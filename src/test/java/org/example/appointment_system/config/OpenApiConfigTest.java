@@ -34,12 +34,12 @@ class OpenApiConfigTest {
         assertNotNull(openAPI);
         Info info = openAPI.getInfo();
         assertNotNull(info);
-        assertEquals("Appointment System API", info.getTitle());
+        assertEquals("预约系统 API", info.getTitle());
         assertEquals("1.0.0", info.getVersion());
         assertNotNull(info.getDescription());
-        assertTrue(info.getDescription().contains("ToC Appointment Platform"));
+        assertTrue(info.getDescription().contains("预约平台"));
         assertNotNull(info.getContact());
-        assertEquals("Appointment System Support", info.getContact().getName());
+        assertEquals("预约系统支持", info.getContact().getName());
         assertNotNull(info.getLicense());
         assertEquals("Apache 2.0", info.getLicense().getName());
     }
@@ -55,11 +55,11 @@ class OpenApiConfigTest {
 
         Server devServer = servers.get(0);
         assertEquals("http://localhost:8080", devServer.getUrl());
-        assertEquals("Development server", devServer.getDescription());
+        assertEquals("开发服务器", devServer.getDescription());
 
         Server prodServer = servers.get(1);
         assertEquals("https://api.appointment-system.example.com", prodServer.getUrl());
-        assertEquals("Production server", prodServer.getDescription());
+        assertEquals("生产服务器", prodServer.getDescription());
     }
 
     @Test
@@ -76,7 +76,7 @@ class OpenApiConfigTest {
         assertEquals(SecurityScheme.In.COOKIE, securityScheme.getIn());
         assertEquals("SESSION", securityScheme.getName());
         assertNotNull(securityScheme.getDescription());
-        assertTrue(securityScheme.getDescription().contains("Session-based authentication"));
+        assertTrue(securityScheme.getDescription().contains("基于Cookie的会话认证"));
     }
 
     @Test
@@ -95,7 +95,7 @@ class OpenApiConfigTest {
         OpenAPI openAPI = openApiConfig.appointmentSystemOpenAPI();
         String description = openAPI.getInfo().getDescription();
 
-        assertTrue(description.contains("Authentication"));
+        assertTrue(description.contains("认证"));
         assertTrue(description.contains("POST /api/auth/login"));
         assertTrue(description.contains("POST /api/auth/logout"));
     }
@@ -106,9 +106,9 @@ class OpenApiConfigTest {
         OpenAPI openAPI = openApiConfig.appointmentSystemOpenAPI();
         String description = openAPI.getInfo().getDescription();
 
-        assertTrue(description.contains("Rate Limiting"));
-        assertTrue(description.contains("60 requests/minute"));
-        assertTrue(description.contains("120 requests/minute"));
+        assertTrue(description.contains("限流"));
+        assertTrue(description.contains("60次/分钟"));
+        assertTrue(description.contains("120次/分钟"));
     }
 
     @Test
@@ -117,7 +117,7 @@ class OpenApiConfigTest {
         OpenAPI openAPI = openApiConfig.appointmentSystemOpenAPI();
         String description = openAPI.getInfo().getDescription();
 
-        assertTrue(description.contains("Error Handling"));
+        assertTrue(description.contains("错误处理"));
     }
 
     @Test
