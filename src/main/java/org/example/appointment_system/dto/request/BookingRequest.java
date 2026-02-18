@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for booking creation request.
+ * 预约创建请求DTO。
  *
- * <p>Contains the required information for creating a new booking.</p>
+ * <p>包含创建新预约所需的必要信息。</p>
  *
- * <h3>Validation rules:</h3>
+ * <h3>校验规则：</h3>
  * <ul>
- *   <li>slotId: Required, must be a valid slot ID</li>
- *   <li>remark: Optional, max 500 characters</li>
+ *   <li>slotId：必填，必须是有效的时段ID</li>
+ *   <li>remark：可选，最多500个字符</li>
  * </ul>
  */
 @Getter
@@ -26,16 +26,16 @@ import lombok.Setter;
 public class BookingRequest {
 
     /**
-     * ID of the appointment slot to book.
-     * Required field.
+     * 要预约的时段ID。
+     * 必填字段。
      */
     private Long slotId;
 
     /**
-     * Optional remark or note from the user.
-     * Can contain special requests or notes for the merchant.
-     * Max 500 characters.
+     * 用户可选的备注或说明。
+     * 可包含对商户的特殊要求或备注。
+     * 最多500个字符。
      */
-    @Size(max = 500, message = "Remark must be at most 500 characters")
+    @Size(max = 500, message = "备注长度不能超过500个字符")
     private String remark;
 }
