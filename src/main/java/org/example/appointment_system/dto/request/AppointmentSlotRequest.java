@@ -11,9 +11,9 @@ import lombok.Setter;
 import java.time.LocalTime;
 
 /**
- * DTO for appointment slot creation request.
+ * 预约时段创建请求DTO。
  *
- * <p>Contains all fields needed to create a time slot within a task.</p>
+ * <p>包含在任务中创建时间段所需的所有字段。</p>
  */
 @Getter
 @Setter
@@ -23,24 +23,24 @@ import java.time.LocalTime;
 public class AppointmentSlotRequest {
 
     /**
-     * Start time of the slot.
-     * Required.
+     * 时段的开始时间。
+     * 必填。
      */
-    @NotNull(message = "Start time is required")
+    @NotNull(message = "开始时间不能为空")
     private LocalTime startTime;
 
     /**
-     * End time of the slot.
-     * Required.
+     * 时段的结束时间。
+     * 必填。
      */
-    @NotNull(message = "End time is required")
+    @NotNull(message = "结束时间不能为空")
     private LocalTime endTime;
 
     /**
-     * Maximum bookings allowed for this slot.
-     * Required, minimum 1.
+     * 该时段允许的最大预约数。
+     * 必填，最小值为1。
      */
-    @NotNull(message = "Capacity is required")
-    @Min(value = 1, message = "Capacity must be at least 1")
+    @NotNull(message = "容量不能为空")
+    @Min(value = 1, message = "容量至少为1")
     private Integer capacity;
 }
