@@ -10,24 +10,24 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 /**
- * Service for sending real-time WebSocket notifications.
+ * 用于发送实时WebSocket通知的服务类。
  *
- * <p>This service handles sending notifications to merchants and users
- * about booking-related events via WebSocket.</p>
+ * <p>此服务处理通过WebSocket向商家和用户发送
+ * 预约相关事件的通知。</p>
  *
- * <h3>Notification Types:</h3>
+ * <h3>通知类型：</h3>
  * <ul>
- *   <li>NEW_BOOKING - Sent to merchant when a new booking is created</li>
- *   <li>BOOKING_CANCELLED - Sent when a booking is cancelled</li>
- *   <li>BOOKING_CONFIRMED - Sent to user when booking is confirmed</li>
- *   <li>BOOKING_COMPLETED - Sent to user when booking is completed</li>
- *   <li>BOOKING_REMINDER - Sent to user before appointment</li>
+ *   <li>NEW_BOOKING - 创建新预约时发送给商家</li>
+ *   <li>BOOKING_CANCELLED - 预约取消时发送</li>
+ *   <li>BOOKING_CONFIRMED - 预约确认时发送给用户</li>
+ *   <li>BOOKING_COMPLETED - 预约完成时发送给用户</li>
+ *   <li>BOOKING_REMINDER - 预约前发送给用户提醒</li>
  * </ul>
  *
- * <h3>Destination Patterns:</h3>
+ * <h3>目标模式：</h3>
  * <ul>
- *   <li>/topic/merchant/{merchantId} - Merchant-specific notifications</li>
- *   <li>/topic/user/{userId} - User-specific notifications</li>
+ *   <li>/topic/merchant/{merchantId} - 商家特定通知</li>
+ *   <li>/topic/user/{userId} - 用户特定通知</li>
  * </ul>
  */
 @Service
@@ -37,7 +37,7 @@ public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    // Notification type constants
+    // 通知类型常量
     public static final String TYPE_NEW_BOOKING = "NEW_BOOKING";
     public static final String TYPE_BOOKING_CANCELLED = "BOOKING_CANCELLED";
     public static final String TYPE_BOOKING_CONFIRMED = "BOOKING_CONFIRMED";
@@ -106,14 +106,14 @@ public class NotificationService {
             .message(String.format("Booking #%d has been cancelled", booking.getId()))
             .build();
 
-        // Notify merchant if available
+        // 如果可用，通知商户
         if (booking.getMerchantId() != null) {
             String merchantDestination = "/topic/merchant/" + booking.getMerchantId();
             messagingTemplate.convertAndSend(merchantDestination, notification);
             log.debug("Sent BOOKING_CANCELLED notification to merchant: {}", merchantDestination);
         }
 
-        // Notify user
+        // 通知用户
         if (booking.getUserId() != null) {
             String userDestination = "/topic/user/" + booking.getUserId();
             messagingTemplate.convertAndSend(userDestination, notification);
