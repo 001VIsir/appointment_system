@@ -26,15 +26,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Global exception handler for the application.
- * Handles all exceptions and returns standardized error responses.
+ * 应用程序的全局异常处理器。
+ * 处理所有异常并返回标准化的错误响应。
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * Handle BusinessException - custom business logic errors.
+     * 处理BusinessException - 自定义业务逻辑错误。
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle validation errors from @Valid annotation.
+     * 处理@Valid注解的验证错误。
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle constraint violation exceptions.
+     * 处理约束违反异常。
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
@@ -116,7 +116,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle missing request parameter.
+     * 处理缺少请求参数。
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParameterException(
@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle method argument type mismatch.
+     * 处理方法参数类型不匹配。
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatchException(
@@ -159,7 +159,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle HTTP message not readable (invalid JSON).
+     * 处理HTTP消息不可读（无效JSON）。
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleMessageNotReadableException(
@@ -179,7 +179,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle HTTP method not supported.
+     * 处理不支持的HTTP方法。
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(
@@ -199,7 +199,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle no handler found (404).
+     * 处理未找到处理器（404）。
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(
@@ -219,7 +219,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle bad credentials (wrong username/password).
+     * 处理错误凭据（用户名/密码错误）。
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
@@ -239,7 +239,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle disabled account.
+     * 处理已禁用的账户。
      */
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ErrorResponse> handleDisabledException(
@@ -259,7 +259,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle authentication exceptions.
+     * 处理认证异常。
      */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
@@ -279,7 +279,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle access denied (insufficient permissions).
+     * 处理访问被拒绝（权限不足）。
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(
@@ -299,7 +299,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle optimistic locking failure (concurrent modification).
+     * 处理乐观锁失败（并发修改）。
      */
     @ExceptionHandler(OptimisticLockingFailureException.class)
     public ResponseEntity<ErrorResponse> handleOptimisticLockingFailureException(
@@ -319,7 +319,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle data integrity violation (unique constraint, foreign key).
+     * 处理数据完整性违反（唯一约束、外键）。
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
@@ -349,7 +349,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle all other uncaught exceptions.
+     * 处理所有其他未捕获的异常。
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
@@ -369,11 +369,11 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Extract field name from constraint violation.
+     * 从约束违反中提取字段名。
      */
     private String extractFieldName(ConstraintViolation<?> violation) {
         String propertyPath = violation.getPropertyPath().toString();
-        // Remove method prefix if present (e.g., "methodName.fieldName" -> "fieldName")
+        // 如果存在，移除方法前缀（例如："methodName.fieldName" -> "fieldName"）
         int dotIndex = propertyPath.lastIndexOf('.');
         return dotIndex >= 0 ? propertyPath.substring(dotIndex + 1) : propertyPath;
     }

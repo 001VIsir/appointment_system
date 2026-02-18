@@ -114,17 +114,17 @@ public class RequestLoggingFilter implements Filter {
      * 使用追踪和请求信息设置MDC上下文
      */
     private void setupMDC(HttpServletRequest request) {
-        // TraceId - 使用现有头或生成新的
+        // 追踪ID - 使用现有头或生成新的
         String traceId = request.getHeader(HEADER_TRACE_ID);
         if (traceId == null || traceId.isBlank()) {
             traceId = generateTraceId();
         }
         MDC.put(TRACE_ID, traceId);
 
-        // SpanId - 每个请求都生成新的
+        // 跨度ID - 每个请求都生成新的
         MDC.put(SPAN_ID, generateSpanId());
 
-        // RequestId
+        // 请求ID
         MDC.put(REQUEST_ID, UUID.randomUUID().toString().substring(0, 8));
 
         // 客户端IP
