@@ -1182,7 +1182,22 @@ private MerchantProfileRepository merchantProfileRepository;
 
 **解决结果：**
 - [x] 基本搜索功能正常（关键词搜索、分页、类别筛选）
-- [ ] 排序功能仍有问题，需要进一步修复
+- [x] 排序功能已修复（按创建时间、预约日期、预约人数排序）
+
+**最终测试验证：**
+```bash
+# 按日期升序 - 正常 ✅
+curl "http://localhost:8080/api/search?sortBy=taskDate&sortOrder=asc"
+
+# 按预约人数降序 - 正常 ✅
+curl "http://localhost:8080/api/search?sortBy=bookedCount&sortOrder=desc"
+
+# 按创建时间降序 - 正常 ✅
+curl "http://localhost:8080/api/search?sortBy=createdTime&sortOrder=desc"
+
+# 组合筛选+排序 - 正常 ✅
+curl "http://localhost:8080/api/search?category=FITNESS&sortBy=bookedCount&sortOrder=desc"
+```
 
 **涉及文件：**
 - `src/main/java/org/example/appointment_system/service/SearchService.java`
