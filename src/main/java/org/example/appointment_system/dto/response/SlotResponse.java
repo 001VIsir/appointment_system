@@ -9,9 +9,9 @@ import lombok.Setter;
 import java.time.LocalTime;
 
 /**
- * DTO for time slot response data.
+ * 时间段响应数据传输对象。
  *
- * <p>Contains slot information including availability status.</p>
+ * <p>包含时段信息，包括可用状态。</p>
  */
 @Getter
 @Setter
@@ -21,37 +21,37 @@ import java.time.LocalTime;
 public class SlotResponse {
 
     /**
-     * Unique identifier of the slot.
+     * 时段的唯一标识符。
      */
     private Long id;
 
     /**
-     * Start time of the slot.
+     * 时段的开始时间。
      */
     private LocalTime startTime;
 
     /**
-     * End time of the slot.
+     * 时段的结束时间。
      */
     private LocalTime endTime;
 
     /**
-     * Maximum capacity of the slot.
+     * 时段的最大容量。
      */
     private Integer capacity;
 
     /**
-     * Current number of bookings.
+     * 当前预约数。
      */
     private Integer bookedCount;
 
     /**
-     * Number of available spots.
+     * 可用名额数量。
      */
     private Integer availableCount;
 
     /**
-     * Whether the slot has available capacity.
+     * 时段是否有可用容量。
      */
     private Boolean hasCapacity;
 }

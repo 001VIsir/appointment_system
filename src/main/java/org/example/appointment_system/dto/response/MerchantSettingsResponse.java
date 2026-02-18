@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for merchant settings response.
+ * 商户设置响应数据传输对象。
  *
- * <p>Contains all configurable settings for a merchant account
- * with their current values.</p>
+ * <p>包含商户账户的所有可配置设置及其当前值。</p>
  */
 @Getter
 @Setter
@@ -22,37 +21,37 @@ import lombok.Setter;
 public class MerchantSettingsResponse {
 
     /**
-     * Session timeout in seconds.
+     * 会话超时时间（秒）。
      */
     private Integer sessionTimeout;
 
     /**
-     * Enable email notifications for new bookings.
+     * 是否启用新预约的邮件通知。
      */
     private Boolean notificationsEnabled;
 
     /**
-     * Business timezone.
+     * 商家时区。
      */
     private String timezone;
 
     /**
-     * Number of days in advance that bookings can be made.
+     * 允许提前预约的天数。
      */
     private Integer bookingAdvanceDays;
 
     /**
-     * Hours before appointment when cancellation is still allowed.
+     * 允许取消预约的小时数（提前预约时间）。
      */
     private Integer cancelDeadlineHours;
 
     /**
-     * Enable automatic confirmation of bookings.
+     * 是否启用自动确认预约。
      */
     private Boolean autoConfirmBookings;
 
     /**
-     * Maximum bookings per user per day.
+     * 每个用户每天的最大预约数。
      */
     private Integer maxBookingsPerUserPerDay;
 }

@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * DTO for service item response data.
+ * 服务项目响应数据传输对象。
  *
- * <p>Contains all service item information for API responses.</p>
+ * <p>包含API响应的所有服务项目信息。</p>
  */
 @Getter
 @Setter
@@ -23,62 +23,62 @@ import java.time.LocalDateTime;
 public class ServiceItemResponse {
 
     /**
-     * Unique identifier of the service item.
+     * 服务项目的唯一标识符。
      */
     private Long id;
 
     /**
-     * ID of the merchant profile that owns this service.
+     * 拥有此服务的商户资料ID。
      */
     private Long merchantId;
 
     /**
-     * Business name of the merchant.
+     * 商户的商家名称。
      */
     private String merchantBusinessName;
 
     /**
-     * The name of the service.
+     * 服务名称。
      */
     private String name;
 
     /**
-     * Optional description of the service.
+     * 服务的可选描述。
      */
     private String description;
 
     /**
-     * Category of the service.
+     * 服务类别。
      */
     private ServiceCategory category;
 
     /**
-     * Category display name for frontend use.
+     * 供前端显示的类别名称。
      */
     private String categoryDisplayName;
 
     /**
-     * Duration of the service in minutes.
+     * 服务时长（分钟）。
      */
     private Integer duration;
 
     /**
-     * Price of the service.
+     * 服务价格。
      */
     private BigDecimal price;
 
     /**
-     * Whether the service is active and available for booking.
+     * 服务是否启用并可预约。
      */
     private Boolean active;
 
     /**
-     * Timestamp when the service was created.
+     * 服务创建的时间戳。
      */
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp when the service was last updated.
+     * 服务最后更新的时间戳。
      */
     private LocalDateTime updatedAt;
 }

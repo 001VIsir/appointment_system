@@ -12,10 +12,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
- * DTO for booking response data.
+ * 预约响应数据传输对象。
  *
- * <p>Contains all booking information for API responses,
- * including related task and service details.</p>
+ * <p>包含API响应的所有预约信息，包括相关的任务和服务详情。</p>
  */
 @Getter
 @Setter
@@ -25,97 +24,97 @@ import java.time.LocalTime;
 public class BookingResponse {
 
     /**
-     * Unique identifier of the booking.
+     * 预约的唯一标识符。
      */
     private Long id;
 
     /**
-     * ID of the user who made the booking.
+     * 预约用户的ID。
      */
     private Long userId;
 
     /**
-     * Username of the user who made the booking.
+     * 预约用户的用户名。
      */
     private String username;
 
     /**
-     * ID of the appointment slot.
+     * 预约时段的ID。
      */
     private Long slotId;
 
     /**
-     * ID of the appointment task.
+     * 预约任务的ID。
      */
     private Long taskId;
 
     /**
-     * Title of the appointment task.
+     * 预约任务的标题。
      */
     private String taskTitle;
 
     /**
-     * Date of the appointment.
+     * 预约日期。
      */
     private LocalDate taskDate;
 
     /**
-     * Start time of the booked slot.
+     * 已预约时段的开始时间。
      */
     private LocalTime startTime;
 
     /**
-     * End time of the booked slot.
+     * 已预约时段的结束时间。
      */
     private LocalTime endTime;
 
     /**
-     * ID of the service item.
+     * 服务项目的ID。
      */
     private Long serviceId;
 
     /**
-     * Name of the service.
+     * 服务名称。
      */
     private String serviceName;
 
     /**
-     * ID of the merchant.
+     * 商户的ID。
      */
     private Long merchantId;
 
     /**
-     * Business name of the merchant.
+     * 商户的商家名称。
      */
     private String merchantBusinessName;
 
     /**
-     * Current status of the booking.
+     * 预约的当前状态。
      */
     private BookingStatus status;
 
     /**
-     * Display name of the status.
+     * 状态的显示名称。
      */
     private String statusDisplayName;
 
     /**
-     * Optional remark from the user.
+     * 用户的可选备注。
      */
     private String remark;
 
     /**
-     * Optimistic lock version number.
+     * 乐观锁版本号。
      */
     private Long version;
 
     /**
-     * Timestamp when the booking was created.
+     * 预约创建的时间戳。
      */
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp when the booking was last updated.
+     * 预约最后更新的时间戳。
      */
     private LocalDateTime updatedAt;
 }
