@@ -21,7 +21,8 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const response = await authApi.login(credentials)
-      user.value = response.data.data
+      // Backend returns UserResponse directly, not wrapped in { data: ... }
+      user.value = response.data
       return true
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } }
@@ -37,7 +38,8 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const response = await authApi.register(data)
-      user.value = response.data.data
+      // Backend returns UserResponse directly
+      user.value = response.data
       return true
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } }
@@ -62,7 +64,8 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       const response = await authApi.getCurrentUser()
-      user.value = response.data.data
+      // Backend returns UserResponse directly
+      user.value = response.data
       return user.value
     } catch {
       user.value = null
