@@ -2,7 +2,11 @@ package org.example.appointment_system.repository;
 
 import org.example.appointment_system.entity.AppointmentTask;
 import org.example.appointment_system.entity.ServiceItem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -206,4 +210,33 @@ public interface AppointmentTaskRepository extends JpaRepository<AppointmentTask
      * @return 包含任务的Optional（如果找到且启用）
      */
     Optional<AppointmentTask> findByIdAndActive(Long id, Boolean active);
+
+    /**
+     * 分页搜索公开的预约任务。
+     *
+     * <p>根据关键词搜索任务标题，匹配服务类别，且只返回启用状态的任务。</p>
+     *
+     * @param keyword 搜索关键词（任务标题）
+     * @param category 服务类别
+     * @param pageable 分页参数
+     * @return 预约任务分页结果
+     */
+    @Query("SELECT t FROM AppointmentTask t JOIN t.service s WHERE t.active = true AND " +
+           "(:keyword IS NULL OR :keyword = '' OR " +
+           "LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+           "(:category IS NULL OR :category = '' OR s.category = :category)")
+    Page<AppointmentTask> searchTasks(
+            @Param("keyword") String keyword,
+            @Param("category") String category,
+            Pageable pageable);
+
+    /**
+     * 统计搜索结果数量。
+     *
+     * @param keyword 搜索关键词
+     * @param category 服务类别
+     * @return 匹配的任务数量
+     */
+    long countByActiveTrueAndTitleContainingIgnoreCaseOrServiceCategory(
+            String keyword, String category);
 }

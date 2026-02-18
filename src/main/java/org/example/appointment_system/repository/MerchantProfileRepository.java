@@ -2,7 +2,11 @@ package org.example.appointment_system.repository;
 
 import org.example.appointment_system.entity.MerchantProfile;
 import org.example.appointment_system.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -77,4 +81,19 @@ public interface MerchantProfileRepository extends JpaRepository<MerchantProfile
      * @return 如果任何资料使用此名称返回true
      */
     boolean existsByBusinessName(String businessName);
+
+    /**
+     * 分页搜索商户。
+     *
+     * <p>根据关键词搜索商户名称或地址。</p>
+     *
+     * @param keyword 搜索关键词
+     * @param pageable 分页参数
+     * @return 商户分页结果
+     */
+    @Query("SELECT m FROM MerchantProfile m WHERE " +
+           "(:keyword IS NULL OR :keyword = '' OR " +
+           "LOWER(m.businessName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(m.address) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<MerchantProfile> searchMerchants(@Param("keyword") String keyword, Pageable pageable);
 }

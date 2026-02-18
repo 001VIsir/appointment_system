@@ -20,19 +20,19 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Spring Security Configuration.
+ * Spring Security配置类。
  *
- * <p>This configuration sets up the basic security infrastructure for the appointment system,
- * including session-based authentication, CORS policies, and path-based authorization rules.</p>
+ * <p>此配置为预约系统设置基础安全基础设施，
+ * 包括基于会话的认证、CORS策略和基于路径的授权规则。</p>
  *
- * <h3>Key Features:</h3>
+ * <h3>主要功能：</h3>
  * <ul>
- *   <li>Session-based authentication stored in Redis</li>
- *   <li>CORS configuration for frontend integration</li>
- *   <li>CSRF protection disabled for stateless API access</li>
- *   <li>Path-based authorization rules</li>
- *   <li>BCrypt password encoding</li>
- *   <li>Authentication manager for programmatic login</li>
+ *   <li>存储在Redis中的基于会话的认证</li>
+ *   <li>前端集成的CORS配置</li>
+ *   <li>为无状态API访问禁用CSRF保护</li>
+ *   <li>基于路径的授权规则</li>
+ *   <li>BCrypt密码编码</li>
+ *   <li>用于编程式登录的认证管理器</li>
  * </ul>
  */
 @Configuration
@@ -41,38 +41,38 @@ import java.util.List;
 public class SecurityConfig {
 
     /**
-     * Configure the security filter chain.
+     * 配置安全过滤器链。
      *
-     * <p>Defines the security rules for HTTP requests including:</p>
+     * <p>定义HTTP请求的安全规则，包括：</p>
      * <ul>
-     *   <li>Public endpoints: health checks, OpenAPI docs, public booking pages</li>
-     *   <li>Protected endpoints: require authentication</li>
-     *   <li>Admin endpoints: require ADMIN role</li>
+     *   <li>公开接口：健康检查、OpenAPI文档、公开预约页面</li>
+     *   <li>受保护接口：需要认证</li>
+     *   <li>管理员接口：需要ADMIN角色</li>
      * </ul>
      *
-     * @param http the HttpSecurity to configure
-     * @return the configured SecurityFilterChain
-     * @throws Exception if configuration fails
+     * @param http 要配置的HttpSecurity
+     * @return 配置好的SecurityFilterChain
+     * @throws Exception 配置失败
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Configure CORS
+            // 配置CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // Disable CSRF for API usage (using session-based auth with same-site cookies)
+            // 禁用CSRF（使用同站cookie的基于会话的认证）
             .csrf(AbstractHttpConfigurer::disable)
 
-            // Configure session management - use Redis-backed sessions
+            // 配置会话管理 - 使用Redis存储的会话
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )
 
-            // Configure authorization rules
+            // 配置授权规则
             .authorizeHttpRequests(authz -> authz
-                // Public endpoints - no authentication required
+                // 公开接口 - 不需要认证
                 .requestMatchers(
                     "/actuator/health",
                     "/actuator/info",
@@ -83,70 +83,71 @@ public class SecurityConfig {
                     "/api/auth/register",
                     "/api/auth/login",
                     "/api/public/**",
-                    "/api/tasks/**",  // Public task viewing for signed link access
+                    "/api/tasks/**",  // 签名链接访问的公开任务查看
+                    "/api/search/**", // 公开搜索接口
                     "/error"
                 ).permitAll()
 
-                // Admin endpoints - require ADMIN role
+                // 管理员接口 - 需要ADMIN角色
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // Merchant endpoints - require MERCHANT role
+                // 商家接口 - 需要MERCHANT角色
                 .requestMatchers("/api/merchants/**").hasAnyRole("MERCHANT", "ADMIN")
 
-                // All other endpoints require authentication
+                // 所有其他接口需要认证
                 .anyRequest().authenticated()
             )
 
-            // Configure form login (disabled for API-only usage)
+            // 配置表单登录（禁用，仅API使用）
             .formLogin(AbstractHttpConfigurer::disable)
 
-            // Configure HTTP basic auth (disabled, using session-based auth)
+            // 配置HTTP基本认证（禁用，使用基于会话的认证）
             .httpBasic(AbstractHttpConfigurer::disable)
 
-            // Configure logout
+            // 配置登出
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("SESSION")
             );
 
         return http.build();
     }
 
     /**
-     * Configure CORS (Cross-Origin Resource Sharing).
+     * 配置CORS（跨域资源共享）。
      *
-     * <p>Allows the Vue frontend to communicate with the backend API.</p>
+     * <p>允许Vue前端与后端API通信。</p>
      *
-     * @return the CORS configuration source
+     * @return CORS配置源
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allowed origins - in production, configure specific domains
+        // 允许的源 - 生产环境中配置特定域名
         configuration.setAllowedOriginPatterns(List.of(
             "http://localhost:*",
             "http://127.0.0.1:*",
             "http://*.localhost:*"
         ));
 
-        // Allowed HTTP methods
+        // 允许的HTTP方法
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
         ));
 
-        // Allowed headers
+        // 允许的头部
         configuration.setAllowedHeaders(List.of("*"));
 
-        // Allow credentials (cookies, authorization headers)
+        // 允许凭证（cookie、授权头）
         configuration.setAllowCredentials(true);
 
-        // Cache preflight response for 1 hour
+        // 预检响应缓存1小时
         configuration.setMaxAge(3600L);
 
-        // Expose headers that frontend can read
+        // 暴露前端可读取的头部
         configuration.setExposedHeaders(Arrays.asList(
             "X-Total-Count",
             "X-RateLimit-Limit",
@@ -161,11 +162,11 @@ public class SecurityConfig {
     }
 
     /**
-     * Configure the password encoder.
+     * 配置密码编码器。
      *
-     * <p>Uses BCrypt with default strength (10 rounds).</p>
+     * <p>使用默认强度（10轮）的BCrypt。</p>
      *
-     * @return the BCrypt password encoder
+     * @return BCrypt密码编码器
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -173,13 +174,13 @@ public class SecurityConfig {
     }
 
     /**
-     * Expose the AuthenticationManager as a bean.
+     * 将AuthenticationManager暴露为Bean。
      *
-     * <p>Required for programmatic authentication in AuthService.</p>
+     * <p>AuthService中编程式认证所需。</p>
      *
-     * @param authenticationConfiguration the authentication configuration
-     * @return the AuthenticationManager
-     * @throws Exception if configuration fails
+     * @param authenticationConfiguration 认证配置
+     * @return AuthenticationManager
+     * @throws Exception 配置失败
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
