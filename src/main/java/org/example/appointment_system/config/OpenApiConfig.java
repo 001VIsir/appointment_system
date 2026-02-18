@@ -15,32 +15,32 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * OpenAPI (Swagger) configuration for the Appointment System API.
+ * OpenAPI（Swagger）配置，用于预约系统API。
  *
- * <p>Configures:</p>
+ * <p>配置：</p>
  * <ul>
- *   <li>API metadata (title, description, version, contact, license)</li>
- *   <li>Session-based authentication security scheme</li>
- *   <li>Server configuration</li>
+ *   <li>API元数据（标题、描述、版本、联系人、许可证）</li>
+ *   <li>基于会话的认证安全方案</li>
+ *   <li>服务器配置</li>
  * </ul>
  *
- * <h3>Access Points:</h3>
+ * <h3>访问点：</h3>
  * <ul>
  *   <li>Swagger UI: /swagger-ui.html</li>
  *   <li>OpenAPI JSON: /api-docs</li>
  *   <li>OpenAPI YAML: /api-docs.yaml</li>
  * </ul>
  *
- * <h3>API Groups:</h3>
- * <p>APIs are organized by functional area using @Tag annotations:</p>
+ * <h3>API分组：</h3>
+ * <p>API使用@Tag注解按功能区域组织：</p>
  * <ul>
- *   <li>Authentication - User registration, login, logout</li>
- *   <li>Merchant - Merchant profile and settings</li>
- *   <li>Service Item - Service catalog management</li>
- *   <li>Appointment Task - Appointment task and slot management</li>
- *   <li>Booking - Booking creation and management</li>
- *   <li>Signed Links - Secure link generation</li>
- *   <li>Admin - System statistics and administration</li>
+ *   <li>Authentication - 用户注册、登录、登出</li>
+ *   <li>Merchant - 商家资料和设置</li>
+ *   <li>Service Item - 服务目录管理</li>
+ *   <li>Appointment Task - 预约任务和时段管理</li>
+ *   <li>Booking - 预约创建和管理</li>
+ *   <li>Signed Links - 安全链接生成</li>
+ *   <li>Admin - 系统统计和管理</li>
  * </ul>
  */
 @Configuration
@@ -50,27 +50,27 @@ public class OpenApiConfig {
     private String serverPort;
 
     /**
-     * Configure the OpenAPI specification for the Appointment System.
+     * 配置预约系统的OpenAPI规范。
      *
-     * @return configured OpenAPI instance
+     * @return 配置好的OpenAPI实例
      */
     @Bean
     public OpenAPI appointmentSystemOpenAPI() {
         final String securitySchemeName = "sessionAuth";
 
         return new OpenAPI()
-            // API Info
+            // API信息
             .info(apiInfo())
-            // Servers
+            // 服务器
             .servers(List.of(
                 new Server()
                     .url("http://localhost:" + serverPort)
-                    .description("Development server"),
+                    .description("开发服务器"),
                 new Server()
                     .url("https://api.appointment-system.example.com")
-                    .description("Production server")
+                    .description("生产服务器")
             ))
-            // Security Configuration (Session-based)
+            // 安全配置（基于会话）
             .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
             .components(new Components()
                 .addSecuritySchemes(securitySchemeName, sessionSecurityScheme())
@@ -78,44 +78,44 @@ public class OpenApiConfig {
     }
 
     /**
-     * Create API info metadata.
+     * 创建API信息元数据。
      *
-     * @return API info instance
+     * @return API信息实例
      */
     private Info apiInfo() {
         return new Info()
-            .title("Appointment System API")
+            .title("预约系统 API")
             .description("""
-                ## ToC Appointment Platform API
+                ## 预约平台 API
 
-                A comprehensive appointment booking platform where merchants can create
-                appointment tasks and users can book appointments via secure signed links.
+                一个全面的预约预订平台，商户可以创建预约任务，
+                用户可以通过安全的签名链接预约服务。
 
-                ### Features
-                - **User Management**: Registration, authentication, role-based access control
-                - **Merchant Portal**: Profile management, service catalog, booking management
-                - **Appointment System**: Task creation, time slot management, booking with optimistic locking
-                - **Secure Links**: HMAC-signed links for public booking access
-                - **Real-time Notifications**: WebSocket-based notifications for booking events
-                - **Statistics & Analytics**: Booking metrics, user statistics, system monitoring
+                ### 功能特性
+                - **用户管理**：注册、认证、基于角色的访问控制
+                - **商户门户**：资料管理、服务目录、预约管理
+                - **预约系统**：任务创建、时段管理、基于乐观锁的预约
+                - **安全链接**：用于公开预约访问的HMAC签名链接
+                - **实时通知**：基于WebSocket的预约事件通知
+                - **统计与分析**：预约指标、用户统计、系统监控
 
-                ### Authentication
-                This API uses session-based authentication. To authenticate:
-                1. Call `POST /api/auth/login` with your credentials
-                2. The session cookie will be automatically included in subsequent requests
-                3. Call `POST /api/auth/logout` to end your session
+                ### 认证方式
+                本API使用基于会话的认证。认证步骤：
+                1. 使用凭据调用 `POST /api/auth/login`
+                2. 会话Cookie将自动包含在后续请求中
+                3. 调用 `POST /api/auth/logout` 结束会话
 
-                ### Rate Limiting
-                - Anonymous users: 60 requests/minute
-                - Authenticated users: 120 requests/minute
-                - Authentication endpoints: 10 requests/minute
+                ### 限流策略
+                - 匿名用户：60次/分钟
+                - 已认证用户：120次/分钟
+                - 认证端点：10次/分钟
 
-                ### Error Handling
-                All errors follow a consistent format with error codes and descriptive messages.
+                ### 错误处理
+                所有错误遵循一致的格式，包含错误代码和描述性消息。
                 """)
             .version("1.0.0")
             .contact(new Contact()
-                .name("Appointment System Support")
+                .name("预约系统支持")
                 .email("support@appointment-system.example.com")
                 .url("https://appointment-system.example.com/support"))
             .license(new License()
@@ -124,13 +124,12 @@ public class OpenApiConfig {
     }
 
     /**
-     * Create session-based security scheme.
+     * 创建基于会话的安全方案。
      *
-     * <p>Since the application uses Spring Session with Redis, authentication
-     * is handled via session cookies (JSESSIONID). This security scheme
-     * documents that requirement for API consumers.</p>
+     * <p>由于应用程序使用Spring Session与Redis，认证通过会话Cookie（SESSION）处理。
+     * 此安全方案为API使用者记录了这一要求。</p>
      *
-     * @return security scheme for session authentication
+     * @return 会话认证的安全方案
      */
     private SecurityScheme sessionSecurityScheme() {
         return new SecurityScheme()
@@ -138,14 +137,14 @@ public class OpenApiConfig {
             .in(SecurityScheme.In.COOKIE)
             .name("SESSION")
             .description("""
-                Session-based authentication using cookies.
+                基于Cookie的会话认证。
 
-                To authenticate:
-                1. Make a POST request to /api/auth/login with username and password
-                2. The server will set a SESSION cookie
-                3. Include this cookie in subsequent requests
+                认证步骤：
+                1. 使用用户名和密码发送POST请求到 /api/auth/login
+                2. 服务器将设置一个SESSION cookie
+                3. 在后续请求中包含此cookie
 
-                Session timeout: 4 hours (configurable per merchant)
+                会话超时时间：4小时（可按商户配置）
                 """);
     }
 }
