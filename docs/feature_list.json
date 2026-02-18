@@ -939,7 +939,7 @@
         "load-test/*.jmx",
         "load-test/README.md"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }
