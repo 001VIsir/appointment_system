@@ -15,17 +15,17 @@ import org.example.appointment_system.enums.ServiceCategory;
 import java.math.BigDecimal;
 
 /**
- * DTO for service item create/update request.
+ * 服务项目创建/更新请求DTO。
  *
- * <p>Contains all fields that can be set or modified on a service item.</p>
+ * <p>包含服务项目上所有可以设置或修改的字段。</p>
  *
- * <h3>Validation Rules:</h3>
+ * <h3>校验规则：</h3>
  * <ul>
- *   <li>name: Required, 2-100 characters</li>
- *   <li>description: Optional, max 1000 characters</li>
- *   <li>category: Required, must be a valid ServiceCategory</li>
- *   <li>duration: Required, minimum 5 minutes</li>
- *   <li>price: Required, minimum 0</li>
+ *   <li>名称：必填，2-100个字符</li>
+ *   <li>描述：可选，最多1000个字符</li>
+ *   <li>类别：必填，必须是有效的 ServiceCategory</li>
+ *   <li>时长：必填，最少5分钟</li>
+ *   <li>价格：必填，最小值为0</li>
  * </ul>
  */
 @Getter
@@ -36,46 +36,46 @@ import java.math.BigDecimal;
 public class ServiceItemRequest {
 
     /**
-     * The name of the service.
-     * Required field, displayed to customers.
+     * 服务的名称。
+     * 必填字段，展示给客户。
      */
-    @NotBlank(message = "Service name is required")
-    @Size(min = 2, max = 100, message = "Service name must be between 2 and 100 characters")
+    @NotBlank(message = "服务名称不能为空")
+    @Size(min = 2, max = 100, message = "服务名称长度必须在2到100个字符之间")
     private String name;
 
     /**
-     * Optional description of the service.
-     * Can be used to describe what the service includes.
+     * 服务的可选描述。
+     * 可用于描述服务包含的内容。
      */
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    @Size(max = 1000, message = "描述长度不能超过1000个字符")
     private String description;
 
     /**
-     * Category of the service.
-     * Used for classification and filtering.
+     * 服务的类别。
+     * 用于分类和筛选。
      */
-    @NotNull(message = "Service category is required")
+    @NotNull(message = "服务类别不能为空")
     private ServiceCategory category;
 
     /**
-     * Duration of the service in minutes.
-     * Minimum 5 minutes to ensure meaningful appointments.
+     * 服务的时长，单位分钟。
+     * 最少5分钟以确保预约有意义。
      */
-    @NotNull(message = "Duration is required")
-    @Min(value = 5, message = "Duration must be at least 5 minutes")
+    @NotNull(message = "时长不能为空")
+    @Min(value = 5, message = "时长至少为5分钟")
     private Integer duration;
 
     /**
-     * Price of the service.
-     * Can be 0 for free services.
+     * 服务的价格。
+     * 可以为0表示免费服务。
      */
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.0", message = "Price must be non-negative")
+    @NotNull(message = "价格不能为空")
+    @DecimalMin(value = "0.0", message = "价格不能为负数")
     private BigDecimal price;
 
     /**
-     * Whether the service is active and available for booking.
-     * Defaults to true for new services.
+     * 服务是否启用并可用于预约。
+     * 新服务默认为 true。
      */
     private Boolean active;
 }
