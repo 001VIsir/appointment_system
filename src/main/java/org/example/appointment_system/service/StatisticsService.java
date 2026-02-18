@@ -283,7 +283,7 @@ public class StatisticsService {
     public SystemStatsResponse getSystemStats() {
         log.debug("Getting system stats");
 
-        // API call statistics from Redis
+        // 来自 Redis 的 API 调用统计
         long todayApiCalls = getTodayMetric(API_CALLS_KEY);
         long lastHourApiCalls = getLastHourMetric(API_CALLS_KEY);
         double apiCallsPerMinute = lastHourApiCalls / 60.0;

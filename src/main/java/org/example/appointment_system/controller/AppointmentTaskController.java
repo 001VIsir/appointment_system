@@ -33,33 +33,33 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * REST Controller for appointment task management operations.
+ * 预约任务管理操作的REST控制器。
  *
- * <p>Provides endpoints for:</p>
+ * <p>提供以下接口：</p>
  * <ul>
- *   <li>Merchant task management (CRUD)</li>
- *   <li>Merchant slot management</li>
- *   <li>Public task/slot viewing (for signed link access)</li>
+ *   <li>商家任务管理（CRUD）</li>
+ *   <li>商家时段管理</li>
+ *   <li>公开任务/时段查看（用于签名链接访问）</li>
  * </ul>
  *
- * <h3>Endpoints:</h3>
- * <h4>Merchant Endpoints (require MERCHANT/ADMIN role):</h4>
+ * <h3>接口：</h3>
+ * <h4>商家接口（需要MERCHANT/ADMIN角色）：</h4>
  * <ul>
- *   <li>POST /api/merchants/tasks - Create a new task</li>
- *   <li>GET /api/merchants/tasks - Get all tasks</li>
- *   <li>GET /api/merchants/tasks/{id} - Get task by ID</li>
- *   <li>PUT /api/merchants/tasks/{id} - Update task</li>
- *   <li>DELETE /api/merchants/tasks/{id} - Delete (deactivate) task</li>
- *   <li>POST /api/merchants/tasks/{id}/reactivate - Reactivate task</li>
- *   <li>POST /api/merchants/tasks/{id}/slots - Create slot(s)</li>
- *   <li>DELETE /api/merchants/tasks/{taskId}/slots/{slotId} - Delete slot</li>
+ *   <li>POST /api/merchants/tasks - 创建新任务</li>
+ *   <li>GET /api/merchants/tasks - 获取所有任务</li>
+ *   <li>GET /api/merchants/tasks/{id} - 根据ID获取任务</li>
+ *   <li>PUT /api/merchants/tasks/{id} - 更新任务</li>
+ *   <li>DELETE /api/merchants/tasks/{id} - 删除（停用）任务</li>
+ *   <li>POST /api/merchants/tasks/{id}/reactivate - 重新激活任务</li>
+ *   <li>POST /api/merchants/tasks/{id}/slots - 创建时段</li>
+ *   <li>DELETE /api/merchants/tasks/{taskId}/slots/{slotId} - 删除时段</li>
  * </ul>
  *
- * <h4>Public Endpoints (for signed link access):</h4>
+ * <h4>公开接口（用于签名链接访问）：</h4>
  * <ul>
- *   <li>GET /api/tasks/{id} - Get task details</li>
- *   <li>GET /api/tasks/{id}/slots - Get task slots</li>
- *   <li>GET /api/tasks/{id}/slots/available - Get available slots</li>
+ *   <li>GET /api/tasks/{id} - 获取任务详情</li>
+ *   <li>GET /api/tasks/{id}/slots - 获取任务时段</li>
+ *   <li>GET /api/tasks/{id}/slots/available - 获取可用时段</li>
  * </ul>
  */
 @RestController
@@ -71,7 +71,7 @@ public class AppointmentTaskController {
     private final AppointmentTaskService taskService;
 
     // ============================================
-    // Merchant Task Endpoints
+    // 商家任务接口
     // ============================================
 
     /**
@@ -308,7 +308,7 @@ public class AppointmentTaskController {
     }
 
     // ============================================
-    // Merchant Slot Endpoints
+    // 商家时段接口
     // ============================================
 
     /**
@@ -383,7 +383,7 @@ public class AppointmentTaskController {
     }
 
     // ============================================
-    // Public Task Endpoint (for signed links)
+    // 公开任务接口（用于签名链接）
     // ============================================
 
     /**
@@ -411,6 +411,6 @@ public class AppointmentTaskController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    // Note: Public slot endpoints (GET /api/tasks/{taskId}/slots and GET /api/tasks/{taskId}/slots/available)
-    // are provided by BookingController to avoid duplicate endpoint mappings.
+    // 注意：公开时段接口（GET /api/tasks/{taskId}/slots 和 GET /api/tasks/{taskId}/slots/available）
+    // 由 BookingController 提供，以避免重复的端点映射。
 }

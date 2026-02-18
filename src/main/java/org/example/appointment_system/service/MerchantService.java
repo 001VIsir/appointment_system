@@ -89,7 +89,7 @@ public class MerchantService {
             request.getDescription(),
             request.getPhone(),
             request.getAddress(),
-            null // settings
+            null // 设置
         );
 
         MerchantProfile savedProfile = merchantProfileRepository.save(profile);
