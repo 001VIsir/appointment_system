@@ -23,28 +23,28 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Micrometer Prometheus Metrics Configuration.
+ * Micrometer Prometheus指标配置。
  *
- * <p>Configures custom metrics for the appointment system including:</p>
+ * <p>为预约系统配置自定义指标，包括：</p>
  * <ul>
- *   <li>Booking metrics (total, by status, success rate)</li>
- *   <li>User metrics (total, by role)</li>
- *   <li>Merchant metrics (total, active)</li>
- *   <li>Service item metrics (total, active)</li>
+ *   <li>预约指标（总数、按状态、成功率的）</li>
+ *   <li>用户指标（总数、按角色的）</li>
+ *   <li>商家指标（总数、有效的）</li>
+ *   <li>服务项目指标（总数、有效的）</li>
  * </ul>
  *
- * <h3>Available Metrics:</h3>
+ * <h3>可用指标：</h3>
  * <ul>
- *   <li>{@code appointment.bookings.total} - Total number of bookings (gauge)</li>
- *   <li>{@code appointment.bookings.active} - Active bookings count (gauge)</li>
- *   <li>{@code appointment.bookings.status} - Bookings by status (gauge with status tag)</li>
- *   <li>{@code appointment.bookings.created} - Counter for created bookings</li>
- *   <li>{@code appointment.bookings.cancelled} - Counter for cancelled bookings</li>
- *   <li>{@code appointment.bookings.completed} - Counter for completed bookings</li>
- *   <li>{@code appointment.users.total} - Total users count (gauge)</li>
- *   <li>{@code appointment.merchants.total} - Total merchants count (gauge)</li>
- *   <li>{@code appointment.services.total} - Total service items (gauge)</li>
- *   <li>{@code appointment.services.active} - Active service items (gauge)</li>
+ *   <li>{@code appointment.bookings.total} - 预约总数（gauge）</li>
+ *   <li>{@code appointment.bookings.active} - 有效预约数（gauge）</li>
+ *   <li>{@code appointment.bookings.status} - 按状态的预约（带状态标签的gauge）</li>
+ *   <li>{@code appointment.bookings.created} - 已创建预约的计数器</li>
+ *   <li>{@code appointment.bookings.cancelled} - 已取消预约的计数器</li>
+ *   <li>{@code appointment.bookings.completed} - 已完成预约的计数器</li>
+ *   <li>{@code appointment.users.total} - 用户总数（gauge）</li>
+ *   <li>{@code appointment.merchants.total} - 商家总数（gauge）</li>
+ *   <li>{@code appointment.services.total} - 服务项目总数（gauge）</li>
+ *   <li>{@code appointment.services.active} - 有效服务项目（gauge）</li>
  * </ul>
  */
 @Configuration
@@ -58,32 +58,32 @@ public class MetricsConfig {
     private final ServiceItemRepository serviceItemRepository;
     private final MeterRegistry meterRegistry;
 
-    // Atomic counters for tracking booking operations
+    // 用于跟踪预约操作的原子计数器
     private final AtomicInteger bookingsCreatedCounter = new AtomicInteger(0);
     private final AtomicInteger bookingsCancelledCounter = new AtomicInteger(0);
     private final AtomicInteger bookingsCompletedCounter = new AtomicInteger(0);
     private final AtomicInteger bookingsConfirmedCounter = new AtomicInteger(0);
 
     /**
-     * Configure the MeterRegistry with application-specific settings.
+     * 使用应用程序特定设置配置MeterRegistry。
      * <ul>
-     *   <li>Adds common tags (application name)</li>
-     *   <li>Configures meter filters for percentile histograms</li>
-     *   <li>Sets up distribution statistics for HTTP requests</li>
+     *   <li>添加公共标签（应用程序名称）</li>
+     *   <li>配置百分位直方图的仪表过滤器</li>
+     *   <li>为HTTP请求设置分布统计</li>
      * </ul>
      */
     @PostConstruct
     public void configureMeterRegistry() {
-        // Add common tags to all metrics
+        // 为所有指标添加公共标签
         meterRegistry.config().commonTags(
                 "application", "appointment_system",
                 "version", "2.0.0"
         );
 
-        // Configure meter filter for HTTP server requests
+        // 为HTTP服务器请求配置仪表过滤器
         meterRegistry.config().meterFilter(MeterFilter.acceptNameStartsWith("http.server.requests"));
 
-        // Configure histogram buckets for response time percentiles
+        // 配置响应时间百分位的直方图桶
         meterRegistry.config().meterFilter(new MeterFilter() {
             @Override
             public DistributionStatisticConfig configure(Meter.Id id, DistributionStatisticConfig config) {
@@ -100,7 +100,7 @@ public class MetricsConfig {
             }
         });
 
-        // Enable histogram for custom timers
+        // 为自定义计时器启用直方图
         meterRegistry.config().meterFilter(new MeterFilter() {
             @Override
             public DistributionStatisticConfig configure(Meter.Id id, DistributionStatisticConfig config) {
