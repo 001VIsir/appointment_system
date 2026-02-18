@@ -76,7 +76,20 @@
 | **Micrometer** | - | 指标采集 |
 | **Prometheus** | - | 指标存储 |
 
-### 2.7 工具库
+### 2.7 配置中心
+
+| 组件 | 版本 | 用途 | 说明 |
+|------|------|------|------|
+| **Nacos** | 2.x | 配置中心 | 集中管理配置，支持动态刷新 |
+| **Spring Cloud Alibaba** | 2023.0.x | Nacos 集成 | 提供配置中心和注册中心支持 |
+
+**Nacos 使用场景：**
+- 集中管理应用配置（数据库、Redis、限流等）
+- 多环境配置隔离（dev/test/prod）
+- 运行时配置动态刷新
+- 为微服务架构做准备
+
+### 2.8 工具库
 
 | 组件 | 版本 | 用途 |
 |------|------|------|
@@ -156,6 +169,24 @@
     <dependency>
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+
+    <!-- Nacos Config (配置中心) -->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    </dependency>
+
+    <!-- Nacos Discovery (服务注册与发现) -->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+
+    <!-- Spring Cloud Bootstrap -->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-bootstrap</artifactId>
     </dependency>
 
     <!-- Utilities -->
@@ -278,7 +309,19 @@
 - 异步通知
 - 削峰填谷
 
-### 4.4 容器化
+### 4.4 配置中心
+
+| 组件 | 版本 | 用途 | 端口 |
+|------|------|------|------|
+| **Nacos** | 2.x | 配置中心 + 服务注册 | 8848 |
+
+**Nacos 使用场景：**
+- 集中管理应用配置
+- 多环境配置隔离（dev/test/prod）
+- 配置动态刷新（无需重启）
+- 服务注册与发现（可选）
+
+### 4.5 容器化
 
 > 注意：本项目不使用 Docker 容器化，使用本地开发模式。
 
@@ -315,6 +358,9 @@
 |------|----------|----------|--------------|
 | Java | 21 | 21 | 21 |
 | Spring Boot | 4.0.0 | 4.0.2 | 4.0.x |
+| Spring Cloud | 2023.0.x | 2023.0.3 | 2023.0.x |
+| Spring Cloud Alibaba | 2023.0.x | 2023.0.1.2 | 2023.0.x |
+| Nacos | 2.x | 2.3.0 | 2.x |
 | MySQL | 8.0.30 | 8.0.35 | 8.0.x |
 | Redis | 7.0 | 7.2 | 7.x |
 | RabbitMQ | 3.11 | 3.12 | 3.12.x |
@@ -348,13 +394,14 @@
 
 ### 8.1 短期计划
 
+- [x] 接入 Nacos 配置中心 (2026-02-18)
 - [ ] 接入 ELK 日志系统
 - [ ] 配置 Grafana 监控面板
 - [ ] 添加分布式追踪 (Sleuth/Zipkin)
 
 ### 8.2 中期计划
 
-- [ ] 微服务拆分（服务注册/配置中心）
+- [ ] 微服务拆分（使用 Nacos 注册中心）
 - [ ] 数据库读写分离
 - [ ] 接入 Kubernetes
 

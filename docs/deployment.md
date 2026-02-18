@@ -14,6 +14,7 @@
 | MySQL | 8.0 | 主数据库（本地安装） |
 | Redis | 7.x | 缓存/Session（本地安装） |
 | RabbitMQ | 3.12 | 消息队列（本地安装） |
+| Nacos | 2.x | 配置中心（可选，默认禁用） |
 
 ### 1.2 本地服务安装
 
@@ -31,6 +32,11 @@
 - 下载地址：https://www.rabbitmq.com/download.html
 - 端口：5672（AMQP）/ 15672（管理界面）
 - 需要安装 Erlang：https://www.erlang.org/downloads
+
+#### Nacos 2.x 安装（可选）
+- 下载地址：https://github.com/alibaba/nacos/releases
+- 端口：8848（HTTP）/ 9848（gRPC）
+- 推荐使用 Docker 快速启动
 
 ## 2. 快速开始
 
@@ -161,6 +167,42 @@ spring.rabbitmq.port=5672
 spring.rabbitmq.username=guest
 spring.rabbitmq.password=guest
 ```
+
+### Nacos 配置（可选，默认禁用）
+
+**启用 Nacos 配置中心：**
+```properties
+# 启用配置中心
+spring.cloud.nacos.config.enabled=true
+spring.cloud.nacos.discovery.enabled=true
+
+# Nacos 服务器地址
+spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+
+# 命名空间（dev/test/prod）
+spring.cloud.nacos.config.namespace=dev
+
+# 配置分组
+spring.cloud.nacos.config.group=DEFAULT_GROUP
+```
+
+**快速启动 Nacos（Docker）：**
+```bash
+docker run -d --name nacos \
+  -p 8848:8848 -p 9848:9848 \
+  -e MODE=standalone \
+  nacos/nacos-server:v2.3.0
+```
+
+**访问 Nacos 控制台：**
+- 地址：http://localhost:8848/nacos
+- 用户名：nacos
+- 密码：nacos
+
+**详细使用请参考：**
+- `docs/nacos-usage.md` - Nacos 使用指南
+- `config/nacos/import-guide.md` - 配置导入指南
+- `config/nacos/*.properties` - 各环境配置示例
 
 ## 6. 故障排查
 
