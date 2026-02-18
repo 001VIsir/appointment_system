@@ -8,21 +8,20 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Service for rate limiting using Redis sliding window algorithm.
+ * 使用Redis滑动窗口算法进行限流的服务类。
  *
- * <p>This service implements a sliding window rate limiting algorithm using Redis.
- * It tracks request counts per client (IP address or user) within configurable
- * time windows.</p>
+ * <p>此服务使用Redis实现滑动窗口限流算法。
+ * 它在可配置的时间窗口内跟踪每个客户端（IP地址或用户）的请求计数。</p>
  *
- * <h3>Features:</h3>
+ * <h3>功能：</h3>
  * <ul>
- *   <li>Sliding window algorithm for precise rate limiting</li>
- *   <li>Configurable limits per endpoint or client</li>
- *   <li>Redis-backed for distributed rate limiting</li>
- *   <li>Supports different rate limits for authenticated vs anonymous users</li>
+ *   <li>滑动窗口算法实现精确限流</li>
+ *   <li>每个端点或客户端可配置的限制</li>
+ *   <li>基于Redis支持分布式限流</li>
+ *   <li>支持已认证用户和匿名用户不同的限流限制</li>
  * </ul>
  *
- * <h3>Key Format:</h3>
+ * <h3>键格式：</h3>
  * <pre>
  * rate_limit:{type}:{identifier}:{window}
  * </pre>
@@ -34,41 +33,41 @@ public class RateLimitService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    // Default rate limits
+    // 默认限流规则
     private static final int DEFAULT_REQUESTS_PER_MINUTE = 60;
     private static final int DEFAULT_REQUESTS_PER_HOUR = 1000;
     private static final int AUTHENTICATED_REQUESTS_PER_MINUTE = 120;
     private static final int AUTHENTICATED_REQUESTS_PER_HOUR = 2000;
 
-    // Window durations in seconds
+    // 窗口时长（秒）
     private static final long MINUTE_WINDOW = 60;
     private static final long HOUR_WINDOW = 3600;
 
-    // Key prefixes
+    // 键前缀
     private static final String RATE_LIMIT_PREFIX = "rate_limit:";
     private static final String IP_PREFIX = "ip:";
     private static final String USER_PREFIX = "user:";
 
     /**
-     * Check if a request is allowed for the given client identifier.
+     * 检查给定客户端标识符的请求是否允许。
      *
-     * <p>Uses sliding window algorithm to track request counts.</p>
+     * <p>使用滑动窗口算法跟踪请求计数。</p>
      *
-     * @param clientId the client identifier (IP or user ID)
-     * @param isAuthenticated whether the client is authenticated
-     * @return RateLimitResult containing the check result and limit info
+     * @param clientId 客户端标识符（IP或用户ID）
+     * @param isAuthenticated 客户端是否已认证
+     * @return 包含检查结果和限制信息的RateLimitResult
      */
     public RateLimitResult checkRateLimit(String clientId, boolean isAuthenticated) {
         return checkRateLimit(clientId, isAuthenticated, null);
     }
 
     /**
-     * Check if a request is allowed with custom limits.
+     * 使用自定义限制检查请求是否允许。
      *
-     * @param clientId the client identifier
-     * @param isAuthenticated whether the client is authenticated
-     * @param customLimit custom requests per minute limit (null for default)
-     * @return RateLimitResult containing the check result and limit info
+     * @param clientId 客户端标识符
+     * @param isAuthenticated 客户端是否已认证
+     * @param customLimit 自定义每分钟请求限制（null表示默认）
+     * @return 包含检查结果和限制信息的RateLimitResult
      */
     public RateLimitResult checkRateLimit(String clientId, boolean isAuthenticated, Integer customLimit) {
         int perMinuteLimit = customLimit != null ? customLimit :
@@ -95,9 +94,9 @@ public class RateLimitService {
     }
 
     /**
-     * Check rate limit for an IP address.
+     * 检查IP地址的限流。
      *
-     * @param ipAddress the IP address
+     * @param ipAddress IP地址
      * @return RateLimitResult
      */
     public RateLimitResult checkIpRateLimit(String ipAddress) {
@@ -105,9 +104,9 @@ public class RateLimitService {
     }
 
     /**
-     * Check rate limit for an authenticated user.
+     * 检查已认证用户的限流。
      *
-     * @param userId the user ID
+     * @param userId 用户ID
      * @return RateLimitResult
      */
     public RateLimitResult checkUserRateLimit(Long userId) {
@@ -115,11 +114,11 @@ public class RateLimitService {
     }
 
     /**
-     * Check rate limit for a specific endpoint.
+     * 检查特定端点的限流。
      *
-     * @param endpoint the endpoint path
-     * @param clientId the client identifier
-     * @param limit the requests per minute limit
+     * @param endpoint 端点路径
+     * @param clientId 客户端标识符
+     * @param limit 每分钟请求限制
      * @return RateLimitResult
      */
     public RateLimitResult checkEndpointRateLimit(String endpoint, String clientId, int limit) {
@@ -128,9 +127,9 @@ public class RateLimitService {
     }
 
     /**
-     * Reset the rate limit counter for a client.
+     * 重置客户端的限流计数器。
      *
-     * @param clientId the client identifier
+     * @param clientId 客户端标识符
      */
     public void resetRateLimit(String clientId) {
         String minuteKey = buildKey(clientId, "minute");
@@ -141,10 +140,10 @@ public class RateLimitService {
     }
 
     /**
-     * Get current request count for a client.
+     * 获取客户端的当前请求计数。
      *
-     * @param clientId the client identifier
-     * @return current request count in the minute window
+     * @param clientId 客户端标识符
+     * @return 分钟窗口内的当前请求计数
      */
     public long getCurrentCount(String clientId) {
         String minuteKey = buildKey(clientId, "minute");
@@ -153,36 +152,36 @@ public class RateLimitService {
     }
 
     /**
-     * Build the Redis key for rate limiting.
+     * 构建用于限流的Redis键。
      *
-     * @param clientId the client identifier
-     * @param window the window type (minute/hour)
-     * @return the Redis key
+     * @param clientId 客户端标识符
+     * @param window 窗口类型（minute/hour）
+     * @return Redis键
      */
     private String buildKey(String clientId, String window) {
         return RATE_LIMIT_PREFIX + clientId + ":" + window;
     }
 
     /**
-     * Increment the counter and set expiry if needed.
+     * 递增计数器并在需要时设置过期时间。
      *
-     * <p>Uses Redis INCR command with expiry for atomic operation.</p>
+     * <p>使用Redis INCR命令与过期时间实现原子操作。</p>
      *
-     * @param key the Redis key
-     * @param windowSeconds the window duration in seconds
-     * @return the new counter value
+     * @param key Redis键
+     * @param windowSeconds 窗口时长（秒）
+     * @return 新的计数器值
      */
     private long incrementCounter(String key, long windowSeconds) {
         Long count = redisTemplate.opsForValue().increment(key);
         if (count != null && count == 1) {
-            // Set expiry only on first increment
+            // 仅在首次递增时设置过期时间
             redisTemplate.expire(key, windowSeconds, TimeUnit.SECONDS);
         }
         return count != null ? count : 0;
     }
 
     /**
-     * Result of a rate limit check.
+     * 限流检查的结果。
      */
     public record RateLimitResult(
         boolean allowed,
@@ -192,9 +191,9 @@ public class RateLimitService {
         long currentCount
     ) {
         /**
-         * Get the remaining requests as a percentage of the limit.
+         * 获取剩余请求占限制的百分比。
          *
-         * @return percentage remaining (0-100)
+         * @return 剩余百分比（0-100）
          */
         public int getRemainingPercentage() {
             if (limit == 0) return 0;
@@ -202,10 +201,10 @@ public class RateLimitService {
         }
 
         /**
-         * Check if the client is approaching the rate limit.
+         * 检查客户端是否接近限流限制。
          *
-         * @param threshold percentage threshold (0-100)
-         * @return true if remaining percentage is below threshold
+         * @param threshold 百分比阈值（0-100）
+         * @return 如果剩余百分比低于阈值返回true
          */
         public boolean isApproachingLimit(int threshold) {
             return getRemainingPercentage() < threshold;

@@ -31,18 +31,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Service for statistics and metrics operations.
+ * 统计和指标操作服务类。
  *
- * <p>Provides various statistics including:</p>
+ * <p>提供各种统计数据，包括：</p>
  * <ul>
- *   <li>Booking statistics (by date, merchant, status)</li>
- *   <li>User statistics (registrations, activity)</li>
- *   <li>System statistics (API calls, error rates, response times)</li>
+ *   <li>预约统计（按日期、商家、状态）</li>
+ *   <li>用户统计（注册、活动）</li>
+ *   <li>系统统计（API调用、错误率、响应时间）</li>
  * </ul>
  *
- * <h3>Redis-based Metrics:</h3>
- * <p>This service uses Redis to track API calls, errors, and response times
- * with time-based keys for real-time statistics.</p>
+ * <h3>基于Redis的指标：</h3>
+ * <p>此服务使用Redis跟踪API调用、错误和响应时间，
+ * 使用时间键进行实时统计。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class StatisticsService {
     private final ServiceItemRepository serviceItemRepository;
     private final StringRedisTemplate redisTemplate;
 
-    // Redis key prefixes for metrics
+    // 指标Redis键前缀
     private static final String API_CALLS_KEY = "stats:api:calls:";
     private static final String ERRORS_KEY = "stats:api:errors:";
     private static final String RESPONSE_TIME_KEY = "stats:api:response:";
@@ -63,13 +63,13 @@ public class StatisticsService {
     private static final String SERVER_ERRORS_KEY = "stats:api:server_errors:";
 
     // ============================================
-    // Booking Statistics
+    // 预约统计
     // ============================================
 
     /**
-     * Get overall booking statistics.
+     * 获取总体预约统计。
      *
-     * @return BookingStatsResponse with all booking metrics
+     * @return 包含所有预约指标的BookingStatsResponse
      */
     @Transactional(readOnly = true)
     public BookingStatsResponse getBookingStats() {
@@ -77,17 +77,17 @@ public class StatisticsService {
     }
 
     /**
-     * Get booking statistics for a date range.
+     * 获取日期范围的预约统计。
      *
-     * @param startDate start date (inclusive), null for all time
-     * @param endDate   end date (inclusive), null for all time
-     * @return BookingStatsResponse with booking metrics
+     * @param startDate 开始日期（包含），null表示所有时间
+     * @param endDate   结束日期（包含），null表示所有时间
+     * @return 包含预约指标的BookingStatsResponse
      */
     @Transactional(readOnly = true)
     public BookingStatsResponse getBookingStats(@Nullable LocalDate startDate, @Nullable LocalDate endDte) {
         log.debug("Getting booking stats from {} to {}", startDate, endDte);
 
-        // Overall counts
+        // 总计数
         long totalBookings = bookingRepository.count();
         long pendingBookings = bookingRepository.countByStatus(BookingStatus.PENDING);
         long confirmedBookings = bookingRepository.countByStatus(BookingStatus.CONFIRMED);
@@ -95,7 +95,7 @@ public class StatisticsService {
         long completedBookings = bookingRepository.countByStatus(BookingStatus.COMPLETED);
         long activeBookings = pendingBookings + confirmedBookings;
 
-        // Today's statistics
+        // 今日统计
         LocalDate today = LocalDate.now();
         LocalDateTime todayStart = today.atStartOfDay();
         LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
@@ -106,13 +106,13 @@ public class StatisticsService {
         long todayCompleted = todayBookingsList.stream()
                 .filter(b -> b.getStatus() == BookingStatus.COMPLETED).count();
 
-        // Calculate rates
+        // 计算比率
         double completionRate = totalBookings > 0 ? (double) completedBookings / totalBookings * 100 : 0;
         double cancellationRate = totalBookings > 0 ? (double) cancelledBookings / totalBookings * 100 : 0;
         double confirmationRate = totalBookings > 0
                 ? (double) confirmedBookings / totalBookings * 100 : 0;
 
-        // Date range statistics
+        // 日期范围统计
         long periodBookings = 0;
         Map<LocalDate, Long> dailyBookings = new HashMap<>();
 
@@ -122,7 +122,7 @@ public class StatisticsService {
             List<Booking> periodBookingsList = bookingRepository.findByCreatedAtBetween(periodStart, periodEnd);
             periodBookings = periodBookingsList.size();
 
-            // Group by date
+            // 按日期分组
             periodBookingsList.forEach(booking -> {
                 LocalDate date = booking.getCreatedAt().toLocalDate();
                 dailyBookings.merge(date, 1L, Long::sum);
@@ -150,10 +150,10 @@ public class StatisticsService {
     }
 
     /**
-     * Get booking statistics for a specific merchant.
+     * 获取特定商家的预约统计。
      *
-     * @param merchantId the merchant ID
-     * @return BookingStatsResponse with merchant-specific metrics
+     * @param merchantId 商家ID
+     * @return 包含商家特定指标的BookingStatsResponse
      */
     @Transactional(readOnly = true)
     public BookingStatsResponse getMerchantBookingStats(Long merchantId) {
@@ -172,7 +172,7 @@ public class StatisticsService {
                 .filter(b -> b.getStatus() == BookingStatus.COMPLETED).count();
         long activeBookings = pendingBookings + confirmedBookings;
 
-        // Today's statistics for merchant
+        // 今日统计 for merchant
         LocalDate today = LocalDate.now();
         LocalDateTime todayStart = today.atStartOfDay();
         LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
@@ -184,7 +184,7 @@ public class StatisticsService {
         long todayCompleted = todayBookingsList.stream()
                 .filter(b -> b.getStatus() == BookingStatus.COMPLETED).count();
 
-        // Calculate rates
+        // 计算比率
         double completionRate = totalBookings > 0 ? (double) completedBookings / totalBookings * 100 : 0;
         double cancellationRate = totalBookings > 0 ? (double) cancelledBookings / totalBookings * 100 : 0;
         double confirmationRate = totalBookings > 0
@@ -207,40 +207,40 @@ public class StatisticsService {
     }
 
     // ============================================
-    // User Statistics
+    // 用户统计
     // ============================================
 
     /**
-     * Get user statistics.
+     * 获取用户统计。
      *
-     * @return UserStatsResponse with user metrics
+     * @return 包含用户指标的UserStatsResponse
      */
     @Transactional(readOnly = true)
     public UserStatsResponse getUserStats() {
         log.debug("Getting user stats");
 
-        // Overall user counts
+        // 总用户数
         long totalUsers = userRepository.count();
         long enabledUsers = userRepository.findByEnabledTrue().size();
         long disabledUsers = userRepository.findByEnabledFalse().size();
 
-        // Role-based counts
+        // 基于角色的计数
         long adminCount = userRepository.countByRole(UserRole.ADMIN);
         long merchantCount = userRepository.countByRole(UserRole.MERCHANT);
         long userCount = userRepository.countByRole(UserRole.USER);
 
-        // Registration statistics (approximation based on creation time)
+        // 注册统计（基于创建时间的近似值）
         LocalDate today = LocalDate.now();
         LocalDate weekStart = today.minusDays(7);
         LocalDate monthStart = today.minusDays(30);
 
-        // For new user counts, we'll use a simple approximation
-        // In a real system, you'd have a createdAt field on User and query it
-        long todayNewUsers = 0; // Would need createdAt on User entity
+        // 对于新用户计数，我们将使用一个简单的近似值
+        // 在实际系统中，你会在User实体上有createdAt字段并查询它
+        long todayNewUsers = 0; // 需要User实体上的createdAt
         long weekNewUsers = 0;
         long monthNewUsers = 0;
 
-        // Activity statistics
+        // 活动统计
         long activeUsersWithBookings = bookingRepository.findAll().stream()
                 .map(b -> b.getUser().getId())
                 .distinct()
@@ -251,7 +251,7 @@ public class StatisticsService {
                 .distinct()
                 .count();
 
-        // Average bookings per user
+        // 每用户平均预约数
         double averageBookingsPerUser = totalUsers > 0
                 ? (double) bookingRepository.count() / totalUsers : 0;
 
@@ -272,13 +272,13 @@ public class StatisticsService {
     }
 
     // ============================================
-    // System Statistics
+    // 系统统计
     // ============================================
 
     /**
-     * Get system statistics.
+     * 获取系统统计。
      *
-     * @return SystemStatsResponse with system metrics
+     * @return 包含系统指标的SystemStatsResponse
      */
     public SystemStatsResponse getSystemStats() {
         log.debug("Getting system stats");
@@ -288,7 +288,7 @@ public class StatisticsService {
         long lastHourApiCalls = getLastHourMetric(API_CALLS_KEY);
         double apiCallsPerMinute = lastHourApiCalls / 60.0;
 
-        // Error statistics from Redis
+        // 来自Redis的错误统计
         long todayErrors = getTodayMetric(ERRORS_KEY);
         long lastHourErrors = getLastHourMetric(ERRORS_KEY);
         long clientErrors = getTodayMetric(CLIENT_ERRORS_KEY);
@@ -297,13 +297,13 @@ public class StatisticsService {
         double errorRate = todayApiCalls > 0
                 ? (double) todayErrors / todayApiCalls * 100 : 0;
 
-        // Response time statistics from Redis
+        // 来自Redis的响应时间统计
         double averageResponseTime = getAverageResponseTime();
         long maxResponseTime = getMaxResponseTime();
         long minResponseTime = getMinResponseTime();
         long p95ResponseTime = getP95ResponseTime();
 
-        // Resource statistics
+        // 资源统计
         long activeSessions = getActiveSessionCount();
 
         MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
@@ -334,11 +334,11 @@ public class StatisticsService {
     }
 
     // ============================================
-    // Metric Recording Methods
+    // 指标记录方法
     // ============================================
 
     /**
-     * Record an API call.
+     * 记录API调用。
      */
     public void recordApiCall() {
         String todayKey = API_CALLS_KEY + LocalDate.now();
@@ -352,9 +352,9 @@ public class StatisticsService {
     }
 
     /**
-     * Record an error.
+     * 记录错误。
      *
-     * @param statusCode the HTTP status code
+     * @param statusCode HTTP状态码
      */
     public void recordError(int statusCode) {
         String todayKey = ERRORS_KEY + LocalDate.now();
@@ -366,7 +366,7 @@ public class StatisticsService {
         redisTemplate.opsForValue().increment(hourKey);
         redisTemplate.expire(hourKey, Duration.ofDays(1));
 
-        // Track client vs server errors
+        // 跟踪客户端与服务器错误
         if (statusCode >= 400 && statusCode < 500) {
             String clientKey = CLIENT_ERRORS_KEY + LocalDate.now();
             redisTemplate.opsForValue().increment(clientKey);
@@ -379,25 +379,25 @@ public class StatisticsService {
     }
 
     /**
-     * Record response time.
+     * 记录响应时间。
      *
-     * @param responseTimeMs the response time in milliseconds
+     * @param responseTimeMs 响应时间（毫秒）
      */
     public void recordResponseTime(long responseTimeMs) {
         String todayKey = RESPONSE_TIME_KEY + LocalDate.now();
 
-        // Store in a Redis list for calculating statistics
+        // 存储在Redis列表中用于计算统计
         redisTemplate.opsForList().rightPush(todayKey, String.valueOf(responseTimeMs));
 
-        // Trim the list to keep only last 10000 entries
+        // 修剪列表只保留最后10000条记录
         redisTemplate.opsForList().trim(todayKey, -10000, -1);
 
-        // Set expiry
+        // 设置过期时间
         redisTemplate.expire(todayKey, Duration.ofDays(2));
     }
 
     // ============================================
-    // Helper Methods for Redis Metrics
+    // Redis指标的辅助方法 =====================================
     // ============================================
 
     private long getTodayMetric(String keyPrefix) {
@@ -468,8 +468,8 @@ public class StatisticsService {
     }
 
     private long getActiveSessionCount() {
-        // Count sessions in Redis with the session namespace
-        // This is an approximation - actual implementation depends on Spring Session configuration
+        // 统计Redis中会话命名空间下的会话数
+        // 这是一个近似值 - 实际实现取决于Spring Session配置
         try {
             var keys = redisTemplate.keys("appointment:session:*");
             return keys != null ? keys.size() : 0;
@@ -480,19 +480,19 @@ public class StatisticsService {
     }
 
     // ============================================
-    // Daily Summary Generation
+    // 每日汇总生成 =====================================
     // ============================================
 
     /**
-     * Generate daily statistics summary.
-     * Called by the scheduled task.
+     * 生成每日统计摘要。
+     * 由定时任务调用。
      *
-     * @param date the date to generate summary for
+     * @param date 生成摘要的日期
      */
     public void generateDailySummary(LocalDate date) {
         log.info("Generating daily summary for {}", date);
 
-        // Generate booking stats for the date
+        // 生成当天的预约统计
         LocalDateTime dayStart = date.atStartOfDay();
         LocalDateTime dayEnd = date.atTime(LocalTime.MAX);
 
@@ -507,7 +507,7 @@ public class StatisticsService {
         log.info("Daily summary for {}: total={}, pending={}, confirmed={}, cancelled={}, completed={}",
                 date, totalBookings, pending, confirmed, cancelled, completed);
 
-        // Store summary in Redis for quick access
+        // 将汇总存储到Redis以便快速访问
         String summaryKey = "stats:daily:" + date;
         Map<String, String> summary = Map.of(
                 "total", String.valueOf(totalBookings),
@@ -518,6 +518,6 @@ public class StatisticsService {
         );
 
         redisTemplate.opsForHash().putAll(summaryKey, summary);
-        redisTemplate.expire(summaryKey, Duration.ofDays(90)); // Keep for 90 days
+        redisTemplate.expire(summaryKey, Duration.ofDays(90)); // 保留90天
     }
 }

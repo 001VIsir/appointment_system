@@ -29,19 +29,19 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Service for merchant profile management operations.
+ * 商家资料管理操作服务类。
  *
- * <p>Handles CRUD operations for merchant profiles including:</p>
+ * <p>处理商家资料的CRUD操作，包括：</p>
  * <ul>
- *   <li>Creating merchant profiles for MERCHANT role users</li>
- *   <li>Updating merchant profile information</li>
- *   <li>Retrieving merchant profile data</li>
- *   <li>Managing merchant settings (stored as JSON)</li>
+ *   <li>为具有MERCHANT角色的用户创建商家资料</li>
+ *   <li>更新商家资料信息</li>
+ *   <li>获取商家资料数据</li>
+ *   <li>管理商家设置（存储为JSON）</li>
  * </ul>
  *
- * <h3>Security:</h3>
- * <p>All operations require the current user to have MERCHANT role.
- * Users can only access and modify their own merchant profile.</p>
+ * <h3>安全性：</h3>
+ * <p>所有操作要求当前用户具有MERCHANT角色。
+ * 用户只能访问和修改自己的商家资料。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -56,34 +56,33 @@ public class MerchantService {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     /**
-     * Create a new merchant profile for the current user.
+     * 为当前用户创建新的商家资料。
      *
-     * <p>The current user must have MERCHANT role and must not already
-     * have a merchant profile.</p>
+     * <p>当前用户必须具有MERCHANT角色，且尚未拥有商家资料。</p>
      *
-     * @param request the profile creation request
-     * @return MerchantProfileResponse containing the created profile
-     * @throws IllegalStateException if user already has a merchant profile
-     * @throws IllegalArgumentException if user is not a MERCHANT
+     * @param request 资料创建请求
+     * @return 包含已创建资料的MerchantProfileResponse
+     * @throws IllegalStateException 如果用户已有商家资料
+     * @throws IllegalArgumentException 如果用户不是MERCHANT
      */
     @Transactional
     public MerchantProfileResponse createProfile(MerchantProfileRequest request) {
         User currentUser = getCurrentUserOrThrow();
 
-        // Validate user is a merchant
+        // 验证用户是商家
         if (currentUser.getRole() != UserRole.MERCHANT) {
             log.warn("User {} (role={}) attempted to create merchant profile",
                 currentUser.getUsername(), currentUser.getRole());
             throw new IllegalArgumentException("Only users with MERCHANT role can create a merchant profile");
         }
 
-        // Check if profile already exists
+        // 检查资料是否已存在
         if (merchantProfileRepository.existsByUserId(currentUser.getId())) {
             log.warn("User {} already has a merchant profile", currentUser.getUsername());
             throw new IllegalStateException("User already has a merchant profile");
         }
 
-        // Create new profile
+        // 创建新资料
         MerchantProfile profile = new MerchantProfile(
             currentUser,
             request.getBusinessName(),
@@ -101,11 +100,11 @@ public class MerchantService {
     }
 
     /**
-     * Get the merchant profile for the current user.
+     * 获取当前用户的商家资料。
      *
-     * <p>Results are cached to improve performance.</p>
+     * <p>结果会被缓存以提高性能。</p>
      *
-     * @return Optional containing MerchantProfileResponse if found
+     * @return 包含MerchantProfileResponse的Optional（如果找到）
      */
     @Transactional(readOnly = true)
     @Cacheable(value = CacheConfig.CACHE_MERCHANT_PROFILES, key = "#root.methodName + ':' + T(org.example.appointment_system.service.MerchantService).getCurrentUserId()")
@@ -117,10 +116,10 @@ public class MerchantService {
     }
 
     /**
-     * Helper method to get current user ID for cache key.
-     * This is used internally for cache key generation.
+     * 获取当前用户ID用于缓存键的辅助方法。
+     * 此方法在内部用于缓存键生成。
      *
-     * @return the current user ID or null
+     * @return 当前用户ID或null
      */
     public static Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -132,12 +131,12 @@ public class MerchantService {
     }
 
     /**
-     * Get a merchant profile by ID.
+     * 根据ID获取商家资料。
      *
-     * <p>Only allows access to the current user's own profile.</p>
+     * <p>只允许访问当前用户自己的资料。</p>
      *
-     * @param profileId the profile ID
-     * @return Optional containing MerchantProfileResponse if found and owned by current user
+     * @param profileId 资料ID
+     * @return 包含MerchantProfileResponse的Optional（如果找到且属于当前用户）
      */
     @Transactional(readOnly = true)
     public Optional<MerchantProfileResponse> getProfileById(Long profileId) {
@@ -149,13 +148,13 @@ public class MerchantService {
     }
 
     /**
-     * Update the merchant profile for the current user.
+     * 更新当前用户的商家资料。
      *
-     * <p>Cache is evicted after update to ensure consistency.</p>
+     * <p>更新后清除缓存以确保一致性。</p>
      *
-     * @param request the profile update request
-     * @return MerchantProfileResponse containing the updated profile
-     * @throws IllegalArgumentException if user doesn't have a merchant profile
+     * @param request 资料更新请求
+     * @return 包含已更新资料的MerchantProfileResponse
+     * @throws IllegalArgumentException 如果用户没有商家资料
      */
     @Transactional
     @CacheEvict(value = CacheConfig.CACHE_MERCHANT_PROFILES, allEntries = true)
@@ -165,7 +164,7 @@ public class MerchantService {
         MerchantProfile profile = merchantProfileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new IllegalArgumentException("Merchant profile not found for current user"));
 
-        // Update fields
+        // 更新字段
         profile.setBusinessName(request.getBusinessName());
         profile.setDescription(request.getDescription());
         profile.setPhone(request.getPhone());
@@ -179,12 +178,12 @@ public class MerchantService {
     }
 
     /**
-     * Get the current merchant's settings.
+     * 获取当前商家的设置。
      *
-     * <p>Results are cached to improve performance.</p>
+     * <p>结果会被缓存以提高性能。</p>
      *
-     * @return MerchantSettingsResponse containing the settings
-     * @throws IllegalArgumentException if user doesn't have a merchant profile
+     * @return 包含设置的MerchantSettingsResponse
+     * @throws IllegalArgumentException 如果用户没有商家资料
      */
     @Transactional(readOnly = true)
     @Cacheable(value = CacheConfig.CACHE_MERCHANT_SETTINGS, key = "'settings:' + T(org.example.appointment_system.service.MerchantService).getCurrentUserId()")
@@ -198,14 +197,14 @@ public class MerchantService {
     }
 
     /**
-     * Update the merchant's settings.
+     * 更新商家的设置。
      *
-     * <p>Merges the provided settings with existing settings.
-     * Cache is evicted after update to ensure consistency.</p>
+     * <p>将提供的设置与现有设置合并。
+     * 更新后清除缓存以确保一致性。</p>
      *
-     * @param request the settings update request
-     * @return MerchantSettingsResponse containing the updated settings
-     * @throws IllegalArgumentException if user doesn't have a merchant profile
+     * @param request 设置更新请求
+     * @return 包含已更新设置的MerchantSettingsResponse
+     * @throws IllegalArgumentException 如果用户没有商家资料
      */
     @Transactional
     @CacheEvict(value = CacheConfig.CACHE_MERCHANT_SETTINGS, allEntries = true)
@@ -215,13 +214,13 @@ public class MerchantService {
         MerchantProfile profile = merchantProfileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new IllegalArgumentException("Merchant profile not found for current user"));
 
-        // Parse existing settings or create new map
+        // 解析现有设置或创建新映射
         @SuppressWarnings("unchecked")
         Map<String, Object> settingsMap = profile.getSettings() != null
             ? parseSettingsToMap(profile.getSettings())
             : new java.util.HashMap<>();
 
-        // Update settings from request
+        // 从请求更新设置
         if (request.getSessionTimeout() != null) {
             settingsMap.put("sessionTimeout", request.getSessionTimeout());
         }
@@ -244,7 +243,7 @@ public class MerchantService {
             settingsMap.put("maxBookingsPerUserPerDay", request.getMaxBookingsPerUserPerDay());
         }
 
-        // Save updated settings
+        // 保存更新的设置
         try {
             profile.setSettings(objectMapper.writeValueAsString(settingsMap));
         } catch (JsonProcessingException e) {
@@ -259,13 +258,12 @@ public class MerchantService {
     }
 
     /**
-     * Delete the merchant profile for the current user.
+     * 删除当前用户的商家资料。
      *
-     * <p>Note: This is a hard delete. Consider implementing soft delete
-     * if business requirements need to retain historical data.
-     * Cache is evicted after deletion.</p>
+     * <p>注意：这是硬删除。如果业务需求需要保留历史数据，
+     * 请考虑实现软删除。删除后清除缓存。</p>
      *
-     * @throws IllegalArgumentException if user doesn't have a merchant profile
+     * @throws IllegalArgumentException 如果用户没有商家资料
      */
     @Transactional
     @Caching(evict = {
@@ -284,9 +282,9 @@ public class MerchantService {
     }
 
     /**
-     * Check if the current user has a merchant profile.
+     * 检查当前用户是否有商家资料。
      *
-     * @return true if the current user has a merchant profile
+     * @return 如果当前用户有商家资料返回true
      */
     @Transactional(readOnly = true)
     public boolean hasMerchantProfile() {
@@ -295,9 +293,9 @@ public class MerchantService {
     }
 
     /**
-     * Get the current merchant's profile ID.
+     * 获取当前商家的资料ID。
      *
-     * @return Optional containing the merchant profile ID if found
+     * @return 包含商家资料ID的Optional（如果找到）
      */
     @Transactional(readOnly = true)
     public Optional<Long> getCurrentMerchantId() {
@@ -307,9 +305,9 @@ public class MerchantService {
     }
 
     /**
-     * Get the current authenticated user.
+     * 获取当前已认证的用户。
      *
-     * @return Optional containing the current User
+     * @return 包含当前用户的Optional
      */
     private Optional<User> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -326,10 +324,10 @@ public class MerchantService {
     }
 
     /**
-     * Get the current authenticated user or throw an exception.
+     * 获取当前已认证的用户或抛出异常。
      *
-     * @return the current User
-     * @throws IllegalStateException if no authenticated user
+     * @return 当前用户
+     * @throws IllegalStateException 如果没有已认证的用户
      */
     private User getCurrentUserOrThrow() {
         return getCurrentUser()
@@ -337,10 +335,10 @@ public class MerchantService {
     }
 
     /**
-     * Map MerchantProfile entity to response DTO.
+     * 将MerchantProfile实体映射到响应DTO。
      *
-     * @param profile the entity to map
-     * @return the response DTO
+     * @param profile 要映射的实体
+     * @return 响应DTO
      */
     private MerchantProfileResponse mapToResponse(MerchantProfile profile) {
         return MerchantProfileResponse.builder()
@@ -358,10 +356,10 @@ public class MerchantService {
     }
 
     /**
-     * Parse JSON settings string to MerchantSettingsResponse.
+     * 将JSON设置字符串解析为MerchantSettingsResponse。
      *
-     * @param settingsJson the JSON string
-     * @return the settings response
+     * @param settingsJson JSON字符串
+     * @return 设置响应
      */
     private MerchantSettingsResponse parseSettings(String settingsJson) {
         if (settingsJson == null || settingsJson.isBlank()) {
@@ -377,10 +375,10 @@ public class MerchantService {
     }
 
     /**
-     * Parse JSON settings string to Map.
+     * 将JSON设置字符串解析为Map。
      *
-     * @param settingsJson the JSON string
-     * @return the settings map
+     * @param settingsJson JSON字符串
+     * @return 设置Map
      */
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseSettingsToMap(String settingsJson) {
