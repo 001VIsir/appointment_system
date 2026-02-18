@@ -8,65 +8,65 @@ import java.util.concurrent.Callable;
 import static org.example.appointment_system.filter.RequestLoggingFilter.*;
 
 /**
- * Utility class for managing trace context (TraceId, SpanId, etc.)
+ * 用于管理追踪上下文（TraceId、SpanId等）的工具类。
  *
- * Provides methods to:
- * - Get/set trace context values
- * - Run code with specific trace context
- * - Propagate trace context across thread boundaries
+ * 提供以下方法：
+ * - 获取/设置追踪上下文值
+ * - 使用特定追踪上下文运行代码
+ * - 跨线程边界传播追踪上下文
  */
 public final class TraceContext {
 
     private TraceContext() {
-        // Utility class
+        // 工具类
     }
 
     // ==================== Getters ====================
 
     /**
-     * Get current TraceId
+     * 获取当前TraceId
      */
     public static String getTraceId() {
         return MDC.get(TRACE_ID);
     }
 
     /**
-     * Get current SpanId
+     * 获取当前SpanId
      */
     public static String getSpanId() {
         return MDC.get(SPAN_ID);
     }
 
     /**
-     * Get current RequestId
+     * 获取当前RequestId
      */
     public static String getRequestId() {
         return MDC.get(REQUEST_ID);
     }
 
     /**
-     * Get current UserId
+     * 获取当前UserId
      */
     public static String getUserId() {
         return MDC.get(USER_ID);
     }
 
     /**
-     * Get current MerchantId
+     * 获取当前MerchantId
      */
     public static String getMerchantId() {
         return MDC.get(MERCHANT_ID);
     }
 
     /**
-     * Get current ClientIp
+     * 获取当前ClientIp
      */
     public static String getClientIp() {
         return MDC.get(CLIENT_IP);
     }
 
     /**
-     * Get all current MDC values as a map
+     * 获取所有当前MDC值作为Map
      */
     public static Map<String, String> getCopyOfContextMap() {
         return MDC.getCopyOfContextMap();
@@ -75,7 +75,7 @@ public final class TraceContext {
     // ==================== Setters ====================
 
     /**
-     * Set TraceId
+     * 设置TraceId
      */
     public static void setTraceId(String traceId) {
         if (traceId != null) {
@@ -84,7 +84,7 @@ public final class TraceContext {
     }
 
     /**
-     * Set SpanId
+     * 设置SpanId
      */
     public static void setSpanId(String spanId) {
         if (spanId != null) {
@@ -93,7 +93,7 @@ public final class TraceContext {
     }
 
     /**
-     * Set UserId
+     * 设置UserId
      */
     public static void setUserId(String userId) {
         if (userId != null) {
@@ -102,7 +102,7 @@ public final class TraceContext {
     }
 
     /**
-     * Set MerchantId
+     * 设置MerchantId
      */
     public static void setMerchantId(String merchantId) {
         if (merchantId != null) {
@@ -111,7 +111,7 @@ public final class TraceContext {
     }
 
     /**
-     * Set context from a map
+     * 从Map设置上下文
      */
     public static void setContextMap(Map<String, String> contextMap) {
         if (contextMap != null) {
@@ -122,35 +122,35 @@ public final class TraceContext {
     // ==================== Clear ====================
 
     /**
-     * Clear TraceId
+     * 清除TraceId
      */
     public static void clearTraceId() {
         MDC.remove(TRACE_ID);
     }
 
     /**
-     * Clear SpanId
+     * 清除SpanId
      */
     public static void clearSpanId() {
         MDC.remove(SPAN_ID);
     }
 
     /**
-     * Clear UserId
+     * 清除UserId
      */
     public static void clearUserId() {
         MDC.remove(USER_ID);
     }
 
     /**
-     * Clear MerchantId
+     * 清除MerchantId
      */
     public static void clearMerchantId() {
         MDC.remove(MERCHANT_ID);
     }
 
     /**
-     * Clear all MDC context
+     * 清除所有MDC上下文
      */
     public static void clear() {
         MDC.clear();
@@ -159,7 +159,7 @@ public final class TraceContext {
     // ==================== Context Propagation ====================
 
     /**
-     * Run a Runnable with the current trace context propagated
+     * 使用当前追踪上下文执行Runnable任务
      */
     public static Runnable wrap(Runnable task) {
         Map<String, String> contextMap = getCopyOfContextMap();
@@ -181,7 +181,7 @@ public final class TraceContext {
     }
 
     /**
-     * Run a Callable with the current trace context propagated
+     * 使用当前追踪上下文执行Callable任务
      */
     public static <T> Callable<T> wrap(Callable<T> task) {
         Map<String, String> contextMap = getCopyOfContextMap();
@@ -203,7 +203,7 @@ public final class TraceContext {
     }
 
     /**
-     * Run a task with a specific trace context
+     * 使用指定追踪上下文执行任务
      */
     public static void runWithContext(Map<String, String> contextMap, Runnable task) {
         Map<String, String> previousContext = MDC.getCopyOfContextMap();
@@ -222,7 +222,7 @@ public final class TraceContext {
     }
 
     /**
-     * Run a task with a specific trace context and return result
+     * 使用指定追踪上下文执行任务并返回结果
      */
     public static <T> T callWithContext(Map<String, String> contextMap, Callable<T> task) throws Exception {
         Map<String, String> previousContext = MDC.getCopyOfContextMap();
@@ -243,7 +243,7 @@ public final class TraceContext {
     // ==================== Validation ====================
 
     /**
-     * Check if a trace context is active
+     * 检查追踪上下文是否激活
      */
     public static boolean hasTraceContext() {
         String traceId = getTraceId();
@@ -251,7 +251,7 @@ public final class TraceContext {
     }
 
     /**
-     * Check if user context is available
+     * 检查用户上下文是否可用
      */
     public static boolean hasUserContext() {
         String userId = getUserId();
