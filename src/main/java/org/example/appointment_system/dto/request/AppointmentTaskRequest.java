@@ -14,9 +14,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 /**
- * DTO for appointment task creation/update request.
+ * 预约任务创建/更新请求DTO。
  *
- * <p>Contains all fields needed to create or update an appointment task.</p>
+ * <p>包含创建或更新预约任务所需的所有字段。</p>
  */
 @Getter
 @Setter
@@ -26,45 +26,45 @@ import java.time.LocalDate;
 public class AppointmentTaskRequest {
 
     /**
-     * ID of the service item this task belongs to.
-     * Required for task creation.
+     * 该任务所属的服务项目ID。
+     * 创建任务时必填。
      */
-    @NotNull(message = "Service ID is required")
+    @NotNull(message = "服务ID不能为空")
     private Long serviceId;
 
     /**
-     * Title of the appointment task.
-     * Required, 2-100 characters.
+     * 预约任务的标题。
+     * 必填，2-100个字符。
      */
-    @NotBlank(message = "Title is required")
-    @Size(min = 2, max = 100, message = "Title must be between 2 and 100 characters")
+    @NotBlank(message = "标题不能为空")
+    @Size(min = 2, max = 100, message = "标题长度必须在2到100个字符之间")
     private String title;
 
     /**
-     * Optional description of the appointment task.
-     * Maximum 1000 characters.
+     * 预约任务的可选描述。
+     * 最多1000个字符。
      */
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    @Size(max = 1000, message = "描述长度不能超过1000个字符")
     private String description;
 
     /**
-     * Date of the appointment task.
-     * Required, must be today or in the future for new tasks.
+     * 预约任务的日期。
+     * 必填，对于新任务必须是今天或未来日期。
      */
-    @NotNull(message = "Task date is required")
+    @NotNull(message = "任务日期不能为空")
     private LocalDate taskDate;
 
     /**
-     * Maximum total bookings for this task.
-     * Required, minimum 1.
+     * 该任务的最大预约总数。
+     * 必填，最小值为1。
      */
-    @NotNull(message = "Total capacity is required")
-    @Min(value = 1, message = "Total capacity must be at least 1")
+    @NotNull(message = "总容量不能为空")
+    @Min(value = 1, message = "总容量至少为1")
     private Integer totalCapacity;
 
     /**
-     * Whether the task is active.
-     * Optional, defaults to true.
+     * 任务是否启用。
+     * 可选，默认为 true。
      */
     private Boolean active;
 }
