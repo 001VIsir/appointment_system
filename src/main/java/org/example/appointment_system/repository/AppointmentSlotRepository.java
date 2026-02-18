@@ -12,113 +12,113 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for AppointmentSlot entity.
+ * 预约时段实体Repository接口。
  *
- * <p>Provides data access operations for appointment slots including:</p>
+ * <p>提供预约时段数据访问操作，包括：</p>
  * <ul>
- *   <li>Standard CRUD operations (inherited from JpaRepository)</li>
- *   <li>Find by appointment task</li>
- *   <li>Find available slots (with capacity)</li>
- *   <li>Check slot availability</li>
+ *   <li>标准CRUD操作（继承自JpaRepository）</li>
+ *   <li>按预约任务查询</li>
+ *   <li>查询可用时段（有剩余容量的）</li>
+ *   <li>检查时段可用性</li>
  * </ul>
  */
 @Repository
 public interface AppointmentSlotRepository extends JpaRepository<AppointmentSlot, Long> {
 
     /**
-     * Find all slots belonging to a specific appointment task.
+     * 查询指定预约任务的所有时段。
      *
-     * @param task the appointment task to search by
-     * @return list of slots for the task
+     * @param task 要查询的预约任务
+     * @return 该任务的时段列表
      */
     List<AppointmentSlot> findByTask(AppointmentTask task);
 
     /**
-     * Find all slots belonging to a specific appointment task by task ID.
+     * 按预约任务ID查询所有时段。
      *
-     * @param taskId the appointment task ID to search by
-     * @return list of slots for the task
+     * @param taskId 要查询的预约任务ID
+     * @return 该任务的时段列表
      */
     List<AppointmentSlot> findByTaskId(Long taskId);
 
     /**
-     * Find a slot by ID and task.
+     * 按ID和任务查询时段。
      *
-     * @param id   the slot ID
-     * @param task the appointment task
-     * @return Optional containing the slot if found and belongs to the task
+     * @param id   时段ID
+     * @param task 预约任务
+     * @return 包含时段的Optional（如果找到且属于该任务）
      */
     Optional<AppointmentSlot> findByIdAndTask(Long id, AppointmentTask task);
 
     /**
-     * Find a slot by ID and task ID.
+     * 按ID和任务ID查询时段。
      *
-     * @param id     the slot ID
-     * @param taskId the appointment task ID
-     * @return Optional containing the slot if found
+     * @param id     时段ID
+     * @param taskId 预约任务ID
+     * @return 包含时段的Optional（如果找到）
      */
     Optional<AppointmentSlot> findByIdAndTaskId(Long id, Long taskId);
 
     /**
-     * Find all slots with available capacity for a task.
-     * Slots where booked_count < capacity.
+     * 查询指定任务的有可用容量的所有时段。
+     * 条件为 booked_count < capacity。
      *
-     * @param task the appointment task
-     * @return list of slots with available capacity
+     * @param task 预约任务
+     * @return 有可用容量的时段列表
      */
     @Query("SELECT s FROM AppointmentSlot s WHERE s.task = :task AND s.bookedCount < s.capacity")
     List<AppointmentSlot> findAvailableSlotsByTask(@Param("task") AppointmentTask task);
 
     /**
-     * Find all slots with available capacity for a task by task ID.
+     * 按任务ID查询有可用容量的所有时段。
      *
-     * @param taskId the appointment task ID
-     * @return list of slots with available capacity
+     * @param taskId 预约任务ID
+     * @return 有可用容量的时段列表
      */
     @Query("SELECT s FROM AppointmentSlot s WHERE s.task.id = :taskId AND s.bookedCount < s.capacity")
     List<AppointmentSlot> findAvailableSlotsByTaskId(@Param("taskId") Long taskId);
 
     /**
-     * Find slots by task ordered by start time.
+     * 按任务查询时段并按开始时间排序。
      *
-     * @param task the appointment task
-     * @return list of slots ordered by start time ascending
+     * @param task 预约任务
+     * @return 按开始时间升序的时段列表
      */
     List<AppointmentSlot> findByTaskOrderByStartTimeAsc(AppointmentTask task);
 
     /**
-     * Find slots by task ID ordered by start time.
+     * 按任务ID查询时段并按开始时间排序。
      *
-     * @param taskId the appointment task ID
-     * @return list of slots ordered by start time ascending
+     * @param taskId 预约任务ID
+     * @return 按开始时间升序的时段列表
      */
     List<AppointmentSlot> findByTaskIdOrderByStartTimeAsc(Long taskId);
 
     /**
-     * Find a slot by task and start time.
+     * 按任务和开始时间查询时段。
      *
-     * @param task      the appointment task
-     * @param startTime the start time
-     * @return Optional containing the slot if found
+     * @param task      预约任务
+     * @param startTime 开始时间
+     * @return 包含时段的Optional（如果找到）
      */
     Optional<AppointmentSlot> findByTaskAndStartTime(AppointmentTask task, LocalTime startTime);
 
     /**
-     * Find a slot by task ID and start time.
+     * 按任务ID和开始时间查询时段。
      *
-     * @param taskId    the appointment task ID
-     * @param startTime the start time
-     * @return Optional containing the slot if found
+     * @param taskId    预约任务ID
+     * @param startTime 开始时间
+     * @return 包含时段的Optional（如果找到）
      */
     Optional<AppointmentSlot> findByTaskIdAndStartTime(Long taskId, LocalTime startTime);
 
     /**
-     * Find slots by task and time range.
+     * 按任务和时间范围查询时段。
      *
-     * @param task      the appointment task
-     * @param startTime the start time (inclusive)
-     * @param endTime   the end time (inclusive)
-     * @return list of slots in the time range
+     * @param task      预约任务
+     * @param startTime 开始时间（包含）
+     * @param endTime   结束时间（包含）
+     * @return 时间范围内的时段列表
      */
     @Query("SELECT s FROM AppointmentSlot s WHERE s.task = :task " +
            "AND s.startTime >= :startTime AND s.endTime <= :endTime")
@@ -128,78 +128,78 @@ public interface AppointmentSlotRepository extends JpaRepository<AppointmentSlot
             @Param("endTime") LocalTime endTime);
 
     /**
-     * Count all slots for a task.
+     * 统计指定任务的所有时段数量。
      *
-     * @param task the appointment task
-     * @return the count of slots
+     * @param task 预约任务
+     * @return 时段数量
      */
     long countByTask(AppointmentTask task);
 
     /**
-     * Count slots with available capacity for a task.
+     * 统计指定任务的有可用容量的时段数量。
      *
-     * @param task the appointment task
-     * @return the count of available slots
+     * @param task 预约任务
+     * @return 可用时段数量
      */
     @Query("SELECT COUNT(s) FROM AppointmentSlot s WHERE s.task = :task AND s.bookedCount < s.capacity")
     long countAvailableSlotsByTask(@Param("task") AppointmentTask task);
 
     /**
-     * Count total capacity for a task (sum of all slot capacities).
+     * 统计指定任务的总容量（所有时段容量之和）。
      *
-     * @param taskId the appointment task ID
-     * @return the total capacity
+     * @param taskId 预约任务ID
+     * @return 总容量
      */
     @Query("SELECT COALESCE(SUM(s.capacity), 0) FROM AppointmentSlot s WHERE s.task.id = :taskId")
     int sumCapacityByTaskId(@Param("taskId") Long taskId);
 
     /**
-     * Count total booked count for a task (sum of all slot booked counts).
+     * 统计指定任务的总预约数（所有时段预约数之和）。
      *
-     * @param taskId the appointment task ID
-     * @return the total booked count
+     * @param taskId 预约任务ID
+     * @return 总预约数
      */
     @Query("SELECT COALESCE(SUM(s.bookedCount), 0) FROM AppointmentSlot s WHERE s.task.id = :taskId")
     int sumBookedCountByTaskId(@Param("taskId") Long taskId);
 
     /**
-     * Check if a slot exists with the given start time for a task.
+     * 检查指定任务是否存在指定开始时间的时段。
      *
-     * @param task      the appointment task
-     * @param startTime the start time to check
-     * @return true if a slot with this start time exists
+     * @param task      预约任务
+     * @param startTime 要检查的开始时间
+     * @return 如果存在此开始时间的时段返回true
      */
     boolean existsByTaskAndStartTime(AppointmentTask task, LocalTime startTime);
 
     /**
-     * Check if a slot exists with the given time range for a task.
+     * 检查指定任务是否存在指定时间范围的时段。
      *
-     * @param task      the appointment task
-     * @param startTime the start time
-     * @param endTime   the end time
-     * @return true if a slot with this time range exists
+     * @param task      预约任务
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 如果存在此时间范围的时段返回true
      */
     boolean existsByTaskAndStartTimeAndEndTime(AppointmentTask task, LocalTime startTime, LocalTime endTime);
 
     /**
-     * Delete all slots for a task.
+     * 删除指定任务的所有时段。
      *
-     * @param task the appointment task
+     * @param task 预约任务
      */
     void deleteByTask(AppointmentTask task);
 
     /**
-     * Delete all slots for a task by task ID.
+     * 按任务ID删除所有时段。
      *
-     * @param taskId the appointment task ID
+     * @param taskId 预约任务ID
      */
     void deleteByTaskId(Long taskId);
 
     /**
-     * Find fully booked slots for a task.
+     * 查询指定任务的已满时段。
      *
-     * @param task the appointment task
-     * @return list of fully booked slots
+     * @param task 预约任务
+     * @return 已满时段列表
      */
     @Query("SELECT s FROM AppointmentSlot s WHERE s.task = :task AND s.bookedCount >= s.capacity")
     List<AppointmentSlot> findFullyBookedSlotsByTask(@Param("task") AppointmentTask task);

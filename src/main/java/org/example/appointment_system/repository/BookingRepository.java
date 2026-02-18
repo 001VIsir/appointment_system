@@ -17,376 +17,376 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for Booking entity.
+ * 预约实体Repository接口。
  *
- * <p>Provides data access operations for bookings including:</p>
+ * <p>提供预约数据访问操作，包括：</p>
  * <ul>
- *   <li>Standard CRUD operations (inherited from JpaRepository)</li>
- *   <li>Find by user, slot, and status</li>
- *   <li>Count bookings by various criteria</li>
- *   <li>Check for duplicate bookings</li>
+ *   <li>标准CRUD操作（继承自JpaRepository）</li>
+ *   <li>按用户、时段和状态查询</li>
+ *   <li>按各种条件统计预约数量</li>
+ *   <li>检查重复预约</li>
  * </ul>
  */
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // ============================================
-    // Find by User
+    // 按用户查询
     // ============================================
 
     /**
-     * Find all bookings for a specific user.
+     * 查询指定用户的所有预约。
      *
-     * @param user the user to search by
-     * @return list of bookings for the user
+     * @param user 要查询的用户
+     * @return 该用户的预约列表
      */
     List<Booking> findByUser(User user);
 
     /**
-     * Find all bookings for a specific user by user ID.
+     * 按用户ID查询所有预约。
      *
-     * @param userId the user ID to search by
-     * @return list of bookings for the user
+     * @param userId 要查询的用户ID
+     * @return 该用户的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId")
     List<Booking> findByUserId(@Param("userId") Long userId);
 
     /**
-     * Find all bookings for a specific user with pagination.
+     * 按用户ID分页查询所有预约。
      *
-     * @param userId   the user ID to search by
-     * @param pageable pagination information
-     * @return page of bookings for the user
+     * @param userId   要查询的用户ID
+     * @param pageable 分页信息
+     * @return 该用户的预约分页
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId")
     Page<Booking> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
     /**
-     * Find bookings by user and status.
+     * 按用户和状态查询预约。
      *
-     * @param user   the user to search by
-     * @param status the booking status
-     * @return list of bookings matching the criteria
+     * @param user   要查询的用户
+     * @param status 预约状态
+     * @return 匹配条件的预约列表
      */
     List<Booking> findByUserAndStatus(User user, BookingStatus status);
 
     /**
-     * Find bookings by user ID and status.
+     * 按用户ID和状态查询预约。
      *
-     * @param userId the user ID to search by
-     * @param status the booking status
-     * @return list of bookings matching the criteria
+     * @param userId 要查询的用户ID
+     * @param status 预约状态
+     * @return 匹配条件的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.status = :status")
     List<Booking> findByUserIdAndStatus(@Param("userId") Long userId, @Param("status") BookingStatus status);
 
     /**
-     * Find bookings by user ID and status with pagination.
+     * 按用户ID和状态分页查询预约。
      *
-     * @param userId   the user ID to search by
-     * @param status   the booking status
-     * @param pageable pagination information
-     * @return page of bookings matching the criteria
+     * @param userId   要查询的用户ID
+     * @param status   预约状态
+     * @param pageable 分页信息
+     * @return 匹配条件的预约分页
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.status = :status")
     Page<Booking> findByUserIdAndStatus(@Param("userId") Long userId, @Param("status") BookingStatus status, Pageable pageable);
 
     /**
-     * Find bookings by user with status in a list.
+     * 按用户和状态列表查询预约。
      *
-     * @param userId  the user ID to search by
-     * @param statuses list of statuses to filter by
-     * @return list of bookings matching the criteria
+     * @param userId   要查询的用户ID
+     * @param statuses 要筛选的状态列表
+     * @return 匹配条件的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.status IN :statuses")
     List<Booking> findByUserIdAndStatusIn(@Param("userId") Long userId, @Param("statuses") List<BookingStatus> statuses);
 
     // ============================================
-    // Find by Slot
+    // 按时段查询
     // ============================================
 
     /**
-     * Find all bookings for a specific slot.
+     * 查询指定时段的所有预约。
      *
-     * @param slot the slot to search by
-     * @return list of bookings for the slot
+     * @param slot 要查询的时段
+     * @return 该时段的预约列表
      */
     List<Booking> findBySlot(AppointmentSlot slot);
 
     /**
-     * Find all bookings for a specific slot by slot ID.
+     *按时段ID查询所有预约。
      *
-     * @param slotId the slot ID to search by
-     * @return list of bookings for the slot
+     * @param slotId 要查询的时段ID
+     * @return 该时段的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.id = :slotId")
     List<Booking> findBySlotId(@Param("slotId") Long slotId);
 
     /**
-     * Find bookings by slot and status.
+     * 按时段和状态查询预约。
      *
-     * @param slot   the slot to search by
-     * @param status the booking status
-     * @return list of bookings matching the criteria
+     * @param slot   要查询的时段
+     * @param status 预约状态
+     * @return 匹配条件的预约列表
      */
     List<Booking> findBySlotAndStatus(AppointmentSlot slot, BookingStatus status);
 
     /**
-     * Find bookings by slot ID and status.
+     * 按时段ID和状态查询预约。
      *
-     * @param slotId the slot ID to search by
-     * @param status the booking status
-     * @return list of bookings matching the criteria
+     * @param slotId 要查询的时段ID
+     * @param status 预约状态
+     * @return 匹配条件的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.id = :slotId AND b.status = :status")
     List<Booking> findBySlotIdAndStatus(@Param("slotId") Long slotId, @Param("status") BookingStatus status);
 
     // ============================================
-    // Find by User and Slot (for duplicate check)
+    // 按用户和时段查询（用于重复检查）
     // ============================================
 
     /**
-     * Find a booking by user and slot.
+     * 按用户和时段查询预约。
      *
-     * @param user the user
-     * @param slot the slot
-     * @return Optional containing the booking if found
+     * @param user 用户
+     * @param slot 时段
+     * @return 包含预约的Optional（如果找到）
      */
     Optional<Booking> findByUserAndSlot(User user, AppointmentSlot slot);
 
     /**
-     * Find a booking by user ID and slot ID.
+     * 按用户ID和时段ID查询预约。
      *
-     * @param userId the user ID
-     * @param slotId the slot ID
-     * @return Optional containing the booking if found
+     * @param userId 用户ID
+     * @param slotId 时段ID
+     * @return 包含预约的Optional（如果找到）
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.slot.id = :slotId")
     Optional<Booking> findByUserIdAndSlotId(@Param("userId") Long userId, @Param("slotId") Long slotId);
 
     /**
-     * Check if a booking exists for a user and slot.
+     * 检查指定用户和时段是否存在预约。
      *
-     * @param userId the user ID
-     * @param slotId the slot ID
-     * @return true if a booking exists
+     * @param userId 用户ID
+     * @param slotId 时段ID
+     * @return 如果存在预约返回true
      */
     @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b WHERE b.user.id = :userId AND b.slot.id = :slotId")
     boolean existsByUserIdAndSlotId(@Param("userId") Long userId, @Param("slotId") Long slotId);
 
     /**
-     * Check if an active booking exists for a user and slot.
+     * 检查指定用户和时段是否存在有效预约。
      *
-     * @param userId the user ID
-     * @param slotId the slot ID
-     * @return true if an active booking exists
+     * @param userId 用户ID
+     * @param slotId 时段ID
+     * @return 如果存在有效预约返回true
      */
     @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b " +
            "WHERE b.user.id = :userId AND b.slot.id = :slotId AND b.status IN ('PENDING', 'CONFIRMED')")
     boolean existsActiveBookingByUserIdAndSlotId(@Param("userId") Long userId, @Param("slotId") Long slotId);
 
     // ============================================
-    // Find by Status
+    // 按状态查询
     // ============================================
 
     /**
-     * Find all bookings with a specific status.
+     * 查询所有具有指定状态的预约。
      *
-     * @param status the booking status
-     * @return list of bookings with the status
+     * @param status 预约状态
+     * @return 具有该状态的预约列表
      */
     List<Booking> findByStatus(BookingStatus status);
 
     /**
-     * Find all bookings with a specific status with pagination.
+     * 分页查询所有具有指定状态的预约。
      *
-     * @param status   the booking status
-     * @param pageable pagination information
-     * @return page of bookings with the status
+     * @param status   预约状态
+     * @param pageable 分页信息
+     * @return 具有该状态的预约分页
      */
     Page<Booking> findByStatus(BookingStatus status, Pageable pageable);
 
     /**
-     * Find all bookings with status in a list.
+     * 查询状态在列表中的所有预约。
      *
-     * @param statuses list of statuses to filter by
-     * @return list of bookings matching any of the statuses
+     * @param statuses 要筛选的状态列表
+     * @return 匹配任一状态的预约列表
      */
     List<Booking> findByStatusIn(List<BookingStatus> statuses);
 
     // ============================================
-    // Find by Task (through slot)
+    // 按任务查询（通过时段）
     // ============================================
 
     /**
-     * Find all bookings for a specific task by task ID.
+     * 按任务ID查询所有预约。
      *
-     * @param taskId the task ID to search by
-     * @return list of bookings for the task
+     * @param taskId 要查询的任务ID
+     * @return 该任务的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.id = :taskId")
     List<Booking> findByTaskId(@Param("taskId") Long taskId);
 
     /**
-     * Find bookings for a task by task ID with pagination.
+     * 按任务ID分页查询预约。
      *
-     * @param taskId   the task ID to search by
-     * @param pageable pagination information
-     * @return page of bookings for the task
+     * @param taskId   要查询的任务ID
+     * @param pageable 分页信息
+     * @return 该任务的预约分页
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.id = :taskId")
     Page<Booking> findByTaskId(@Param("taskId") Long taskId, Pageable pageable);
 
     /**
-     * Find bookings for a task by task ID and status.
+     * 按任务ID和状态查询预约。
      *
-     * @param taskId the task ID to search by
-     * @param status the booking status
-     * @return list of bookings matching the criteria
+     * @param taskId 要查询的任务ID
+     * @param status 预约状态
+     * @return 匹配条件的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.id = :taskId AND b.status = :status")
     List<Booking> findByTaskIdAndStatus(@Param("taskId") Long taskId, @Param("status") BookingStatus status);
 
     // ============================================
-    // Find by Merchant (through slot -> task -> service -> merchant)
+    // 按商家查询（通过时段 -> 任务 -> 服务 -> 商家）
     // ============================================
 
     /**
-     * Find all bookings for a specific merchant by merchant ID.
+     * 按商家ID查询所有预约。
      *
-     * @param merchantId the merchant ID to search by
-     * @return list of bookings for the merchant
+     * @param merchantId 要查询的商家ID
+     * @return 该商家的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.service.merchant.id = :merchantId")
     List<Booking> findByMerchantId(@Param("merchantId") Long merchantId);
 
     /**
-     * Find bookings for a merchant by merchant ID with pagination.
+     * 按商家ID分页查询预约。
      *
-     * @param merchantId the merchant ID to search by
-     * @param pageable   pagination information
-     * @return page of bookings for the merchant
+     * @param merchantId 要查询的商家ID
+     * @param pageable   分页信息
+     * @return 该商家的预约分页
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.service.merchant.id = :merchantId")
     Page<Booking> findByMerchantId(@Param("merchantId") Long merchantId, Pageable pageable);
 
     /**
-     * Find bookings for a merchant by merchant ID and status.
+     * 按商家ID和状态查询预约。
      *
-     * @param merchantId the merchant ID to search by
-     * @param status     the booking status
-     * @return list of bookings matching the criteria
+     * @param merchantId 要查询的商家ID
+     * @param status     预约状态
+     * @return 匹配条件的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.service.merchant.id = :merchantId AND b.status = :status")
     List<Booking> findByMerchantIdAndStatus(@Param("merchantId") Long merchantId, @Param("status") BookingStatus status);
 
     /**
-     * Find bookings for a merchant by merchant ID and status with pagination.
+     * 按商家ID和状态分页查询预约。
      *
-     * @param merchantId the merchant ID to search by
-     * @param status     the booking status
-     * @param pageable   pagination information
-     * @return page of bookings matching the criteria
+     * @param merchantId 要查询的商家ID
+     * @param status     预约状态
+     * @param pageable   分页信息
+     * @return 匹配条件的预约分页
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.service.merchant.id = :merchantId AND b.status = :status")
     Page<Booking> findByMerchantIdAndStatus(@Param("merchantId") Long merchantId, @Param("status") BookingStatus status, Pageable pageable);
 
     // ============================================
-    // Count Operations
+    // 计数操作
     // ============================================
 
     /**
-     * Count all bookings for a user.
+     * 统计指定用户的所有预约数量。
      *
-     * @param userId the user ID
-     * @return the count of bookings
+     * @param userId 用户ID
+     * @return 预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.user.id = :userId")
     long countByUserId(@Param("userId") Long userId);
 
     /**
-     * Count bookings for a user by status.
+     * 按用户ID和状态统计预约数量。
      *
-     * @param userId the user ID
-     * @param status the booking status
-     * @return the count of bookings
+     * @param userId 用户ID
+     * @param status 预约状态
+     * @return 预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.user.id = :userId AND b.status = :status")
     long countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") BookingStatus status);
 
     /**
-     * Count all bookings for a slot.
+     * 统计指定时段的所有预约数量。
      *
-     * @param slotId the slot ID
-     * @return the count of bookings
+     * @param slotId 时段ID
+     * @return 预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.slot.id = :slotId")
     long countBySlotId(@Param("slotId") Long slotId);
 
     /**
-     * Count active (non-cancelled, non-completed) bookings for a slot.
+     * 统计指定时段的有效预约数量（非取消、非完成）。
      *
-     * @param slotId the slot ID
-     * @return the count of active bookings
+     * @param slotId 时段ID
+     * @return 有效预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.slot.id = :slotId AND b.status IN ('PENDING', 'CONFIRMED')")
     long countActiveBySlotId(@Param("slotId") Long slotId);
 
     /**
-     * Count bookings for a task.
+     * 统计指定任务的预约数量。
      *
-     * @param taskId the task ID
-     * @return the count of bookings
+     * @param taskId 任务ID
+     * @return 预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.slot.task.id = :taskId")
     long countByTaskId(@Param("taskId") Long taskId);
 
     /**
-     * Count active bookings for a task.
+     * 统计指定任务的有效预约数量。
      *
-     * @param taskId the task ID
-     * @return the count of active bookings
+     * @param taskId 任务ID
+     * @return 有效预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.slot.task.id = :taskId AND b.status IN ('PENDING', 'CONFIRMED')")
     long countActiveByTaskId(@Param("taskId") Long taskId);
 
     /**
-     * Count bookings for a merchant.
+     * 统计指定商家的预约数量。
      *
-     * @param merchantId the merchant ID
-     * @return the count of bookings
+     * @param merchantId 商家ID
+     * @return 预约数量
      */
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.slot.task.service.merchant.id = :merchantId")
     long countByMerchantId(@Param("merchantId") Long merchantId);
 
     /**
-     * Count all bookings with a specific status.
+     * 统计所有具有指定状态的预约数量。
      *
-     * @param status the booking status
-     * @return the count of bookings
+     * @param status 预约状态
+     * @return 预约数量
      */
     long countByStatus(BookingStatus status);
 
     // ============================================
-    // Find by Date Range
+    // 按日期范围查询
     // ============================================
 
     /**
-     * Find bookings created within a date range.
+     * 查询在指定日期范围内创建的预约。
      *
-     * @param start the start datetime (inclusive)
-     * @param end   the end datetime (exclusive)
-     * @return list of bookings in the date range
+     * @param start 开始日期时间（包含）
+     * @param end   结束日期时间（不包含）
+     * @return 日期范围内的预约列表
      */
     List<Booking> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     /**
-     * Find bookings for a user created within a date range.
+     * 查询指定用户在指定日期范围内创建的预约。
      *
-     * @param userId the user ID
-     * @param start  the start datetime (inclusive)
-     * @param end    the end datetime (exclusive)
-     * @return list of bookings in the date range
+     * @param userId 用户ID
+     * @param start  开始日期时间（包含）
+     * @param end    结束日期时间（不包含）
+     * @return 日期范围内的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :userId AND b.createdAt >= :start AND b.createdAt < :end")
     List<Booking> findByUserIdAndCreatedAtBetween(
@@ -395,12 +395,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("end") LocalDateTime end);
 
     /**
-     * Find bookings for a merchant created within a date range.
+     * 查询指定商家在指定日期范围内创建的预约。
      *
-     * @param merchantId the merchant ID
-     * @param start      the start datetime (inclusive)
-     * @param end        the end datetime (exclusive)
-     * @return list of bookings in the date range
+     * @param merchantId 商家ID
+     * @param start      开始日期时间（包含）
+     * @param end        结束日期时间（不包含）
+     * @return 日期范围内的预约列表
      */
     @Query("SELECT b FROM Booking b WHERE b.slot.task.service.merchant.id = :merchantId " +
            "AND b.createdAt >= :start AND b.createdAt < :end")
@@ -410,46 +410,46 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("end") LocalDateTime end);
 
     // ============================================
-    // Find by ID with checks
+    // 按ID查询（含检查）
     // ============================================
 
     /**
-     * Find a booking by ID and user ID.
+     * 按ID和用户ID查询预约。
      *
-     * @param id     the booking ID
-     * @param userId the user ID
-     * @return Optional containing the booking if found and belongs to the user
+     * @param id     预约ID
+     * @param userId 用户ID
+     * @return 包含预约的Optional（如果找到且属于该用户）
      */
     @Query("SELECT b FROM Booking b WHERE b.id = :id AND b.user.id = :userId")
     Optional<Booking> findByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
 
     /**
-     * Find a booking by ID and slot ID.
+     * 按ID和时段ID查询预约。
      *
-     * @param id     the booking ID
-     * @param slotId the slot ID
-     * @return Optional containing the booking if found and belongs to the slot
+     * @param id     预约ID
+     * @param slotId 时段ID
+     * @return 包含预约的Optional（如果找到且属于该时段）
      */
     @Query("SELECT b FROM Booking b WHERE b.id = :id AND b.slot.id = :slotId")
     Optional<Booking> findByIdAndSlotId(@Param("id") Long id, @Param("slotId") Long slotId);
 
     // ============================================
-    // Delete Operations
+    // 删除操作
     // ============================================
 
     /**
-     * Delete all bookings for a user.
+     * 删除指定用户的所有预约。
      *
-     * @param userId the user ID
+     * @param userId 用户ID
      */
     @Modifying
     @Query(value = "DELETE FROM bookings WHERE user_id = :userId", nativeQuery = true)
     void deleteByUserId(@Param("userId") Long userId);
 
     /**
-     * Delete all bookings for a slot.
+     * 删除指定时段的所有预约。
      *
-     * @param slotId the slot ID
+     * @param slotId 时段ID
      */
     @Modifying
     @Query(value = "DELETE FROM bookings WHERE slot_id = :slotId", nativeQuery = true)

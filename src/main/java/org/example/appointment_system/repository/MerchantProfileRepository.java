@@ -8,74 +8,73 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * Repository interface for MerchantProfile entity.
+ * 商户实体Repository接口。
  *
- * <p>Provides data access operations for merchant profiles including:</p>
+ * <p>提供商户数据访问操作，包括：</p>
  * <ul>
- *   <li>Standard CRUD operations (inherited from JpaRepository)</li>
- *   <li>Find by user ID (for looking up merchant by user)</li>
- *   <li>Find by user entity</li>
- *   <li>Check existence by user ID</li>
+ *   <li>标准CRUD操作（继承自JpaRepository）</li>
+ *   <li>按用户ID查询（用于通过用户查找商户）</li>
+ *   <li>按用户实体查询</li>
+ *   <li>按用户ID检查是否存在</li>
  * </ul>
  */
 @Repository
 public interface MerchantProfileRepository extends JpaRepository<MerchantProfile, Long> {
 
     /**
-     * Find a merchant profile by the associated user's ID.
+     * 按关联用户的ID查询商户资料。
      *
-     * <p>Used to look up a merchant's profile given their user account ID.</p>
+     * <p>根据用户账户ID查找商户资料。</p>
      *
-     * @param userId the user ID to search for
-     * @return Optional containing the merchant profile if found
+     * @param userId 要查询的用户ID
+     * @return 包含商户资料的Optional（如果找到）
      */
     Optional<MerchantProfile> findByUserId(Long userId);
 
     /**
-     * Find a merchant profile by the associated user entity.
+     * 按关联的用户实体查询商户资料。
      *
-     * <p>Alternative method using the User entity directly.</p>
+     * <p>直接使用User实体的替代方法。</p>
      *
-     * @param user the user entity to search for
-     * @return Optional containing the merchant profile if found
+     * @param user 要查询的用户实体
+     * @return 包含商户资料的Optional（如果找到）
      */
     Optional<MerchantProfile> findByUser(User user);
 
     /**
-     * Check if a merchant profile exists for the given user ID.
+     * 检查指定用户ID是否存在商户资料。
      *
-     * <p>Used to validate that a user already has a merchant profile
-     * before creating a new one.</p>
+     * <p>在创建新商户资料前验证用户是否已有商户资料。</p>
      *
-     * @param userId the user ID to check
-     * @return true if a profile exists for this user, false otherwise
+     * @param userId 要检查的用户ID
+     * @return 如果该用户存在资料返回true，否则返回false
      */
     boolean existsByUserId(Long userId);
 
     /**
-     * Check if a merchant profile exists for the given user entity.
+     * 检查指定用户实体是否存在商户资料。
      *
-     * @param user the user entity to check
-     * @return true if a profile exists for this user, false otherwise
+     * @param user 要检查的用户实体
+     * @return 如果该用户存在资料返回true，否则返回false
      */
     boolean existsByUser(User user);
 
     /**
-     * Find a merchant profile by business name.
+     * 按商户名称查询商户资料。
      *
-     * <p>Used for searching merchants by their business name.
-     * Note: Business names are not unique, so this returns Optional.</p>
+     * <p>用于按商户名称搜索商户。
+     * 注意：商户名称不唯一，因此返回Optional。</p>
      *
-     * @param businessName the business name to search for
-     * @return Optional containing the first matching merchant profile
+     * @param businessName 要查询的商户名称
+     * @return 包含第一个匹配的商户资料的Optional
      */
     Optional<MerchantProfile> findByBusinessName(String businessName);
 
     /**
-     * Check if a merchant profile exists with the given business name.
+     * 检查是否存在指定商户名称的商户资料。
      *
-     * @param businessName the business name to check
-     * @return true if any profile has this business name
+     * @param businessName 要检查的商户名称
+     * @return 如果任何资料使用此名称返回true
      */
     boolean existsByBusinessName(String businessName);
 }

@@ -9,93 +9,93 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for User entity.
+ * 用户实体Repository接口。
  *
- * <p>Provides data access operations for users including:</p>
+ * <p>提供用户数据访问操作，包括：</p>
  * <ul>
- *   <li>Standard CRUD operations (inherited from JpaRepository)</li>
- *   <li>Find by username (for authentication)</li>
- *   <li>Find by email (for uniqueness checks)</li>
- *   <li>Find by role (for user management)</li>
+ *   <li>标准CRUD操作（继承自JpaRepository）</li>
+ *   <li>按用户名查询（用于认证）</li>
+ *   <li>按邮箱查询（用于唯一性检查）</li>
+ *   <li>按角色查询（用于用户管理）</li>
  * </ul>
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Find a user by username.
+     * 按用户名查询用户。
      *
-     * <p>Used during authentication to load user details.</p>
+     * <p>认证时用于加载用户详情。</p>
      *
-     * @param username the username to search for
-     * @return Optional containing the user if found
+     * @param username 要查询的用户名
+     * @return 包含用户的Optional（如果找到）
      */
     Optional<User> findByUsername(String username);
 
     /**
-     * Find a user by email address.
+     * 按邮箱地址查询用户。
      *
-     * <p>Used for email uniqueness validation during registration.</p>
+     * <p>注册时用于邮箱唯一性验证。</p>
      *
-     * @param email the email address to search for
-     * @return Optional containing the user if found
+     * @param email 要查询的邮箱地址
+     * @return 包含用户的Optional（如果找到）
      */
     Optional<User> findByEmail(String email);
 
     /**
-     * Check if a username already exists.
+     * 检查用户名是否已存在。
      *
-     * @param username the username to check
-     * @return true if username exists, false otherwise
+     * @param username 要检查的用户名
+     * @return 如果用户名存在返回true，否则返回false
      */
     boolean existsByUsername(String username);
 
     /**
-     * Check if an email already exists.
+     * 检查邮箱是否已存在。
      *
-     * @param email the email to check
-     * @return true if email exists, false otherwise
+     * @param email 要检查的邮箱
+     * @return 如果邮箱存在返回true，否则返回false
      */
     boolean existsByEmail(String email);
 
     /**
-     * Find all users by role.
+     * 按角色查询所有用户。
      *
-     * <p>Used by administrators to list users by type.</p>
+     * <p>管理员用于按类型列出用户。</p>
      *
-     * @param role the role to filter by
-     * @return list of users with the specified role
+     * @param role 要筛选的角色
+     * @return 具有指定角色的用户列表
      */
     List<User> findByRole(UserRole role);
 
     /**
-     * Find all enabled users.
+     * 查询所有已启用的用户。
      *
-     * @return list of enabled users
+     * @return 已启用的用户列表
      */
     List<User> findByEnabledTrue();
 
     /**
-     * Find all disabled users.
+     * 查询所有已禁用的用户。
      *
-     * @return list of disabled users
+     * @return 已禁用的用户列表
      */
     List<User> findByEnabledFalse();
 
     /**
-     * Find users by role and enabled status.
+     * 按角色和启用状态查询用户。
      *
-     * @param role    the role to filter by
-     * @param enabled the enabled status
-     * @return list of matching users
+     * @param role    要筛选的角色
+     * @param enabled 启用状态
+     * @return 匹配条件的用户列表
      */
     List<User> findByRoleAndEnabled(UserRole role, boolean enabled);
 
     /**
-     * Count users by role.
+     * 按角色统计用户数量。
      *
-     * @param role the role to count
-     * @return number of users with the specified role
+     * @param role 要统计的角色
+     * @return 具有指定角色的用户数量
      */
     long countByRole(UserRole role);
 }

@@ -10,148 +10,147 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for ServiceItem entity.
+ * 服务项目实体Repository接口。
  *
- * <p>Provides data access operations for service items including:</p>
+ * <p>提供服务项目数据访问操作，包括：</p>
  * <ul>
- *   <li>Standard CRUD operations (inherited from JpaRepository)</li>
- *   <li>Find by merchant profile</li>
- *   <li>Find by category and active status</li>
- *   <li>Check existence by merchant and name</li>
+ *   <li>标准CRUD操作（继承自JpaRepository）</li>
+ *   <li>按商户资料查询</li>
+ *   <li>按类别和启用状态查询</li>
+ *   <li>按商户和名称检查是否存在</li>
  * </ul>
  */
 @Repository
 public interface ServiceItemRepository extends JpaRepository<ServiceItem, Long> {
 
     /**
-     * Find all service items belonging to a specific merchant.
+     * 查询指定商户的所有服务项目。
      *
-     * <p>Returns both active and inactive services for the merchant.</p>
+     * <p>返回商户的所有服务项目，包括启用和禁用的。</p>
      *
-     * @param merchant the merchant profile to search by
-     * @return list of service items for the merchant
+     * @param merchant 要查询的商户资料
+     * @return 该商户的服务项目列表
      */
     List<ServiceItem> findByMerchant(MerchantProfile merchant);
 
     /**
-     * Find all service items belonging to a specific merchant by merchant ID.
+     * 按商户ID查询所有服务项目。
      *
-     * <p>Convenience method using merchant ID directly.</p>
+     * <p>直接使用商户ID的便捷方法。</p>
      *
-     * @param merchantId the merchant profile ID to search by
-     * @return list of service items for the merchant
+     * @param merchantId 要查询的商户ID
+     * @return 该商户的服务项目列表
      */
     List<ServiceItem> findByMerchantId(Long merchantId);
 
     /**
-     * Find all active service items belonging to a specific merchant.
+     * 查询指定商户的所有启用状态的服务项目。
      *
-     * <p>Used to display available services to customers.</p>
+     * <p>用于向客户展示可用服务。</p>
      *
-     * @param merchant the merchant profile to search by
-     * @return list of active service items for the merchant
+     * @param merchant 要查询的商户资料
+     * @return 该商户的启用状态服务项目列表
      */
     List<ServiceItem> findByMerchantAndActiveTrue(MerchantProfile merchant);
 
     /**
-     * Find all active service items belonging to a specific merchant by merchant ID.
+     * 按商户ID查询所有启用状态的服务项目。
      *
-     * @param merchantId the merchant profile ID to search by
-     * @return list of active service items for the merchant
+     * @param merchantId 要查询的商户ID
+     * @return 该商户的启用状态服务项目列表
      */
     List<ServiceItem> findByMerchantIdAndActiveTrue(Long merchantId);
 
     /**
-     * Find a service item by ID and merchant.
+     * 按ID和商户查询服务项目。
      *
-     * <p>Used to verify that a service belongs to a specific merchant
-     * before performing operations on it.</p>
+     * <p>用于在执行操作前验证服务是否属于指定商户。</p>
      *
-     * @param id       the service item ID
-     * @param merchant the merchant profile
-     * @return Optional containing the service item if found and belongs to the merchant
+     * @param id       服务项目ID
+     * @param merchant 商户资料
+     * @return 包含服务项目的Optional（如果找到且属于该商户）
      */
     Optional<ServiceItem> findByIdAndMerchant(Long id, MerchantProfile merchant);
 
     /**
-     * Find a service item by ID and merchant ID.
+     * 按ID和商户ID查询服务项目。
      *
-     * @param id         the service item ID
-     * @param merchantId the merchant profile ID
-     * @return Optional containing the service item if found
+     * @param id         服务项目ID
+     * @param merchantId 商户ID
+     * @return 包含服务项目的Optional（如果找到）
      */
     Optional<ServiceItem> findByIdAndMerchantId(Long id, Long merchantId);
 
     /**
-     * Find all service items by category.
+     * 按类别查询所有服务项目。
      *
-     * <p>Used for filtering services by category across all merchants.</p>
+     * <p>用于跨商户按类别筛选服务。</p>
      *
-     * @param category the service category to filter by
-     * @return list of service items in the specified category
+     * @param category 要筛选的服务类别
+     * @return 指定类别的服务项目列表
      */
     List<ServiceItem> findByCategory(ServiceCategory category);
 
     /**
-     * Find all active service items by category.
+     * 按类别查询所有启用状态的服务项目。
      *
-     * @param category the service category to filter by
-     * @return list of active service items in the specified category
+     * @param category 要筛选的服务类别
+     * @return 指定类别的启用状态服务项目列表
      */
     List<ServiceItem> findByCategoryAndActiveTrue(ServiceCategory category);
 
     /**
-     * Find all active service items for a merchant by category.
+     * 按商户和类别查询所有启用状态的服务项目。
      *
-     * @param merchant the merchant profile
-     * @param category the service category
-     * @return list of active service items matching the criteria
+     * @param merchant 商户资料
+     * @param category 服务类别
+     * @return 匹配条件的启用状态服务项目列表
      */
     List<ServiceItem> findByMerchantAndCategoryAndActiveTrue(MerchantProfile merchant, ServiceCategory category);
 
     /**
-     * Check if a service item with the given name exists for a merchant.
+     * 检查指定商户是否存在指定名称的服务项目。
      *
-     * <p>Used to prevent duplicate service names within a merchant's catalog.</p>
+     * <p>用于防止商户目录中出现重复的服务名称。</p>
      *
-     * @param merchant the merchant profile
-     * @param name     the service name to check
-     * @return true if a service with this name exists for the merchant
+     * @param merchant 商户资料
+     * @param name     要检查的服务名称
+     * @return 如果该商户存在此名称的服务返回true
      */
     boolean existsByMerchantAndName(MerchantProfile merchant, String name);
 
     /**
-     * Check if a service item with the given name exists for a merchant by merchant ID.
+     * 按商户ID检查是否存在指定名称的服务项目。
      *
-     * @param merchantId the merchant profile ID
-     * @param name       the service name to check
-     * @return true if a service with this name exists for the merchant
+     * @param merchantId 商户ID
+     * @param name       要检查的服务名称
+     * @return 如果该商户存在此名称的服务返回true
      */
     boolean existsByMerchantIdAndName(Long merchantId, String name);
 
     /**
-     * Count all service items for a merchant.
+     * 统计指定商户的所有服务项目数量。
      *
-     * @param merchant the merchant profile
-     * @return the count of service items
+     * @param merchant 商户资料
+     * @return 服务项目数量
      */
     long countByMerchant(MerchantProfile merchant);
 
     /**
-     * Count active service items for a merchant.
+     * 统计指定商户的启用状态服务项目数量。
      *
-     * @param merchant the merchant profile
-     * @return the count of active service items
+     * @param merchant 商户资料
+     * @return 启用状态服务项目数量
      */
     long countByMerchantAndActiveTrue(MerchantProfile merchant);
 
     /**
-     * Find all inactive service items for a merchant.
+     * 查询指定商户的所有禁用状态的服务项目。
      *
-     * <p>Used for merchant to manage/reactivate disabled services.</p>
+     * <p>用于商户管理/重新启用被禁用的服务。</p>
      *
-     * @param merchant the merchant profile
-     * @return list of inactive service items
+     * @param merchant 商户资料
+     * @return 禁用状态服务项目列表
      */
     List<ServiceItem> findByMerchantAndActiveFalse(MerchantProfile merchant);
 }
