@@ -111,7 +111,14 @@ const handleRegister = async () => {
         })
         if (success) {
           ElMessage.success('注册成功')
-          router.push('/')
+          // 根据用户角色进行跳转
+          if (authStore.isAdmin) {
+            router.push('/admin/dashboard')
+          } else if (authStore.isMerchant) {
+            router.push('/merchant/dashboard')
+          } else {
+            router.push('/')
+          }
         } else {
           ElMessage.error(authStore.error || '注册失败')
         }

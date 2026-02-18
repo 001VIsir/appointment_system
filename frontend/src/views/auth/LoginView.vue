@@ -63,7 +63,14 @@ const handleLogin = async () => {
         if (success) {
           ElMessage.success('登录成功')
           const redirect = route.query.redirect as string
-          router.push(redirect || '/')
+          // 根据用户角色进行跳转
+          if (authStore.isAdmin) {
+            router.push('/admin/dashboard')
+          } else if (authStore.isMerchant) {
+            router.push('/merchant/dashboard')
+          } else {
+            router.push(redirect || '/')
+          }
         } else {
           ElMessage.error(authStore.error || '登录失败')
         }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.appointment_system.service.RateLimitService;
 import org.example.appointment_system.service.RateLimitService.RateLimitResult;
 import org.example.appointment_system.security.CustomUserDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.Authentication;
@@ -61,12 +62,28 @@ import java.util.Map;
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
-@RequiredArgsConstructor
 @Slf4j
 public class RateLimitFilter implements Filter {
 
     private final RateLimitService rateLimitService;
     private final ObjectMapper objectMapper;
+
+    @Value("${app.rate-limit.enabled:true}")
+    private boolean rateLimitEnabled;
+
+    @Value("${app.rate-limit.default-per-minute:60}")
+    private int defaultLimit;
+
+    @Value("${app.rate-limit.authenticated-per-minute:120}")
+    private int authenticatedLimit;
+
+    @Value("${app.rate-limit.auth-endpoint-per-minute:10}")
+    private int authEndpointLimit;
+
+    public RateLimitFilter(RateLimitService rateLimitService, ObjectMapper objectMapper) {
+        this.rateLimitService = rateLimitService;
+        this.objectMapper = objectMapper;
+    }
 
     // Custom rate limits for specific endpoint patterns
     private static final int AUTH_ENDPOINT_LIMIT = 10;  // Stricter for auth endpoints
@@ -79,6 +96,12 @@ public class RateLimitFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
+        // Skip rate limiting if disabled
+        if (!rateLimitEnabled) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
