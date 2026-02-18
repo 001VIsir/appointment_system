@@ -20,22 +20,22 @@ import java.time.LocalTime;
 import java.util.List;
 
 /**
- * Scheduled tasks for appointment management.
+ * 预约管理的定时任务。
  *
- * <p>This class contains various scheduled tasks that run automatically:</p>
+ * <p>此类包含各种自动运行的定时任务：</p>
  * <ul>
- *   <li>Appointment timeout handling - cancels bookings for past slots</li>
- *   <li>Appointment reminders - prepares reminder notifications</li>
- *   <li>Auto-completion - marks completed appointments</li>
- *   <li>Daily statistics - generates daily summary reports</li>
+ *   <li>预约超时处理 - 取消过去时段的预约</li>
+ *   <li>预约提醒 - 准备提醒通知</li>
+ *   <li>自动完成 - 标记已完成的预约</li>
+ *   <li>每日统计 - 生成每日汇总报告</li>
  * </ul>
  *
- * <h3>Schedule:</h3>
+ * <h3>执行计划：</h3>
  * <ul>
- *   <li>Timeout task: Every minute</li>
- *   <li>Reminder task: Every 5 minutes</li>
- *   <li>Auto-completion: Every hour</li>
- *   <li>Daily statistics: Daily at 1:00 AM</li>
+ *   <li>超时任务：每分钟</li>
+ *   <li>提醒任务：每5分钟</li>
+ *   <li>自动完成：每小时</li>
+ *   <li>每日统计：每天凌晨1点</li>
  * </ul>
  */
 @Component
@@ -48,22 +48,22 @@ public class AppointmentScheduledTask {
     private final AppointmentSlotRepository slotRepository;
     private final StatisticsService statisticsService;
 
-    // Configuration constants
-    private static final int REMINDER_HOURS_BEFORE = 24; // Send reminder 24 hours before
-    private static final int AUTO_COMPLETE_HOURS_AFTER = 2; // Auto-complete 2 hours after end time
+    // 配置常量
+    private static final int REMINDER_HOURS_BEFORE = 24; // 提前24小时发送提醒
+    private static final int AUTO_COMPLETE_HOURS_AFTER = 2; // 结束后2小时自动完成
 
     // ============================================
-    // Timeout Handling Task (Every Minute)
+    // 超时处理任务（每分钟）
     // ============================================
 
     /**
-     * Handle booking timeouts.
-     * Cancels bookings for slots that have ended.
+     * 处理预约超时。
+     * 取消已结束时段的预约。
      *
-     * <p>This task runs every minute to check for expired slots
-     * and cancel any remaining active bookings.</p>
+     * <p>此任务每分钟运行一次，检查已过期的时段
+     * 并取消任何剩余的有效预约。</p>
      */
-    @Scheduled(fixedRate = 60000) // Every minute
+    @Scheduled(fixedRate = 60000) // 每分钟
     @Transactional
     public void handleBookingTimeouts() {
         log.debug("Running booking timeout check");
@@ -73,28 +73,28 @@ public class AppointmentScheduledTask {
             LocalDate today = now.toLocalDate();
             LocalTime currentTime = now.toLocalTime();
 
-            // Find all active tasks for today
+            // 查找今天的所有有效任务
             List<AppointmentTask> todayTasks = taskRepository.findByTaskDateAndActiveTrue(today);
 
             int cancelledCount = 0;
 
             for (AppointmentTask task : todayTasks) {
-                // Get all slots for this task that have ended
+                // 获取此任务已结束的所有时段
                 List<AppointmentSlot> endedSlots = slotRepository.findByTask(task).stream()
                         .filter(slot -> slot.getEndTime().isBefore(currentTime))
                         .toList();
 
                 for (AppointmentSlot slot : endedSlots) {
-                    // Cancel any active bookings for ended slots
+                    // 取消已结束时段的任何有效预约
                     List<Booking> activeBookings = bookingRepository.findBySlotIdAndStatus(
                             slot.getId(), BookingStatus.PENDING);
 
                     for (Booking booking : activeBookings) {
-                        // Cancel the booking
+                        // 取消预约
                         booking.cancel();
                         bookingRepository.save(booking);
 
-                        // Decrement the slot's booked count
+                        // 减少时段的已预约数量
                         slot.decrementBookedCount();
                         slotRepository.save(slot);
 
@@ -115,17 +115,17 @@ public class AppointmentScheduledTask {
     }
 
     // ============================================
-    // Reminder Task (Every 5 Minutes)
+    // 提醒任务（每5分钟）
     // ============================================
 
     /**
-     * Send appointment reminders.
-     * Identifies bookings that need reminders and prepares notifications.
+     * 发送预约提醒。
+     * 识别需要提醒的预约并准备通知。
      *
-     * <p>This task runs every 5 minutes to check for upcoming appointments
-     * and queue reminder notifications.</p>
+     * <p>此任务每5分钟运行一次，检查即将到来的预约
+     * 并排队提醒通知。</p>
      */
-    @Scheduled(fixedRate = 300000) // Every 5 minutes
+    @Scheduled(fixedRate = 300000) // 每5分钟
     @Transactional
     public void sendAppointmentReminders() {
         log.debug("Running appointment reminder check");
@@ -138,31 +138,31 @@ public class AppointmentScheduledTask {
             LocalTime targetTimeStart = reminderThreshold.toLocalTime();
             LocalTime targetTimeEnd = targetTimeStart.plusMinutes(5);
 
-            // Find all active tasks for the reminder window
+            // 查找提醒窗口内的所有有效任务
             List<AppointmentTask> upcomingTasks = taskRepository.findByTaskDateAndActiveTrue(targetDate);
 
             int reminderCount = 0;
 
             for (AppointmentTask task : upcomingTasks) {
-                // Find slots in the reminder window
+                // 查找提醒窗口内的时段
                 List<AppointmentSlot> upcomingSlots = slotRepository.findByTaskAndTimeRange(
                         task, targetTimeStart, targetTimeEnd);
 
                 for (AppointmentSlot slot : upcomingSlots) {
-                    // Get confirmed bookings for this slot
+                    // 获取此时段的已确认预约
                     List<Booking> confirmedBookings = bookingRepository.findBySlotIdAndStatus(
                             slot.getId(), BookingStatus.CONFIRMED);
 
                     for (Booking booking : confirmedBookings) {
-                        // In a real system, you would queue a notification here
-                        // For now, we just log it
+                        // 在实际系统中，你会在此排队通知
+                        // 目前，我们只记录日志
                         log.info("Reminder: Booking {} for user {} is scheduled for {} at {}",
                                 booking.getId(),
                                 booking.getUser().getId(),
                                 task.getTaskDate(),
                                 slot.getStartTime());
 
-                        // TODO: Integrate with notification service (email, push, etc.)
+                        // TODO: 与通知服务集成（邮件、推送等）
                         reminderCount++;
                     }
                 }
@@ -178,17 +178,17 @@ public class AppointmentScheduledTask {
     }
 
     // ============================================
-    // Auto-Completion Task (Every Hour)
+    // 自动完成任务（每小时）
     // ============================================
 
     /**
-     * Auto-complete appointments.
-     * Marks appointments as completed after they have ended.
+     * 自动完成预约。
+     * 在预约结束后标记为已完成。
      *
-     * <p>This task runs every hour to automatically complete confirmed bookings
-     * for slots that ended more than AUTO_COMPLETE_HOURS_AFTER hours ago.</p>
+     * <p>此任务每小时运行一次，自动完成AUTO_COMPLETE_HOURS_AFTER小时前结束的
+     * 时段的已确认预约。</p>
      */
-    @Scheduled(fixedRate = 3600000) // Every hour
+    @Scheduled(fixedRate = 3600000) // 每小时
     @Transactional
     public void autoCompleteAppointments() {
         log.debug("Running auto-completion check");
@@ -200,22 +200,22 @@ public class AppointmentScheduledTask {
             LocalDate cutoffDate = completionThreshold.toLocalDate();
             LocalTime cutoffTime = completionThreshold.toLocalTime();
 
-            // Find all tasks before or on the cutoff date
+            // 查找截止日期当天或之前的所有任务
             List<AppointmentTask> pastTasks = taskRepository.findByTaskDateBetweenAndActiveTrue(
                     cutoffDate.minusDays(7), cutoffDate);
 
             int completedCount = 0;
 
             for (AppointmentTask task : pastTasks) {
-                // For tasks on the cutoff date, check time
+                // 对于截止日期当天的任务，检查时间
                 if (task.getTaskDate().isEqual(cutoffDate)) {
-                    // Get slots that ended before the cutoff time
+                    // 获取截止时间前结束的时段
                     List<AppointmentSlot> completedSlots = slotRepository.findByTask(task).stream()
                             .filter(slot -> slot.getEndTime().isBefore(cutoffTime))
                             .toList();
 
                     for (AppointmentSlot slot : completedSlots) {
-                        // Complete confirmed bookings
+                        // 完成已确认的预约
                         List<Booking> confirmedBookings = bookingRepository.findBySlotIdAndStatus(
                                 slot.getId(), BookingStatus.CONFIRMED);
 
@@ -229,7 +229,7 @@ public class AppointmentScheduledTask {
                         }
                     }
                 } else {
-                    // For tasks before the cutoff date, all slots should be completed
+                    // 对于截止日期之前的任务，所有时段都应该被标记为完成
                     List<AppointmentSlot> allSlots = slotRepository.findByTask(task);
 
                     for (AppointmentSlot slot : allSlots) {
@@ -258,7 +258,7 @@ public class AppointmentScheduledTask {
     }
 
     // ============================================
-    // Daily Statistics Task (Daily at 1:00 AM)
+    // 每日统计任务（每天凌晨1点）
     // ============================================
 
     /**
@@ -268,7 +268,7 @@ public class AppointmentScheduledTask {
      * <p>This task runs daily at 1:00 AM to generate statistics
      * for the previous day and store them for reporting.</p>
      */
-    @Scheduled(cron = "0 0 1 * * ?") // Daily at 1:00 AM
+    @Scheduled(cron = "0 0 1 * * ?") // 每天凌晨1点
     @Transactional
     public void generateDailyStatistics() {
         log.info("Running daily statistics generation");
@@ -276,10 +276,10 @@ public class AppointmentScheduledTask {
         try {
             LocalDate yesterday = LocalDate.now().minusDays(1);
 
-            // Generate and store daily summary
+            // 生成并存储每日汇总
             statisticsService.generateDailySummary(yesterday);
 
-            // Log daily metrics
+            // 记录每日指标
             logDailyMetrics(yesterday);
 
             log.info("Daily statistics generation completed for {}", yesterday);
@@ -298,7 +298,7 @@ public class AppointmentScheduledTask {
         LocalDateTime dayStart = date.atStartOfDay();
         LocalDateTime dayEnd = date.atTime(LocalTime.MAX);
 
-        // Get daily booking counts
+        // 获取每日预约数量
         List<Booking> dayBookings = bookingRepository.findByCreatedAtBetween(dayStart, dayEnd);
         long totalBookings = dayBookings.size();
         long activeBookings = dayBookings.stream().filter(Booking::isActive).count();
@@ -307,7 +307,7 @@ public class AppointmentScheduledTask {
         long cancelledBookings = dayBookings.stream()
                 .filter(b -> b.getStatus() == BookingStatus.CANCELLED).count();
 
-        // Get task counts
+        // 获取任务数量
         List<AppointmentTask> dayTasks = taskRepository.findByTaskDate(date);
         long totalTasks = dayTasks.size();
         long activeTasks = dayTasks.stream().filter(AppointmentTask::isActive).count();
@@ -318,7 +318,7 @@ public class AppointmentScheduledTask {
                 date, totalBookings, activeBookings, completedBookings, cancelledBookings,
                 totalTasks, activeTasks);
 
-        // Calculate and log utilization rate
+        // 计算并记录利用率
         if (totalTasks > 0) {
             int totalCapacity = 0;
             int totalBooked = 0;
@@ -337,7 +337,7 @@ public class AppointmentScheduledTask {
     }
 
     // ============================================
-    // Cleanup Task (Daily at 2:00 AM)
+    // 清理任务（每天凌晨2点）
     // ============================================
 
     /**
@@ -351,22 +351,22 @@ public class AppointmentScheduledTask {
      *   <li>Expired Redis keys</li>
      * </ul>
      */
-    @Scheduled(cron = "0 0 2 * * ?") // Daily at 2:00 AM
+    @Scheduled(cron = "0 0 2 * * ?") // 每天凌晨2点
     @Transactional
     public void cleanupOldData() {
         log.info("Running data cleanup");
 
         try {
-            LocalDate archiveDate = LocalDate.now().minusDays(90); // Keep 90 days
+            LocalDate archiveDate = LocalDate.now().minusDays(90); // 保留90天
 
-            // Find old cancelled/completed bookings
+            // 查找旧的已取消/已完成预约
             LocalDateTime archiveThreshold = archiveDate.atStartOfDay();
 
-            // In a real system, you would:
-            // 1. Archive old bookings to a history table
-            // 2. Delete old Redis keys
-            // 3. Compress log files
-            // For now, we just log what would be cleaned up
+            // 在实际系统中，你应该：
+            // 1. 将旧预约归档到历史表
+            // 2. 删除旧的Redis键
+            // 3. 压缩日志文件
+            // 目前，我们只记录将要清理的内容
 
             List<Booking> oldCancelledBookings = bookingRepository.findByStatusIn(
                     List.of(BookingStatus.CANCELLED, BookingStatus.COMPLETED)).stream()
@@ -375,7 +375,7 @@ public class AppointmentScheduledTask {
 
             if (!oldCancelledBookings.isEmpty()) {
                 log.info("Would archive {} old bookings (before {})", oldCancelledBookings.size(), archiveDate);
-                // In production: archiveService.archiveBookings(oldCancelledBookings);
+                // 生产环境：archiveService.archiveBookings(oldCancelledBookings);
             }
 
             log.info("Data cleanup completed");
