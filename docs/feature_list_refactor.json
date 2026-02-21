@@ -1,0 +1,408 @@
+{
+  "project": "appointment_system",
+  "description": "预约系统重构计划 - 精简版，适合个人开发者",
+  "version": "3.0.0",
+  "design_principles": [
+    "优先使用最简单的方案解决问题",
+    "只有真正需要时才引入中间件",
+    "保持架构简单，降低维护成本",
+    "不要为了技术而技术"
+  ],
+  "techStack": {
+    "current": {
+      "backend": "Spring Boot 4.0.2 + Java 21",
+      "frontend": "Vue 3 + TypeScript + Element Plus",
+      "database": "MySQL 8.0 + Flyway",
+      "cache": "Redis 7.x (可选)",
+      "messageQueue": "RabbitMQ 3.12 (未使用)",
+      "gateway": "Spring Cloud Gateway 4.x (未使用)",
+      "websocket": "已配置但未使用"
+    },
+    "target": {
+      "backend": "Spring Boot 3.2.x + Java 17",
+      "frontend": "Vue 3 + TypeScript + Element Plus",
+      "database": "MySQL 8.0 + Flyway",
+      "cache": "Caffeine (内存) 或 Redis",
+      "messageQueue": "移除 (使用 @Async)",
+      "websocket": "移除 (使用 SSE 或轮询)"
+    }
+  },
+  "phases": [
+    {
+      "id": "R1",
+      "name": "清理无用依赖",
+      "priority": 1,
+      "description": "移除项目中未使用的中间件依赖"
+    },
+    {
+      "id": "R2",
+      "name": "简化数据访问层",
+      "priority": 2,
+      "description": "优化数据库和缓存使用"
+    },
+    {
+      "id": "R3",
+      "name": "异步处理优化",
+      "priority": 3,
+      "description": "用 Spring @Async 替代消息队列"
+    },
+    {
+      "id": "R4",
+      "name": "精简监控与配置",
+      "priority": 4,
+      "description": "简化监控组件，移除不需要的功能"
+    },
+    {
+      "id": "R5",
+      "name": "前端优化",
+      "priority": 5,
+      "description": "前端代码优化和精简"
+    },
+    {
+      "id": "R6",
+      "name": "测试与部署",
+      "priority": 6,
+      "description": "更新测试用例，优化部署配置"
+    }
+  ],
+  "features": [
+    {
+      "id": "REFACTOR-001",
+      "phase": "R1",
+      "category": "cleanup",
+      "priority": 1,
+      "title": "移除 RabbitMQ 依赖",
+      "description": "从 pom.xml 中移除未使用的 RabbitMQ 依赖和相关配置",
+      "current_status": "pom.xml 中存在 spring-boot-starter-amqp 但未使用",
+      "steps": [
+        "分析当前 RabbitMQ 使用情况（确认无代码使用）",
+        "从 pom.xml 移除 spring-boot-starter-amqp",
+        "移除 application.properties 中的 RabbitMQ 配置",
+        "移除 docker-compose.yml 中的 RabbitMQ 服务",
+        "更新 feature_list.json 中的技术栈说明"
+      ],
+      "替代方案": "使用 Spring @Async 或数据库任务表处理异步任务",
+      "files": [
+        "pom.xml",
+        "src/main/resources/application.properties",
+        "docker-compose.yml"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-002",
+      "phase": "R1",
+      "category": "cleanup",
+      "priority": 2,
+      "title": "清理 WebSocket 配置",
+      "description": "移除或简化 WebSocket 配置，评估是否需要实时通知功能",
+      "current_status": "WebSocketConfig 和 NotificationService 存在但无实际使用",
+      "steps": [
+        "评估业务是否需要实时通知（商户新订单提醒等）",
+        "如不需要：完全移除 WebSocket 相关代码",
+        "如需要：考虑用 SSE（Server-Sent Events）替代",
+        "删除未使用的 WebSocket 配置类"
+      ],
+      "替代方案": {
+        "不需要实时": "直接移除",
+        "需要单向推送": "SSE (Server-Send Events)",
+        "需要轮询": "前端定时请求 API"
+      },
+      "files": [
+        "src/main/java/org/example/appointment_system/websocket/",
+        "src/main/java/org/example/appointment_system/config/WebSocketConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-003",
+      "phase": "R1",
+      "category": "cleanup",
+      "priority": 3,
+      "title": "评估 Nacos 必要性",
+      "description": "评估 Nacos 配置中心是否真的需要",
+      "current_status": "默认禁用，仅预留",
+      "steps": [
+        "评估多环境部署需求",
+        "如果单环境：移除 Nacos 相关配置",
+        "保留 bootstrap.properties 备用但简化",
+        "更新文档说明何时启用"
+      ],
+      "建议": "单体应用开发阶段不需要配置中心，本地配置足够",
+      "files": [
+        "src/main/resources/bootstrap.properties",
+        "pom.xml"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-004",
+      "phase": "R2",
+      "category": "cache",
+      "priority": 4,
+      "title": "缓存方案优化",
+      "description": "评估并优化缓存使用，考虑 Caffeine 内存缓存",
+      "current_status": "使用 Redis 作为缓存",
+      "steps": [
+        "评估是否需要分布式缓存",
+        "单机部署：改用 Caffeine（更快更简单）",
+        "保留 Redis 支持（如需要分布式）",
+        "更新缓存配置"
+      ],
+      "替代方案": "Caffeine - 进程内缓存，适合单机部署",
+      "files": [
+        "src/main/java/org/example/appointment_system/config/CacheConfig.java",
+        "pom.xml"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-005",
+      "phase": "R2",
+      "category": "session",
+      "priority": 5,
+      "title": "Session 方案优化",
+      "description": "评估并优化 Session 存储方案",
+      "current_status": "使用 Redis 存储 Session",
+      "steps": [
+        "评估是否需要分布式 Session",
+        "单机部署：使用内存 Session",
+        "保留 Redis Session 支持（如需要分布式）",
+        "更新安全配置"
+      ],
+      "替代方案": "单机使用内存 Session，减少 Redis 依赖",
+      "files": [
+        "src/main/java/org/example/appointment_system/config/RedisConfig.java",
+        "src/main/java/org/example/appointment_system/config/SecurityConfig.java",
+        "src/main/resources/application.properties"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-006",
+      "phase": "R2",
+      "category": "ratelimit",
+      "priority": 6,
+      "title": "限流方案优化",
+      "description": "评估并优化限流实现",
+      "current_status": "使用 Redis 实现滑动窗口限流",
+      "steps": [
+        "评估限流需求复杂度",
+        "单机部署：改用 Bucket4j 或 Guava RateLimiter",
+        "保留 Redis 限流支持（如需要分布式）",
+        "更新限流服务"
+      ],
+      "替代方案": "Bucket4j - 进程内限流，无需 Redis",
+      "files": [
+        "src/main/java/org/example/appointment_system/service/RateLimitService.java",
+        "src/main/java/org/example/appointment_system/filter/RateLimitFilter.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-007",
+      "phase": "R3",
+      "category": "async",
+      "priority": 7,
+      "title": "异步任务处理优化",
+      "description": "用 Spring @Async 替代消息队列",
+      "current_status": "使用 RabbitMQ（但实际未用），定时任务直接处理",
+      "steps": [
+        "启用 Spring @Async",
+        "改造预约通知为异步执行",
+        "保留定时任务处理核心逻辑",
+        "如需可靠异步：考虑数据库任务表方案"
+      ],
+      "替代方案": "Spring @Async + @EnableAsync",
+      "files": [
+        "src/main/java/org/example/appointment_system/service/BookingService.java",
+        "src/main/java/org/example/appointment_system/task/AppointmentScheduledTask.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-008",
+      "phase": "R4",
+      "category": "monitoring",
+      "priority": 8,
+      "title": "监控组件精简",
+      "description": "简化或移除不必要的监控组件",
+      "current_status": "包含 Prometheus、Grafana、OpenAPI 等",
+      "steps": [
+        "保留：Spring Boot Actuator（基础监控）",
+        "保留：OpenAPI（开发友好）",
+        "简化：Prometheus（个人项目不需要完整监控）",
+        "移除：过度的链路追踪配置"
+      ],
+      "files": [
+        "pom.xml",
+        "src/main/resources/application.properties",
+        "src/main/java/org/example/appointment_system/config/MetricsConfig.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-009",
+      "phase": "R4",
+      "category": "stats",
+      "priority": 9,
+      "title": "统计服务优化",
+      "description": "简化统计指标存储",
+      "current_status": "使用 Redis 存储实时统计指标",
+      "steps": [
+        "评估统计需求",
+        "简化为数据库统计查询",
+        "移除 Redis 统计键",
+        "保留定时统计汇总"
+      ],
+      "替代方案": "使用数据库聚合查询 + 定时任务",
+      "files": [
+        "src/main/java/org/example/appointment_system/service/StatisticsService.java"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-010",
+      "phase": "R5",
+      "category": "frontend",
+      "priority": 10,
+      "title": "前端依赖检查",
+      "description": "检查前端是否有未使用的依赖",
+      "current_status": "使用 Element Plus, Pinia, Axios, Vue Router",
+      "steps": [
+        "检查 package.json 依赖",
+        "移除未使用的组件",
+        "优化打包配置",
+        "考虑 Vite 优化"
+      ],
+      "files": [
+        "frontend/package.json",
+        "frontend/vite.config.ts"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-011",
+      "phase": "R6",
+      "category": "test",
+      "priority": 11,
+      "title": "测试用例更新",
+      "description": "更新测试用例以适应新的技术栈",
+      "current_status": "有单元测试和集成测试",
+      "steps": [
+        "移除 RabbitMQ 相关测试配置",
+        "添加 Caffeine 缓存测试",
+        "更新 Session 测试",
+        "确保核心业务流程测试通过"
+      ],
+      "files": [
+        "src/test/"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-012",
+      "phase": "R6",
+      "category": "deploy",
+      "priority": 12,
+      "title": "部署配置更新",
+      "description": "更新部署配置，移除不需要的服务",
+      "current_status": "docker-compose 包含 MySQL, Redis, RabbitMQ",
+      "steps": [
+        "从 docker-compose 移除 RabbitMQ",
+        "保留：MySQL（必需）",
+        "可选：Redis（取决于缓存方案）",
+        "更新部署文档"
+      ],
+      "files": [
+        "docker-compose.yml",
+        ".env.example"
+      ],
+      "passes": false
+    },
+    {
+      "id": "REFACTOR-013",
+      "phase": "R6",
+      "category": "doc",
+      "priority": 13,
+      "title": "文档更新",
+      "description": "更新项目文档，反映精简后的技术栈",
+      "current_status": "feature_list.json 标记所有功能完成",
+      "steps": [
+        "更新 README.md 技术栈说明",
+        "更新 CLAUDE.md 开发指南",
+        "创建 docs/ARCHITECTURE.md 架构决策文档",
+        "创建 docs/DEPLOYMENT.md 精简部署文档"
+      ],
+      "files": [
+        "README.md",
+        "CLAUDE.md",
+        "docs/ARCHITECTURE.md",
+        "docs/DEPLOYMENT.md"
+      ],
+      "passes": false
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "清理阶段完成",
+      "description": "移除 RabbitMQ、WebSocket 等无用配置",
+      "features": ["REFACTOR-001", "REFACTOR-002", "REFACTOR-003"],
+      "expected_outcome": "pom.xml 减少 2-3 个依赖，代码量减少"
+    },
+    {
+      "id": "M2",
+      "name": "缓存优化完成",
+      "description": "评估并优化缓存、Session、限流方案",
+      "features": ["REFACTOR-004", "REFACTOR-005", "REFACTOR-006", "REFACTOR-009"],
+      "expected_outcome": "根据需求选择 Redis 或 Caffeine，单机部署更简单"
+    },
+    {
+      "id": "M3",
+      "name": "异步处理优化完成",
+      "description": "用 @Async 替代消息队列思路",
+      "features": ["REFACTOR-007"],
+      "expected_outcome": "异步任务更简单可靠"
+    },
+    {
+      "id": "M4",
+      "name": "精简版上线",
+      "description": "完成所有重构，系统更轻量",
+      "features": ["REFACTOR-008", "REFACTOR-010", "REFACTOR-011", "REFACTOR-012", "REFACTOR-013"],
+      "expected_outcome": "更简单的技术栈，更低的维护成本"
+    }
+  ],
+  "decision_matrix": {
+    "redis_usage": {
+      "scenario_1": {
+        "description": "单机部署，不需要分布式",
+        "session": "内存 Session",
+        "cache": "Caffeine",
+        "ratelimit": "Bucket4j",
+        "stats": "数据库"
+      },
+      "scenario_2": {
+        "description": "多实例部署，需要分布式",
+        "session": "Redis Session",
+        "cache": "Redis Cache",
+        "ratelimit": "Redis 限流",
+        "stats": "Redis + 数据库"
+      }
+    },
+    "websocket_usage": {
+      "scenario_1": {
+        "description": "不需要实时通知",
+        "action": "完全移除 WebSocket 代码"
+      },
+      "scenario_2": {
+        "description": "需要单向推送（SSE 足够）",
+        "action": "用 SSE 替代 WebSocket"
+      },
+      "scenario_3": {
+        "description": "需要双向实时通信",
+        "action": "保留 WebSocket 但完善实现"
+      }
+    }
+  }
+}
