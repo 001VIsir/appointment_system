@@ -6,6 +6,35 @@
 
 ## 2026-02-21
 
+### REFACTOR-001 - 移除 RabbitMQ 依赖
+
+**完成工作**：
+
+1. **依赖清理**：
+   - 从 `pom.xml` 移除 `spring-boot-starter-amqp` 依赖
+   - 从 `pom.xml` 移除 `spring-rabbit-test` 测试依赖
+
+2. **配置清理**：
+   - 移除 `src/main/resources/application.properties` 中的 RabbitMQ 配置
+   - 移除 `config/nacos/appointment_system-dev.properties` 中的 RabbitMQ 配置
+   - 移除 `config/nacos/appointment_system-test.properties` 中的 RabbitMQ 配置
+   - 移除 `config/nacos/appointment_system-prod.properties` 中的 RabbitMQ 配置
+
+3. **文档更新**：
+   - 更新 `CLAUDE.md` 移除 RabbitMQ 引用
+   - 更新 `docs/deployment.md` 移除 RabbitMQ 相关章节
+
+4. **验证**：
+   - ✅ 编译成功
+   - ✅ 所有测试通过
+
+**功能状态**：✅ 已通过
+
+**提交 commit**：
+- `refactor: 移除未使用的 RabbitMQ 依赖`
+
+---
+
 ### 重构计划启动
 
 **背景**：项目功能已全部完成（36个功能），但存在技术栈过度设计问题。

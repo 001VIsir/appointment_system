@@ -110,9 +110,9 @@ frontend/src/
 
 ## Key Files to Know
 
-- `pom.xml`: Maven dependencies (Spring Boot 4.0.2, Spring Cloud Gateway, Spring Data JPA/Redis/RabbitMQ)
+- `pom.xml`: Maven dependencies (Spring Boot 4.0.2, Spring Cloud Gateway, Spring Data JPA/Redis)
 - `frontend/package.json`: NPM dependencies (Vue 3.4+, Element Plus 2.x, Pinia 2.x)
-- `src/main/resources/application.yml`: Backend configuration (database, redis, rabbitmq, security)
+- `src/main/resources/application.yml`: Backend configuration (database, redis, security)
 - `docs/feature_list.json`: Feature tracking with pass/fail status
 - `docs/api.md`: API documentation
 - `docs/database-design.md`: Database schema and design

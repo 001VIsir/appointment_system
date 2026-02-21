@@ -87,7 +87,7 @@
         "src/main/resources/application.properties",
         "docker-compose.yml"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-002",

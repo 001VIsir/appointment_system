@@ -13,7 +13,6 @@
 | Maven | 3.9+ | Java 构建工具 |
 | MySQL | 8.0 | 主数据库（本地安装） |
 | Redis | 7.x | 缓存/Session（本地安装） |
-| RabbitMQ | 3.12 | 消息队列（本地安装） |
 | Nacos | 2.x | 配置中心（可选，默认禁用） |
 
 ### 1.2 本地服务安装
@@ -27,11 +26,6 @@
 - 下载地址：https://redis.io/download/
 - 端口：6379
 - 或使用 Windows 兼容版本：https://github.com/tporadowski/redis/releases
-
-#### RabbitMQ 3.12 安装
-- 下载地址：https://www.rabbitmq.com/download.html
-- 端口：5672（AMQP）/ 15672（管理界面）
-- 需要安装 Erlang：https://www.erlang.org/downloads
 
 #### Nacos 2.x 安装（可选）
 - 下载地址：https://github.com/alibaba/nacos/releases
@@ -57,7 +51,7 @@ cp .env.example .env
 notepad .env
 ```
 
-确保 `.env` 文件中的数据库、Redis、RabbitMQ 配置与本地安装一致。
+确保 `.env` 文件中的数据库、Redis 配置与本地安装一致。
 
 ### 2.3 启动后端
 
@@ -69,7 +63,6 @@ notepad .env
 后端启动后会：
 1. 连接 MySQL 运行 Flyway 迁移
 2. 连接 Redis 存储 Session
-3. 连接 RabbitMQ 监听消息
 
 ### 2.4 启动前端
 
@@ -90,7 +83,6 @@ npm run dev
 | 后端 API | http://localhost:8080 | Spring Boot |
 | API 文档 | http://localhost:8080/swagger-ui.html | Swagger UI |
 | 前端应用 | http://localhost:5173 | Vue 3 开发服务器 |
-| RabbitMQ 管理 | http://localhost:15672 | 用户名/密码: guest/guest |
 
 ## 3. 项目结构
 
@@ -159,15 +151,6 @@ spring.data.redis.host=localhost
 spring.data.redis.port=6379
 ```
 
-### RabbitMQ 配置
-
-```properties
-spring.rabbitmq.host=localhost
-spring.rabbitmq.port=5672
-spring.rabbitmq.username=guest
-spring.rabbitmq.password=guest
-```
-
 ### Nacos 配置（可选，默认禁用）
 
 **启用 Nacos 配置中心：**
@@ -214,10 +197,6 @@ docker run -d --name nacos \
 ### Redis 连接失败
 - 检查 Redis 服务是否启动
 - 验证端口 6379 是否可访问
-
-### RabbitMQ 连接失败
-- 检查 RabbitMQ 服务是否启动
-- 确认 Erlang 环境变量配置正确
 
 ### 端口被占用
 - Windows 使用 `netstat -ano` 查看端口占用
