@@ -2,6 +2,20 @@
 
 ## 2026-02-22
 
+### 重要澄清：分布式部署场景
+
+**误解修正**:
+之前错误地将项目理解为单机部署场景，计划用 Caffeine/Bucket4j 替代 Redis。
+实际上这是**分布式部署**项目（小规模集群），需要保留 Redis 的以下功能：
+- **Redis Cache** - 分布式缓存
+- **Redis Session** - Session 共享
+- **Redis Rate Limit** - 分布式限流
+- **Redis Statistics** - 多实例统计汇总
+
+REFACTOR-004、005、006、009 已重新评估，确认为"分布式部署需要，保留现有配置"。
+
+---
+
 ### 完成任务: REFACTOR-003 评估 Nacos 必要性
 
 **问题分析**:
@@ -17,6 +31,5 @@
 - `./mvnw clean compile -DskipTests` ✅ 编译成功
 
 **下一步任务**:
-- REFACTOR-004: 缓存方案优化
-- REFACTOR-005: Session 方案优化
-- REFACTOR-006: 限流方案优化
+- REFACTOR-007: 异步任务处理优化
+- REFACTOR-008: 监控组件精简

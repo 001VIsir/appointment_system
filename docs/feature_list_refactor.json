@@ -142,19 +142,20 @@
       "priority": 4,
       "title": "缓存方案优化",
       "description": "评估并优化缓存使用，考虑 Caffeine 内存缓存",
-      "current_status": "使用 Redis 作为缓存",
+      "current_status": "已评估 - 分布式部署保留 Redis Cache",
       "steps": [
         "评估是否需要分布式缓存",
         "单机部署：改用 Caffeine（更快更简单）",
         "保留 Redis 支持（如需要分布式）",
         "更新缓存配置"
       ],
-      "替代方案": "Caffeine - 进程内缓存，适合单机部署",
+      "决策": "分布式部署需要 Redis Cache，保持现有配置",
+      "替代方案": "Caffeine - 进程内缓存，适合单机部署（不适用）",
       "files": [
         "src/main/java/org/example/appointment_system/config/CacheConfig.java",
         "pom.xml"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-005",
@@ -163,20 +164,21 @@
       "priority": 5,
       "title": "Session 方案优化",
       "description": "评估并优化 Session 存储方案",
-      "current_status": "使用 Redis 存储 Session",
+      "current_status": "已评估 - 分布式部署保留 Redis Session",
       "steps": [
         "评估是否需要分布式 Session",
         "单机部署：使用内存 Session",
         "保留 Redis Session 支持（如需要分布式）",
         "更新安全配置"
       ],
-      "替代方案": "单机使用内存 Session，减少 Redis 依赖",
+      "决策": "分布式部署需要 Redis Session 共享，保持现有配置",
+      "替代方案": "单机使用内存 Session（不适用）",
       "files": [
         "src/main/java/org/example/appointment_system/config/RedisConfig.java",
         "src/main/java/org/example/appointment_system/config/SecurityConfig.java",
         "src/main/resources/application.properties"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-006",
@@ -185,19 +187,20 @@
       "priority": 6,
       "title": "限流方案优化",
       "description": "评估并优化限流实现",
-      "current_status": "使用 Redis 实现滑动窗口限流",
+      "current_status": "已评估 - 分布式部署保留 Redis 限流",
       "steps": [
         "评估限流需求复杂度",
         "单机部署：改用 Bucket4j 或 Guava RateLimiter",
         "保留 Redis 限流支持（如需要分布式）",
         "更新限流服务"
       ],
-      "替代方案": "Bucket4j - 进程内限流，无需 Redis",
+      "决策": "分布式部署需要 Redis 分布式限流，保持现有配置",
+      "替代方案": "Bucket4j - 进程内限流（不适用）",
       "files": [
         "src/main/java/org/example/appointment_system/service/RateLimitService.java",
         "src/main/java/org/example/appointment_system/filter/RateLimitFilter.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-007",
@@ -248,18 +251,19 @@
       "priority": 9,
       "title": "统计服务优化",
       "description": "简化统计指标存储",
-      "current_status": "使用 Redis 存储实时统计指标",
+      "current_status": "已评估 - 分布式部署保留 Redis 统计",
       "steps": [
         "评估统计需求",
         "简化为数据库统计查询",
         "移除 Redis 统计键",
         "保留定时统计汇总"
       ],
-      "替代方案": "使用数据库聚合查询 + 定时任务",
+      "决策": "分布式部署需要 Redis 汇总多实例统计数据，保持现有配置",
+      "替代方案": "使用数据库聚合查询 + 定时任务（不适用）",
       "files": [
         "src/main/java/org/example/appointment_system/service/StatisticsService.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-010",

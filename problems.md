@@ -367,3 +367,41 @@ Spring Cloud Alibaba Nacos 与 Spring Boot 4.0 不兼容
 - 减少了 pom.xml 中的无用配置
 - 删除了无效的 bootstrap.properties 文件
 - 项目结构更清晰，没有死代码
+
+---
+
+## 重要澄清：分布式部署场景 (2026-02-22)
+
+### 误解说明
+
+在执行 REFACTOR-004~006 时，错误地将项目理解为**单机部署**场景，计划：
+- 用 Caffeine 替代 Redis Cache
+- 用内存 Session 替代 Redis Session
+- 用 Bucket4j 替代 Redis 限流
+
+### 实际情况
+
+项目是**分布式部署**（小规模集群），需要保留 Redis 的以下功能：
+
+| 功能 | 用途 | 是否保留 |
+|------|------|---------|
+| Redis Cache | 分布式缓存 | ✅ 保留 |
+| Redis Session | Session 共享 | ✅ 保留 |
+| Redis Rate Limit | 分布式限流 | ✅ 保留 |
+| Redis Statistics | 多实例统计汇总 | ✅ 保留 |
+
+### 已执行操作
+
+1. 回滚了错误实施的 REFACTOR-004、005、006 更改
+2. 更新 feature_list_refactor.json，将 REFACTOR-004、005、006、009 标记为"已评估 - 分布式部署需要，保留现有配置"
+
+### 正确的优化方向
+
+对于分布式部署，真正可以优化的：
+- REFACTOR-001: 移除未使用的 RabbitMQ ✅ 已完成
+- REFACTOR-002: 清理 WebSocket 配置 ✅ 已完成
+- REFACTOR-003: 清理 Nacos 配置 ✅ 已完成
+- REFACTOR-007: 异步任务处理（评估是否需要消息队列）
+- REFACTOR-008: 监控组件精简
+- REFACTOR-010~013: 前端、测试、部署、文档
+
