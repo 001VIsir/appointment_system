@@ -12,13 +12,14 @@
 ## 技术栈
 
 ### 后端
-- Spring Boot 4.0.2 + Java 21
+- Spring Boot 3.2.x + Java 17
 - Spring Data JPA + Hibernate
 - Spring Security 6.x
-- Redis (Session + 缓存 + 限流)
-- RabbitMQ (异步消息)
+- Redis (Session + 缓存 + 限流 + 统计)
 - MySQL 8.0
 - Flyway (数据库迁移)
+- Spring Boot Actuator (健康检查)
+- OpenAPI (API 文档)
 
 ### 前端
 - Vue 3 + TypeScript
@@ -30,19 +31,18 @@
 
 ### 前置要求
 
-- JDK 21+
+- JDK 17+
 - Node.js 18+
 - Maven 3.9+
 - MySQL 8.0（本地安装）
 - Redis 7.x（本地安装）
-- RabbitMQ 3.12（本地安装）
 
 ### 启动项目
 
 ```bash
 # 1. 配置环境变量
 cp .env.example .env
-# 编辑 .env 文件，配置数据库、Redis、RabbitMQ 连接信息
+# 编辑 .env 文件，配置数据库、Redis 连接信息
 
 # 2. 启动后端
 ./mvnw spring-boot:run

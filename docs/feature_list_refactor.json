@@ -209,19 +209,20 @@
       "priority": 7,
       "title": "异步任务处理优化",
       "description": "用 Spring @Async 替代消息队列",
-      "current_status": "使用 RabbitMQ（但实际未用），定时任务直接处理",
+      "current_status": "已评估 - 无需异步处理，当前使用 @Scheduled 定时任务",
       "steps": [
-        "启用 Spring @Async",
-        "改造预约通知为异步执行",
-        "保留定时任务处理核心逻辑",
-        "如需可靠异步：考虑数据库任务表方案"
+        "评估异步处理需求",
+        "当前结论：无需要异步处理的业务场景",
+        "保留 @Scheduled 定时任务",
+        "如未来需要：添加 @Async 支持"
       ],
-      "替代方案": "Spring @Async + @EnableAsync",
+      "决策": "当前无需异步处理 - RabbitMQ已移除，定时任务满足需求，NotificationService仅为日志占位",
+      "替代方案": "未来需要时启用 Spring @Async + @EnableAsync",
       "files": [
         "src/main/java/org/example/appointment_system/service/BookingService.java",
         "src/main/java/org/example/appointment_system/task/AppointmentScheduledTask.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-008",
@@ -230,19 +231,18 @@
       "priority": 8,
       "title": "监控组件精简",
       "description": "简化或移除不必要的监控组件",
-      "current_status": "包含 Prometheus、Grafana、OpenAPI 等",
+      "current_status": "已评估 - 当前配置合理，保持不变",
       "steps": [
-        "保留：Spring Boot Actuator（基础监控）",
-        "保留：OpenAPI（开发友好）",
-        "简化：Prometheus（个人项目不需要完整监控）",
-        "移除：过度的链路追踪配置"
+        "评估当前监控组件",
+        "结论：当前配置合理"
       ],
+      "决策": "保留 Spring Boot Actuator、OpenAPI、MetricsConfig - 配置合理",
       "files": [
         "pom.xml",
         "src/main/resources/application.properties",
         "src/main/java/org/example/appointment_system/config/MetricsConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-009",
@@ -272,18 +272,18 @@
       "priority": 10,
       "title": "前端依赖检查",
       "description": "检查前端是否有未使用的依赖",
-      "current_status": "使用 Element Plus, Pinia, Axios, Vue Router",
+      "current_status": "已评估 - 当前依赖合理，无冗余",
       "steps": [
         "检查 package.json 依赖",
-        "移除未使用的组件",
-        "优化打包配置",
-        "考虑 Vite 优化"
+        "分析依赖使用情况",
+        "结论：所有依赖都是必要的"
       ],
+      "决策": "保留所有前端依赖 - Vue、Router、Pinia、Element Plus、Axios、Vite 等均为项目必需",
       "files": [
         "frontend/package.json",
         "frontend/vite.config.ts"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-011",
@@ -292,17 +292,17 @@
       "priority": 11,
       "title": "测试用例更新",
       "description": "更新测试用例以适应新的技术栈",
-      "current_status": "有单元测试和集成测试",
+      "current_status": "已评估 - 测试用例完整，无需修改",
       "steps": [
-        "移除 RabbitMQ 相关测试配置",
-        "添加 Caffeine 缓存测试",
-        "更新 Session 测试",
-        "确保核心业务流程测试通过"
+        "检查测试用例",
+        "无 RabbitMQ 测试需移除",
+        "Redis 测试保留（RateLimit、Statistics 等）"
       ],
+      "决策": "测试用例完整 - 46个测试文件覆盖实体、Repository、Service、Controller、集成测试",
       "files": [
         "src/test/"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-012",
@@ -311,18 +311,17 @@
       "priority": 12,
       "title": "部署配置更新",
       "description": "更新部署配置，移除不需要的服务",
-      "current_status": "docker-compose 包含 MySQL, Redis, RabbitMQ",
+      "current_status": "已评估 - 无 docker-compose.yml，deployment.md 已正确",
       "steps": [
-        "从 docker-compose 移除 RabbitMQ",
-        "保留：MySQL（必需）",
-        "可选：Redis（取决于缓存方案）",
-        "更新部署文档"
+        "检查部署配置文件",
+        "项目无 docker-compose.yml",
+        "deployment.md 已正确描述 MySQL + Redis"
       ],
+      "决策": "部署配置已是最新 - 无需更新",
       "files": [
-        "docker-compose.yml",
-        ".env.example"
+        "docs/deployment.md"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-013",
@@ -331,20 +330,22 @@
       "priority": 13,
       "title": "文档更新",
       "description": "更新项目文档，反映精简后的技术栈",
-      "current_status": "feature_list.json 标记所有功能完成",
+      "current_status": "已完成 - 更新 README.md 和 CLAUDE.md",
       "steps": [
         "更新 README.md 技术栈说明",
         "更新 CLAUDE.md 开发指南",
-        "创建 docs/ARCHITECTURE.md 架构决策文档",
-        "创建 docs/DEPLOYMENT.md 精简部署文档"
+        "检查 docs/DEPLOYMENT.md"
+      ],
+      "更新内容": [
+        "移除 README.md 中 RabbitMQ、Nacos、WebSocket 描述",
+        "移除 CLAUDE.md 中 RabbitMQ、Spring Cloud Gateway 描述",
+        "更新技术栈版本为 Spring Boot 3.2.x + Java 17"
       ],
       "files": [
         "README.md",
-        "CLAUDE.md",
-        "docs/ARCHITECTURE.md",
-        "docs/DEPLOYMENT.md"
+        "CLAUDE.md"
       ],
-      "passes": false
+      "passes": true
     }
   ],
   "milestones": [

@@ -66,7 +66,7 @@ The backend runs on http://localhost:8080 and frontend on http://localhost:5173.
 
 ```
 org.example.appointment_system/
-├── config/          # Configuration classes (Security, Redis, RabbitMQ, OpenAPI)
+├── config/          # Configuration classes (Security, Redis, Cache, OpenAPI)
 ├── controller/     # REST controllers (Auth, User, Merchant, Booking, Admin)
 ├── service/        # Business logic services
 ├── repository/     # Spring Data JPA repositories
@@ -97,9 +97,7 @@ frontend/src/
 ### Infrastructure
 
 - **MySQL 8.0** (port 3306): Main database, managed by Flyway migrations in `src/main/resources/db/migration`
-- **Redis 7.x** (port 6379): Session storage, caching, rate limiting
-- **RabbitMQ 3.12** (port 5672): Async booking queue
-- **Spring Cloud Gateway** (port 8080): API gateway with rate limiting and routing
+- **Redis 7.x** (port 6379): Session storage, caching, rate limiting, statistics
 
 ### Authentication
 
@@ -110,7 +108,7 @@ frontend/src/
 
 ## Key Files to Know
 
-- `pom.xml`: Maven dependencies (Spring Boot 4.0.2, Spring Cloud Gateway, Spring Data JPA/Redis)
+- `pom.xml`: Maven dependencies (Spring Boot 3.2.x, Spring Data JPA/Redis)
 - `frontend/package.json`: NPM dependencies (Vue 3.4+, Element Plus 2.x, Pinia 2.x)
 - `src/main/resources/application.yml`: Backend configuration (database, redis, security)
 - `docs/feature_list.json`: Feature tracking with pass/fail status
