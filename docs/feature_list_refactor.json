@@ -121,7 +121,7 @@
       "priority": 3,
       "title": "评估 Nacos 必要性",
       "description": "评估 Nacos 配置中心是否真的需要",
-      "current_status": "默认禁用，仅预留",
+      "current_status": "已清理 - 移除了无用的 Spring Cloud Alibaba BOM 和 bootstrap.properties",
       "steps": [
         "评估多环境部署需求",
         "如果单环境：移除 Nacos 相关配置",
@@ -133,7 +133,7 @@
         "src/main/resources/bootstrap.properties",
         "pom.xml"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-004",
