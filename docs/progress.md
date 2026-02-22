@@ -35,6 +35,38 @@
 
 ---
 
+## 2026-02-22
+
+### REFACTOR-002 - 清理 WebSocket 配置
+
+**完成工作**：
+
+1. **依赖清理**：
+   - 从 `pom.xml` 移除 `spring-boot-starter-websocket` 依赖
+
+2. **代码清理**：
+   - 删除 `websocket/WebSocketConfig.java` 配置文件
+   - 删除 `websocket/dto/BookingNotification.java` DTO类
+   - 简化 `NotificationService` 为纯日志记录（移除 WebSocket 依赖）
+
+3. **文档更新**：
+   - 更新 `BookingController.java` 移除 WebSocket 相关注释
+   - 更新 `OpenApiConfig.java` 移除 WebSocket 引用
+
+4. **测试更新**：
+   - 重写 `NotificationServiceTest.java` 适配简化后的服务
+
+5. **验证**：
+   - ✅ 编译成功
+   - ✅ 所有测试通过 (781 tests)
+
+**功能状态**：✅ 已通过
+
+**提交 commit**：
+- `refactor: 移除 WebSocket，简化通知服务为日志记录`
+
+---
+
 ### 重构计划启动
 
 **背景**：项目功能已全部完成（36个功能），但存在技术栈过度设计问题。

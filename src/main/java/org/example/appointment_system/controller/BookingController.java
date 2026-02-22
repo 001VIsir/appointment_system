@@ -35,11 +35,9 @@ import java.util.List;
  *   <li>预约状态更新</li>
  * </ul>
  *
- * <h3>实时通知：</h3>
- * <p>当预约被创建或更新时，通过NotificationService向相关商家发送WebSocket通知。</p>
- *
- * <h3>WebSocket集成：</h3>
- * <p>商家可以连接到/ws接收实时预约通知。</p>
+ * <h3>通知服务：</h3>
+ * <p>当预约被创建或更新时，通过NotificationService记录日志。
+ * 用户刷新页面可查看最新预约状态。</p>
  */
 @RestController
 @RequiredArgsConstructor
@@ -61,7 +59,7 @@ public class BookingController {
      * <p>为当前已认证用户在指定时段创建预约。
      * 使用乐观锁防止超售。</p>
      *
-     * <p>预约成功后，向商家发送WebSocket通知。</p>
+     * <p>预约成功后，向商家发送通知。</p>
      *
      * @param request 包含slotId和可选备注的预约请求
      * @return 包含已创建预约详情的BookingResponse
@@ -79,7 +77,7 @@ public class BookingController {
 
         BookingResponse response = bookingService.createBooking(request);
 
-        // 发送WebSocket通知给商家
+        // 发送通知给商家
         notificationService.notifyNewBooking(response);
 
         log.info("Booking created successfully: id={}", response.getId());
@@ -171,7 +169,7 @@ public class BookingController {
      * 取消预约。
      *
      * <p>只有创建预约的用户可以取消它。
-     * 取消时向商家发送WebSocket通知。</p>
+     * 取消时向商家发送通知。</p>
      *
      * @param id 要取消的预约ID
      * @return 更新后的预约详情
@@ -191,7 +189,7 @@ public class BookingController {
 
         BookingResponse response = bookingService.cancelBooking(id);
 
-        // 发送WebSocket通知给商家
+        // 发送通知给商家
         notificationService.notifyBookingCancelled(response);
 
         log.info("Booking cancelled: id={}", id);
@@ -253,7 +251,7 @@ public class BookingController {
      * 确认预约（商家操作）。
      *
      * <p>将预约状态从PENDING更改为CONFIRMED。
-     * 向用户发送WebSocket通知。</p>
+     * 向用户发送通知。</p>
      *
      * @param id 要确认的预约ID
      * @return 更新后的预约详情
@@ -275,7 +273,7 @@ public class BookingController {
         Long merchantId = getCurrentMerchantId();
         BookingResponse response = bookingService.confirmBooking(id, merchantId);
 
-        // 发送WebSocket通知给用户
+        // 发送通知给用户
         notificationService.notifyBookingConfirmed(response);
 
         log.info("Booking confirmed: id={}", id);
@@ -286,7 +284,7 @@ public class BookingController {
      * 将预约标记为已完成（商家操作）。
      *
      * <p>将预约状态从CONFIRMED更改为COMPLETED。
-     * 向用户发送WebSocket通知。</p>
+     * 向用户发送通知。</p>
      *
      * @param id 要完成的预约ID
      * @return 更新后的预约详情
@@ -308,7 +306,7 @@ public class BookingController {
         Long merchantId = getCurrentMerchantId();
         BookingResponse response = bookingService.completeBooking(id, merchantId);
 
-        // 发送WebSocket通知给用户
+        // 发送通知给用户
         notificationService.notifyBookingCompleted(response);
 
         log.info("Booking completed: id={}", id);
@@ -319,7 +317,7 @@ public class BookingController {
      * 取消预约（商家操作）。
      *
      * <p>商家可以取消自己任务上的预约。
-     * 向用户发送WebSocket通知。</p>
+     * 向用户发送通知。</p>
      *
      * @param id 要取消的预约ID
      * @return 更新后的预约详情
@@ -341,7 +339,7 @@ public class BookingController {
         Long merchantId = getCurrentMerchantId();
         BookingResponse response = bookingService.cancelBookingByMerchant(id, merchantId);
 
-        // 发送WebSocket通知给用户
+        // 发送通知给用户
         notificationService.notifyBookingCancelled(response);
 
         log.info("Booking cancelled by merchant: id={}", id);

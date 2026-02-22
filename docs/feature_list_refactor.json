@@ -112,7 +112,7 @@
         "src/main/java/org/example/appointment_system/websocket/",
         "src/main/java/org/example/appointment_system/config/WebSocketConfig.java"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "REFACTOR-003",
